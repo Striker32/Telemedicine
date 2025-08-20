@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_medicine/components/My_button.dart';
 import 'package:flutter_medicine/components/my_textfield.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage ({super.key});
+
+  // email and px text controllers
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _pwController = TextEditingController();
+
+  LoginPage ({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +26,7 @@ class LoginPage extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             // welcome back
+            const SizedBox(height: 25),
             Text(
               "Welcome back, you've benn missed!",
               style: TextStyle(
@@ -31,12 +38,22 @@ class LoginPage extends StatelessWidget {
             const SizedBox(height: 25),
 
             // email textfield
-            MytextField(),
+            MytextField(
+              hintText: "Email",
+              obscuretext: false,
+              controller: _emailController,
+            ),
             // password textfield
-
+            const SizedBox(height: 10),
+            MytextField(
+              hintText: "Password",
+              obscuretext: true,
+              controller: _pwController,
+            ),
             // login button
-
+            const SizedBox(height: 25),
             // register suggestion
+            MyButton()
           ],
         ),
       )
