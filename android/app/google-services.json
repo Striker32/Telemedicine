@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "532463762432",
+    "project_id": "telemedicine-811f6",
+    "storage_bucket": "telemedicine-811f6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532463762432:android:9c0742e35ed3af853dace5",
+        "android_client_info": {
+          "package_name": "com.example.flutter_medicine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPqFDSzPe2vnJxsvNfFPGG9yIvLAKNLL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532463762432:android:5d27dedd2128d7c83dace5",
+        "android_client_info": {
+          "package_name": "com.example.last_telemedicine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPqFDSzPe2vnJxsvNfFPGG9yIvLAKNLL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532463762432:android:559910309b25c6013dace5",
+        "android_client_info": {
+          "package_name": "com.example.telemedicine2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPqFDSzPe2vnJxsvNfFPGG9yIvLAKNLL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
