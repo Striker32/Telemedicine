@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/auth/auth_service.dart';
 import 'package:last_telemedicine/components/My_button.dart';
+import 'package:last_telemedicine/components/back_button.dart';
 import 'package:last_telemedicine/components/my_textfield.dart';
+import 'package:last_telemedicine/pages/Choose_profile.dart';
 
 class LoginPage extends StatelessWidget {
 
@@ -111,7 +113,9 @@ class LoginPage extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),),
                 ),
               ],
-            )
+            ),
+            // Кнопка НАЗАД
+            BackButtonRed(),
           ],
         ),
       )

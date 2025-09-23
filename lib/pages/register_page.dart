@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/My_button.dart';
 import 'package:last_telemedicine/components/my_textfield.dart';
 
+import '../components/back_button.dart';
+
 class RegisterPage extends StatelessWidget{
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
@@ -92,7 +94,9 @@ void register() {
                       style: TextStyle(fontWeight: FontWeight.bold),),
                   ),
                 ],
-              )
+              ),
+              // Кнопка НАЗАД
+              BackButtonRed(),
             ],
           ),
         )
