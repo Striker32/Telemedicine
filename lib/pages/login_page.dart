@@ -52,7 +52,8 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Center(
+      body:
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -115,7 +116,6 @@ class LoginPage extends StatelessWidget {
               ],
             ),
             // Кнопка НАЗАД
-            BackButtonRed(),
           ],
         ),
       )

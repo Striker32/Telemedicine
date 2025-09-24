@@ -27,6 +27,9 @@ void register() {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
+        appBar: AppBar(
+          leading: AppBarBackButton(),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -96,7 +99,6 @@ void register() {
                 ],
               ),
               // Кнопка НАЗАД
-              BackButtonRed(),
             ],
           ),
         )
