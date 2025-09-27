@@ -20,7 +20,7 @@ class AppBarBackButton extends StatelessWidget {
         onPressed: onTap ?? () => Navigator.maybePop(context), // че при нажатии делать
         style: TextButton.styleFrom(
           minimumSize: const Size(0, 0),
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         child: Text(

@@ -1,49 +1,35 @@
 import 'package:flutter/material.dart';
 
+import '../../components/back_button.dart' show AppBarBackButton;
+
 class RegisterPageUser extends StatelessWidget {
   const RegisterPageUser({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // цветовая палитра — подбери точнее под макет
-    final Color primaryText = Colors.black87;
-    final Color hintGray = Colors.grey.shade400;
-    final Color subtleGray = Colors.grey.shade200;
+    // цветовая палитра
+
     final Color pinkBg = const Color(0xFFFFF0F3); // пример светло-розового фона кнопки
     final Color pinkText = const Color(0xFFFF6B86); // пример розового текста кнопки
 
     // общий отступ по горизонтали
-    const horizontalPadding = 24.0;
+    const horizontalPadding = 10.0;
+    const dividerOfContinue = 10.0;
+
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
-        elevation: 0,
-        titleSpacing: 0,
-        // Используем leading как текстовую кнопку слева
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 8.0),
-          child: TextButton(
-            onPressed: () => Navigator.maybePop(context),
-            style: TextButton.styleFrom(
-              minimumSize: const Size(0, 0),
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: const Text(
-              'Назад',
-              style: TextStyle(
-                fontFamily: 'SF Pro Display',
-                fontSize: 20, // оставил 20 — как в описании для hintText
-                fontWeight: FontWeight.w400,
-                color: Color(0xFFFF497C), // яркий розовый (пример)
-              ),
-            ),
-          ),
+        automaticallyImplyLeading: false, // убираем стандартные рамки
+        titleSpacing: 0, // убираем отступы слева
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: AppBarBackButton(),
         ),
       ),
+
+
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -51,6 +37,7 @@ class RegisterPageUser extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 24),
+
 
               // Заголовок
               const Text(
@@ -65,6 +52,8 @@ class RegisterPageUser extends StatelessWidget {
               ),
 
               const SizedBox(height: 18),
+
+
 
               // Подзаголовок
               Text(
@@ -108,7 +97,7 @@ class RegisterPageUser extends StatelessWidget {
               // Поле: Имя и Фамилия
               TextFormField(
                 decoration: const InputDecoration(
-                  hintText: 'Имя и Фамилия пациента',
+                  hintText: '  Имя и Фамилия пациента',
                   hintStyle: TextStyle(
                     fontFamily: 'SF Pro Display',
                     color: Colors.grey,
@@ -126,10 +115,10 @@ class RegisterPageUser extends StatelessWidget {
 
               const Divider(height: 1, thickness: 1, color: Colors.black12),
 
-              const SizedBox(height: 8),
 
               // Телефон: +7 и поле
               Container(
+                // сделать палку снизу
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Colors.black12, width: 1),
@@ -144,7 +133,7 @@ class RegisterPageUser extends StatelessWidget {
                         ),
                       ),
                       width: 72,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 18), // размер палка справа от +7
                       alignment: Alignment.centerLeft,
                       // граница между кодом и полем — реализована визуально через контейнер
                       child: Center(
@@ -158,8 +147,9 @@ class RegisterPageUser extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const VerticalDivider(width: 1, thickness: 1, color: Colors.black12),
+
                     const SizedBox(width: 12),
+
                     Expanded(
                       child: TextFormField(
                         keyboardType: TextInputType.phone,
@@ -185,27 +175,31 @@ class RegisterPageUser extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 4),
-
-              const Divider(height: 1, thickness: 1, color: Colors.black12),
 
               // Пароль
-              TextFormField(
-                obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: 'Пароль',
-                  hintStyle: TextStyle(
-                    fontFamily: 'SF Pro Display',
-                    color: Colors.grey,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black12, width: 1),
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 18),
                 ),
-                style: const TextStyle(
-                  fontFamily: 'SF Pro Display',
-                  fontSize: 20,
+                child: TextFormField(
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    hintText: '  Пароль',
+                    hintStyle: TextStyle(
+                      fontFamily: 'SF Pro Display',
+                      color: Colors.grey,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 18),
+                  ),
+                  style: const TextStyle(
+                    fontFamily: 'SF Pro Display',
+                    fontSize: 20,
+                  ),
                 ),
               ),
 
@@ -263,7 +257,7 @@ class RegisterPageUser extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 36), // нижний отступ
+              const SizedBox(height: dividerOfContinue), // нижний отступ
             ],
           ),
         ),

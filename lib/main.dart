@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:last_telemedicine/pages/Choose_profile.dart';
-import 'package:last_telemedicine/pages/register_user.dart';
+import 'package:last_telemedicine/pages/user_pages/login_user.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
+import 'package:last_telemedicine/pages/user_pages/register_user.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/auth/auth_gate.dart';
@@ -22,7 +24,7 @@ class Myapp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-        home: RegisterPageUser(),
+        home: ProfilePage(),
         theme: lightMode,
     );
   }

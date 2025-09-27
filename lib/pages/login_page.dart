@@ -52,6 +52,14 @@ class LoginPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // убираем стандартные рамки
+          titleSpacing: 0, // убираем отступы слева
+          title: Align(
+            alignment: Alignment.centerLeft,
+            child: AppBarBackButton(),
+          ),
+        ),
       body:
       Center(
         child: Column(

@@ -28,7 +28,12 @@ void register() {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
-          leading: AppBarBackButton(),
+          automaticallyImplyLeading: false, // убираем стандартные рамки
+          titleSpacing: 0, // убираем отступы слева
+          title: Align(
+            alignment: Alignment.centerLeft,
+            child: AppBarBackButton(),
+          ),
         ),
         body: Center(
           child: Column(
