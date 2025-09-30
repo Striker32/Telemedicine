@@ -25,7 +25,9 @@ class Myapp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
         home: ProfilePage(),
-        theme: lightMode,
+        theme: ThemeData(
+          fontFamily: "SF Pro Display",
+        ),
     );
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:last_telemedicine/components/My_button.dart';
-import 'package:last_telemedicine/components/my_textfield.dart';
+import 'package:last_telemedicine/components/legacy/My_button.dart';
+import 'package:last_telemedicine/components/legacy/my_textfield.dart';
 
 import '../components/back_button.dart';
 
