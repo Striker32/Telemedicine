@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
-import 'package:last_telemedicine/components/bottom_navigation_bar.dart';
+import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -10,9 +10,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // Индекс выбранной вкладки: Профиль
-  int _index = 2;
-  final _pages = [Placeholder(), Placeholder(), ProfilePage()];
+
 
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
@@ -207,33 +205,6 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
-
-        bottomNavigationBar: BottomNavBar(
-          currentIndex: _index,
-          onTap: (i) => setState(() => _index = i)
-        ),
-
-
-      // Нижний таббар
-      /*bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (i) {
-          setState(() => _currentIndex = i);
-          // TODO: навигация по вкладкам
-        },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: kNavSelected,
-        unselectedItemColor: kNavUnselected,
-        showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-        unselectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Поиск'),
-          BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), label: 'Заявки'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Чаты'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профиль'),
-        ],
-      ),*/
     );
   }
 }

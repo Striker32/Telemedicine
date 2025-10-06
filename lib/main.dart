@@ -3,6 +3,7 @@ import 'package:last_telemedicine/pages/Choose_profile.dart';
 import 'package:last_telemedicine/pages/user_pages/login_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
 import 'package:last_telemedicine/pages/user_pages/register_user.dart';
+import 'Services/Bottom_Navigator.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/auth/auth_gate.dart';
@@ -24,7 +25,7 @@ class Myapp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-        home: ProfilePage(),
+        home: BottomNavigator(),
         theme: ThemeData(
           fontFamily: "SF Pro Display",
         ),
