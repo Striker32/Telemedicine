@@ -60,7 +60,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/fonts/
-    - assets/images/icons/feed_icon.png
+    - assets/images/icons/
 
   fonts:
     - family: SF Pro Display

@@ -41,8 +41,12 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             ),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
+            icon: ImageIcon(AssetImage('assets/images/icons/heart_icon.png')),
             label: 'Заявки',
+            activeIcon: ImageIcon(
+              AssetImage('assets/images/icons/heart_icon.png'),
+              color: const Color(0xFFFF497C),
+            ),
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профиль'),
         ],

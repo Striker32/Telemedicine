@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 
+import '../../components/DividerLine.dart';
+import '../../components/Infofield.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -147,31 +150,31 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Поля информации — без иконок, с тонкими разделителями
 
-            const _InfoField(
+            const InfoField(
                 title: 'Номер телефона',
                 value: '+7 900 502 9229'
             ),
 
-            const _DividerLine(),
+            const DividerLine(),
 
-            const _InfoField(
+            const InfoField(
                 title: 'Почта',
                 value: 'example@mail.ru',
 
             ),
 
-            const _DividerLine(),
+            const DividerLine(),
 
-            const _InfoField(
+            const InfoField(
                 title: 'Город',
                 value: 'Санкт-Петербург',
             ),
 
-            const _DividerLine(),
+            const DividerLine(),
 
             const SizedBox(height: 20),
 
-            const _DividerLine(),
+            const DividerLine(),
 
             // Кнопки действий
             Padding(
@@ -183,20 +186,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.red.shade200,
                   ),
 
-                  const _DividerLine(),
+                  const DividerLine(),
 
 
                   const SizedBox(height: 12),
 
 
-                  const _DividerLine(),
+                  const DividerLine(),
 
                   const CustomButton(
                     label: 'Выйти',
                     color: Colors.red,
                   ),
 
-                  const _DividerLine(),
+                  const DividerLine(),
                 ],
               ),
             ),
@@ -204,76 +207,6 @@ class _ProfilePageState extends State<ProfilePage> {
             const Spacer(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// Поле информации: заголовок и значение, без иконок
-class _InfoField extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const _InfoField({
-    Key? key,
-    required this.title,
-    required this.value,
-
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // TODO: действие по тапу поля (если требуется)
-      },
-      child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Container(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                value,
-                style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: _ProfilePageState.kSecondaryText,
-
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DividerLine extends StatelessWidget {
-  final double lenght;
-
-  const _DividerLine({
-    Key? key,
-    this.lenght = 1.0,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: lenght),
-      child: const Divider(
-          height: 2,
-          color: _ProfilePageState.kDivider,
       ),
     );
   }
