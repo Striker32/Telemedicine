@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:last_telemedicine/components/home_page.dart';
+import 'package:last_telemedicine/pages/home_page.dart';
 import 'package:last_telemedicine/pages/login_page.dart';
 
 import 'package:last_telemedicine/auth/login_or_register.dart';
