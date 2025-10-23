@@ -17,13 +17,13 @@ class InfoField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        // TODO: действие по тапу поля (если требуется)
-      },
+      // onTap: () {
+      //   // TODO: действие по тапу поля (если требуется)
+      // },
       child: Container(
         color: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Container(
+
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -46,7 +46,7 @@ class InfoField extends StatelessWidget {
               ),
             ],
           ),
-        ),
+
       ),
     );
   }

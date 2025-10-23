@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
+import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 
 import '../pages/Placeholder.dart';
+import '../pages/user_pages/profile_change_user.dart';
 import '../pages/user_pages/profile_user.dart';
 
 class BottomNavigator extends StatefulWidget {
@@ -13,7 +16,7 @@ class BottomNavigator extends StatefulWidget {
 class _BottomNavigatorState extends State<BottomNavigator> {
   int _currentIndex = 2;
 
-  final List<Widget> _pages = [HomePage(), HomePage(), ProfilePage()];
+  final List<Widget> _pages = [ChangeCityPage(), ChangePageUser(), SettingsPage()];
 
   void _navigateBottomBar(int index) {
     setState(() {

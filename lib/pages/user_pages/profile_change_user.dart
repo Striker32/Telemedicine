@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:last_telemedicine/components/AvatarWithPicker.dart';
+import 'package:last_telemedicine/components/SettingsRow.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
+import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 
 import '../../components/DividerLine.dart';
-import '../../components/SettingsRow.dart';
+import '../../components/back_button.dart';
 import '../../themes/AppColors.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ChangePageUser extends StatefulWidget {
+  const ChangePageUser({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ChangePageUser> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ChangePageUser> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kTitleColor = Color(0xFF111111); // цвет "Профиль"
@@ -23,6 +27,34 @@ class _ProfilePageState extends State<ProfilePage> {
     0xFF9BA1A5,
   ); // цвет значения в контактных данных
   static const Color kDivider = Color(0x3C3C43); // цвет разделителя
+
+  final TextEditingController _phoneController = TextEditingController(
+    text: '+ 7 900 502 93',
+  );
+
+  final TextEditingController _emailController = TextEditingController(
+    text: 'example@mail.ru',
+  );
+
+  final TextEditingController _nameController = TextEditingController(
+    text: 'Георгий',
+  );
+
+  final TextEditingController _surnameController = TextEditingController();
+
+  String _currentCity = 'Санкт-Петербург';
+
+  void _changeCityFuncion() async {
+    // Пример: открыть страницу выбора языка и ждать результата
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => ChangeCityPage(selected: _currentCity)),
+    );
+    if (result != null && result != _currentCity) {
+      setState(() => _currentCity = result);
+      // Здесь можно вызвать сохранение в настройки/сервер
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,19 +79,15 @@ class _ProfilePageState extends State<ProfilePage> {
                       minimumSize: const Size(0, 0),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Text(
-                      'Настройки',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
+                    child: AppBarBackButton(),
                   ),
-                  const Spacer(),
+
+                  const SizedBox(width: 70),
+
                   const Text(
                     'Профиль',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontFamily: 'SF Pro Display',
                       fontWeight: FontWeight.w600,
                       color: kTitleColor,
@@ -67,9 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const Spacer(),
                   TextButton(
-                    onPressed: () {
-                      // TODO: режим редактирования профиля
-                    },
+                    onPressed: () {},
                     style: TextButton.styleFrom(
                       foregroundColor: kLinkColor,
                       padding: EdgeInsets.zero,
@@ -77,7 +103,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: const Text(
-                      'Изменить',
+                      'Готово',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
@@ -105,35 +131,43 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: const Color(0xFFE0E0E6),
-                      child: const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                      // Для реальной аватарки: backgroundImage: AssetImage(...) / NetworkImage(...)
-                    ),
+                    AvatarWithPicker(),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Георгий',
+                        children: [
+                          TextField(
+                            controller: _nameController,
+                            textAlign: TextAlign.start,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                               color: kPrimaryText,
                             ),
                           ),
-                          Text(
-                            '+7 900 502 9229',
+
+                          DividerLine(),
+
+                          TextField(
+                            controller: _surnameController,
+                            textAlign: TextAlign.start,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              hintText: 'Фамилия',
+                              hintStyle: TextStyle(color: AppColors.addLightText),
+                            ),
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: kSecondaryText,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: kPrimaryText,
                             ),
                           ),
                         ],
@@ -145,6 +179,21 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
 
             const SizedBox(height: 16),
+
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'Введите свое емя и добавьте по желанию'
+                    '\nфотографию профиля',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF677076),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 40),
 
             // Заголовок "Контактные данные"
             const Padding(
@@ -163,26 +212,54 @@ class _ProfilePageState extends State<ProfilePage> {
 
             const DividerLine(),
 
-            // Поля информации — без иконок, с тонкими разделителями
-            const SettingsRow(title: 'Номер телефона', value: '+7 900 502 9229'),
+            // // Поля информации — без иконок, с тонкими разделителями
+            // Inputfield(
+            //   title: 'Сменить номер',
+            //   value: '+7 900 502 9229',
+            //   controller: _phoneController,
+            // ),
+            //
+            //
+            // const DividerLine(),
+            //
+            // Inputfield(
+            //   title: 'Сменить почту',
+            //   value: 'example@mail.ru',
+            //   controller: _emailController,
+            // ),
+            // const DividerLine(),
+            DividerLine(),
+
+            SettingsRow(
+              title: 'Сменить номер',
+              titleColor: AppColors.addLightText,
+              controller: _phoneController,
+            ),
+
+            DividerLine(),
+
+            SettingsRow(
+              title: 'Сменить почту',
+              titleColor: AppColors.addLightText,
+              controller: _emailController,
+            ),
+
+            DividerLine(),
+
+            SettingsRow(
+              title: _currentCity,
+              titleColor: AppColors.addLightText,
+              showArrow: true,
+              onTap: _changeCityFuncion,
+            ),
 
             const DividerLine(),
-
-            const SettingsRow(title: 'Почта', value: 'example@mail.ru'),
-
-            const DividerLine(),
-
-            const SettingsRow(title: 'Город', value: 'Санкт-Петербург'),
-
-            const DividerLine(),
-
 
             const SizedBox(height: 20),
 
             // Кнопки действий
             Column(
               children: [
-
                 const DividerLine(),
 
                 CustomButton(
@@ -193,16 +270,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 const DividerLine(),
 
                 const SizedBox(height: 12),
-
-                const DividerLine(),
-
-                const CustomButton(label: 'Выйти', color: Colors.red),
-
-                const DividerLine(height: 1.2,),
-
               ],
             ),
-
 
             const Spacer(),
           ],
