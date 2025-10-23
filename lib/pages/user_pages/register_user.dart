@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/themes/AppColors.dart';
 
+import '../../components/Checkbox.dart';
 import '../../components/back_button.dart' show AppBarBackButton;
 
 class RegisterPageUser extends StatelessWidget {
@@ -222,7 +224,7 @@ class RegisterPageUser extends StatelessWidget {
                   ),
                   // В макете круглый свайч справа
                   // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  const Switch(value: false, onChanged: null),
+                  Checkboxswitch(),
                 ],
               ),
 
@@ -239,7 +241,7 @@ class RegisterPageUser extends StatelessWidget {
                     // TODO: действие продолжить
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: pinkBg,
+                    backgroundColor: AppColors.additionalAccent,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
@@ -251,7 +253,7 @@ class RegisterPageUser extends StatelessWidget {
                       fontFamily: 'SF Pro Display',
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
-                      color: pinkText,
+                      color: AppColors.mainColor,
                     ),
                   ),
                 ),

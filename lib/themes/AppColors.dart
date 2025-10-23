@@ -22,6 +22,10 @@ class AppColors {
 
       static const Color addLightText = Color(0xFF9BA1A5);
 
+      static const Color mainColor = Color(0xFFFF4361);
+
+      static const Color additionalAccent = Color(0xFFFFECF1);
+
 
 
 // settings_page.dart & profile_page.dart — акцентный красный (эквивалент Colors.red)

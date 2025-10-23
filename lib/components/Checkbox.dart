@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 // 1. Меняем StatelessWidget на StatefulWidget
-class Checkbox extends StatefulWidget {
-  const Checkbox({super.key});
+class Checkboxswitch extends StatefulWidget {
+  const Checkboxswitch({super.key});
 
   @override
   // 2. Создаем состояние для нашего виджета
-  State<Checkbox> createState() => _CheckboxState();
+  State<Checkboxswitch> createState() => _Checkboxswitch();
 }
 
 // 3. Создаем класс состояния
-class _CheckboxState extends State<Checkbox> {
+class _Checkboxswitch extends State<Checkboxswitch> {
   // 4. Переносим изменяемую переменную сюда
   bool _urgent = false;
 

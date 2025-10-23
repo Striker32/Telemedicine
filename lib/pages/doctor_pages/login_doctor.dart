@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../components/Checkbox.dart';
 import '../../components/back_button.dart' show AppBarBackButton;
+import '../../themes/AppColors.dart';
 
-class LoginPageUser extends StatelessWidget {
-  const LoginPageUser({super.key});
+class LoginPageDoctor extends StatelessWidget {
+  const LoginPageDoctor({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // цветовая палитра
-
-    final Color pinkBg = const Color(0xFFFFF0F3); // пример светло-розового фона кнопки
-    final Color pinkText = const Color(0xFFFF6B86); // пример розового текста кнопки
 
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
@@ -58,7 +55,7 @@ class LoginPageUser extends StatelessWidget {
 
               // Подзаголовок
               Text(
-                'Пожалуйста, введите данные, которые\nВы указывали при регистрации.',
+                'Пожалуйста, введите данные, которые\nВам предоставила поликлинника.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'SF Pro Display',
@@ -78,7 +75,7 @@ class LoginPageUser extends StatelessWidget {
 
 
 
-              // Телефон: +7 и поле
+
               Container(
                 decoration: BoxDecoration(
                   border: Border(
@@ -87,27 +84,7 @@ class LoginPageUser extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(color: Colors.black12, width: 1),
-                        ),
-                      ),
-                      width: 72,
-                      padding: const EdgeInsets.symmetric(vertical: 18), // размер палка справа от +7
-                      alignment: Alignment.centerLeft,
-                      // граница между кодом и полем — реализована визуально через контейнер
-                      child: Center(
-                        child: const Text(
-                          '+7',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro Display',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
+
 
                     const SizedBox(width: 12),
 
@@ -115,7 +92,7 @@ class LoginPageUser extends StatelessWidget {
                       child: TextFormField(
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
-                          hintText: 'Ваш номер телефона',
+                          hintText: 'Логин',
                           hintStyle: TextStyle(
                             fontFamily: 'SF Pro Display',
                             color: Colors.grey,
@@ -183,14 +160,37 @@ class LoginPageUser extends StatelessWidget {
                   ),
                   // В макете круглый свайч справа
                   // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  const Switch(value: false, onChanged: null),
+                  Checkboxswitch(),
                 ],
               ),
 
+              const SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Клятва гиппократа',
+                    style: TextStyle(
+                      fontFamily: 'SF Pro Display',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  // В макете круглый свайч справа
+                  // Использую значение false по умолчанию — заменить на состояние по необходимости.
+                  Checkboxswitch(),
+                ],
+              ),
+
+
+
               const SizedBox(height: 28),
 
+
               // Пустое пространство перед кнопкой, чтобы кнопка не прилипала к полю
-              const SizedBox(height: 150),
+              const SizedBox(height: 50),
 
               // Кнопка "Продолжить"
               SizedBox(
@@ -200,7 +200,7 @@ class LoginPageUser extends StatelessWidget {
                     // TODO: действие продолжить
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: pinkBg,
+                    backgroundColor: AppColors.additionalAccent,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
@@ -212,13 +212,13 @@ class LoginPageUser extends StatelessWidget {
                       fontFamily: 'SF Pro Display',
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
-                      color: pinkText,
+                      color: AppColors.mainColor,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: dividerOfContinue), // нижний отступ
+// нижний отступ
             ],
           ),
         ),
