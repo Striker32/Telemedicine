@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:last_telemedicine/pages/Choose_profile.dart';
 import 'package:last_telemedicine/pages/Main_screen.dart';
+import 'package:last_telemedicine/pages/News_feed.dart';
 import 'package:last_telemedicine/pages/doctor_pages/profile_doctor.dart';
 import 'package:last_telemedicine/pages/user_pages/Welcome_screen_user.dart';
 import 'package:last_telemedicine/pages/user_pages/login_user.dart';
@@ -34,7 +35,7 @@ class Myapp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProfilePageDoctor(),
+      home: NewsFeedPage(),
       theme: appTheme,
     );
   }
