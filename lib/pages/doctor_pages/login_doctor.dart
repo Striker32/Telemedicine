@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../components/Checkbox.dart';
-import '../../components/back_button.dart' show AppBarBackButton;
+import '../../components/AppBarButton.dart' show AppBarButton;
 import '../../themes/AppColors.dart';
 
 class LoginPageDoctor extends StatelessWidget {
@@ -23,7 +23,7 @@ class LoginPageDoctor extends StatelessWidget {
         titleSpacing: 0, // убираем отступы слева
         title: Align(
           alignment: Alignment.centerLeft,
-          child: AppBarBackButton(),
+          child: AppBarButton(),
         ),
       ),
 

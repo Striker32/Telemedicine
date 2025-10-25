@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
 
 import '../../components/Checkbox.dart';
-import '../../components/back_button.dart' show AppBarBackButton;
+import '../../components/AppBarButton.dart' show AppBarButton;
 
 class RegisterPageUser extends StatelessWidget {
   const RegisterPageUser({super.key});
@@ -27,7 +27,7 @@ class RegisterPageUser extends StatelessWidget {
         titleSpacing: 0, // убираем отступы слева
         title: Align(
           alignment: Alignment.centerLeft,
-          child: AppBarBackButton(),
+          child: AppBarButton(),
         ),
       ),
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/legacy/My_button.dart';
 import 'package:last_telemedicine/components/legacy/my_textfield.dart';
 
-import '../components/back_button.dart';
+import '../components/AppBarButton.dart';
 
 class RegisterPage extends StatelessWidget{
   final TextEditingController _emailController = TextEditingController();
@@ -32,7 +32,7 @@ void register() {
           titleSpacing: 0, // убираем отступы слева
           title: Align(
             alignment: Alignment.centerLeft,
-            child: AppBarBackButton(),
+            child: AppBarButton(),
           ),
         ),
         body: Center(

@@ -2,91 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 
+import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/SettingsRow.dart';
+import '../../components/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ProfilePageUser extends StatefulWidget {
+  const ProfilePageUser({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfilePageUser> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePageUser> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
-  static const Color kTitleColor = Color(0xFF111111); // цвет "Профиль"
-  static const Color kLinkColor = Colors.red; // цвет "Настройки" и "Изменить"
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
   static const Color kSecondaryText = Color(
     0xFF9BA1A5,
   ); // цвет значения в контактных данных
-  static const Color kDivider = Color(0x3C3C43); // цвет разделителя
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackground,
+      // AppBar
+      appBar: CustomAppBar(
+        titleText: 'Профиль',
+        leading: AppBarButton(label: 'Настройки', onTap: () {}),
+        action: AppBarButton(label: 'Изменить', onTap: () {}),
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Верхняя панель: Настройки | Профиль | Изменить
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      // TODO: открыть настройки
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: kLinkColor,
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Настройки',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                  const Text(
-                    'Профиль',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: FontWeight.w600,
-                      color: kTitleColor,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      // TODO: режим редактирования профиля
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: kLinkColor,
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Изменить',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
             // Блок аватара, имени и телефона
             Container(

@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:last_telemedicine/components/back_button.dart';
+import 'package:last_telemedicine/components/AppBarButton.dart';
 
+import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/SettingsRow.dart';
 import '../../components/custom_button.dart';
 import '../../themes/AppColors.dart';
 
-class SettingsPage extends StatefulWidget {
+class ProfileSettingsPageUser extends StatefulWidget {
   final String appVersion;
 
-  const SettingsPage({Key? key, this.appVersion = '1.02'}) : super(key: key);
+  const ProfileSettingsPageUser({Key? key, this.appVersion = '1.02'})
+    : super(key: key);
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<ProfileSettingsPageUser> createState() =>
+      _ProfileSettingsPageUserState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
   String _currentLanguage = 'Русский';
 
   void _openPrivacyPolicy() {
@@ -34,43 +37,38 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-
-  void _contactSupport() {
-    // Пример: открыть почтовый клиент, чат, или перейти на страницу поддержки
-    // Реализация зависит от вашей логики
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Связаться с поддержкой'),
-        content: const Text('Открыть почту или чат поддержки.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('ОК'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _contactSupport() {
+  //   // Пример: открыть почтовый клиент, чат, или перейти на страницу поддержки
+  //   // Реализация зависит от вашей логики
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text('Связаться с поддержкой'),
+  //       content: const Text('Открыть почту или чат поддержки.'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Отмена'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('ОК'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     final divider = const Divider(height: 1, thickness: 1);
-    final sectionHeaderStyle = TextStyle(color: AppColors.grey600, fontSize: 13);
+    final sectionHeaderStyle = TextStyle(
+      color: AppColors.grey600,
+      fontSize: 13,
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        leading: AppBarBackButton(),
-        leadingWidth: 90,
-        centerTitle: true,
-        title: const Text('Настройки', style: TextStyle(color: AppColors.black)),
-        backgroundColor: AppColors.background,
-        elevation: 0.5,
-      ),
+      appBar: CustomAppBar(titleText: 'Настройки', leading: AppBarButton()),
       body: SafeArea(
         child: Column(
           children: [
@@ -89,34 +87,27 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
 
-                    Column(
-                      children: [
+                  Column(
+                    children: [
+                      DividerLine(),
 
-                        DividerLine(),
+                      SettingsRow(
+                        title: 'Политика конфиденциальности',
+                        onTap: _openMedicalDocument,
+                        showArrow: true,
+                      ),
 
-                        SettingsRow(
-                          title: 'Политика конфиденциальности',
-                          onTap: _openMedicalDocument,
-                          showArrow: true,
-                        ),
+                      DividerLine(),
 
-                        DividerLine(),
+                      SettingsRow(
+                        title: 'Медицинский документ',
+                        onTap: _openMedicalDocument,
+                        showArrow: true,
+                      ),
 
-                        SettingsRow(
-                          title: 'Медицинский документ',
-                          onTap: _openMedicalDocument,
-                          showArrow: true,
-                        ),
-
-                        DividerLine(),
-                      ],
-
-                    ),
-
-
-
-
-
+                      DividerLine(),
+                    ],
+                  ),
 
                   // Section: Язык интерфейса
                   Padding(
@@ -139,22 +130,18 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
 
-
-
                   // Contact support
-
                   DividerLine(),
 
                   const SizedBox(height: 28),
 
                   DividerLine(),
-                      const CustomButton(
-                        label: 'Связаться с поддержкой',
-                        color: Colors.red,
-                      ),
+                  const CustomButton(
+                    label: 'Связаться с поддержкой',
+                    color: Colors.red,
+                  ),
 
                   DividerLine(),
-
                 ],
               ),
             ),
@@ -189,7 +176,6 @@ class _SettingsPageState extends State<SettingsPage> {
 }
 
 /// Переиспользуемый виджет строки настройки
-
 
 /// Заглушка: страница политики конфиденциальности
 class PrivacyPolicyPage extends StatelessWidget {

@@ -6,8 +6,9 @@ import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 
+import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
-import '../../components/back_button.dart';
+import '../../components/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 
 class ChangePageUser extends StatefulWidget {
@@ -60,60 +61,15 @@ class _ProfilePageState extends State<ChangePageUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackground,
+      appBar: CustomAppBar(
+        titleText: 'Профиль',
+        leading: AppBarButton(),
+        action: AppBarButton(label: 'Готово', onTap: () {}),
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Верхняя панель: Настройки | Профиль | Изменить
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      // TODO: открыть настройки
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: kLinkColor,
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: AppBarBackButton(),
-                  ),
-
-                  const SizedBox(width: 70),
-
-                  const Text(
-                    'Профиль',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: FontWeight.w600,
-                      color: kTitleColor,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      foregroundColor: kLinkColor,
-                      padding: EdgeInsets.zero,
-                      minimumSize: const Size(0, 0),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    child: const Text(
-                      'Готово',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             // Блок аватара, имени и телефона
             Container(
               decoration: BoxDecoration(
@@ -162,7 +118,9 @@ class _ProfilePageState extends State<ChangePageUser> {
                               contentPadding: EdgeInsets.zero,
                               isDense: true,
                               hintText: 'Фамилия',
-                              hintStyle: TextStyle(color: AppColors.addLightText),
+                              hintStyle: TextStyle(
+                                color: AppColors.addLightText,
+                              ),
                             ),
                             style: TextStyle(
                               fontSize: 20,
@@ -184,7 +142,7 @@ class _ProfilePageState extends State<ChangePageUser> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 'Введите свое емя и добавьте по желанию'
-                    '\nфотографию профиля',
+                '\nфотографию профиля',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w400,

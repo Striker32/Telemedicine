@@ -28,6 +28,12 @@ class AppColors {
 
 
 
+      static const Color black = Color(0xFF000000);
+
+      static const Color white = Color(0xFFFFFFFF);
+
+
+
 // settings_page.dart & profile_page.dart — акцентный красный (эквивалент Colors.red)
 // используется для BackButton, ссылок и кнопок "Изменить"/"Настройки"
       static const Color accentRed = Color(0xFFF44336);
@@ -83,8 +89,6 @@ class AppColors {
 
 
 // Базовые цвета
-      static const Color black = Color(0xFF000000);
-      static const Color white = Color(0xFFFFFFFF);
 
       // profile_settings_user.dart 'Связаться с поддержкой'
       static const Color red = Colors.red;
