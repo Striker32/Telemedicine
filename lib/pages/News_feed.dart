@@ -21,37 +21,41 @@ class NewsFeedPage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<NewsFeedPage> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: CustomAppBar(titleText: 'Лента новостей', backgroundColor: AppColors.white,),
+      backgroundColor: AppColors.background2,
+      appBar: CustomAppBar(
+        titleText: 'Лента новостей',
+        backgroundColor: AppColors.white,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight:
-              MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top -
                   MediaQuery.of(context).padding.bottom,
             ),
             child: IntrinsicHeight(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 10,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(height: 8),
-
                         Text(
                           'Опишите свою проблему и врач сам найдет Вас!',
-                          style: TextStyle(color: AppColors.grey600, fontSize: 12),
+                          style: TextStyle(
+                            color: AppColors.grey600,
+                            fontSize: 12,
+                          ),
                           textAlign: TextAlign.center,
                         ),
 
@@ -70,31 +74,32 @@ class _ProfilePageState extends State<NewsFeedPage> {
                                 offset: const Offset(0, 2),
                               ),
                             ],
-
                           ),
                           alignment: Alignment.center,
-                          child: CreateRequestButton(
-                            onTap: (){},
-                          ),
+                          child: CreateRequestButton(onTap: () {}),
                         ),
-
                       ],
                     ),
 
                     const SizedBox(height: 12),
 
-                    NewsCard(date: '9 февраля 2025 15:45', title: 'Дистанционные\nконсультации у терапевта', image: AssetImage(
-                      "assets/images/app/News_pallet_image2.png",
-                    ),),
+                    NewsCard(
+                      date: '9 февраля 2025 15:45',
+                      title: 'Дистанционные\nконсультации у терапевта',
+                      image: AssetImage(
+                        "assets/images/app/News_pallet_image2.png",
+                      ),
+                    ),
 
                     const SizedBox(height: 12),
 
-                    NewsCard(date: '9 февраля 2025 15:45', title: 'Следите за приёмом\nв личном кабинете', image: AssetImage(
-                      "assets/images/app/News_pallet_image1.png",
-                    ),),
-
-
-
+                    NewsCard(
+                      date: '9 февраля 2025 15:45',
+                      title: 'Следите за приёмом\nв личном кабинете',
+                      image: AssetImage(
+                        "assets/images/app/News_pallet_image1.png",
+                      ),
+                    ),
                   ],
                 ),
               ),

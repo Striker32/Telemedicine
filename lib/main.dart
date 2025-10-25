@@ -35,7 +35,7 @@ class Myapp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: NewsFeedPage(),
+      home: ProfilePageDoctor(),
       theme: appTheme,
     );
   }

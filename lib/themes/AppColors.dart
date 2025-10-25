@@ -18,6 +18,10 @@ class AppColors {
 // settings_page.dart — фон Scaffold и AppBar background
       // сдвиг по фазе
 
+      // ЗАПАСНОЙ Т.К. Я НЕ УВЕРЕН КАКОЙ ИМЕННО ЦВЕТ У ЗАДНЕГО ФОНА
+      static const Color background2 = Color(0xFFEFEFF4);
+
+      // ТОТ, КОТОРЫЙ УКАЗАН В ДИЗАЙНЕ
       static const Color background = Color(0xFFFBFCFD);
 
       static const Color addLightText = Color(0xFF9BA1A5);

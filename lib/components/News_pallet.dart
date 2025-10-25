@@ -39,8 +39,6 @@ class NewsCard extends StatelessWidget {
             else
               Container(color: Colors.grey.shade300),
 
-            // Затемнение поверх изображения
-            Container(color: Colors.black.withOpacity(0.45)),
 
             // Содержимое: дата вверху слева, заголовок снизу слева, "Читать" справа внизу
             Padding(
@@ -85,7 +83,7 @@ class NewsCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.12),
+                            color: Colors.white.withValues(alpha: .33),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Text(
