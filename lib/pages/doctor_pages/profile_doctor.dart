@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
+import 'package:last_telemedicine/components/display_rate_component.dart';
 
 import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
@@ -80,7 +81,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
                                 Text(
-                                  'Георгий',
+                                  'Речнекова Мария Д.',
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
@@ -98,6 +99,13 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                               ],
                             ),
                           ),
+                          RatingBadge(
+                            rating: '4,8',
+                            subtitle: '23 заявки',
+                            badgeColor: AppColors.additionalAccent,
+                            badgeSize: 36,
+                          ),
+
                         ],
                       ),
                     ),
