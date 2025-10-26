@@ -30,7 +30,7 @@ class Myapp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainDoctor(),
+      home: ApplicationsPage(),
       theme: ThemeData(
         fontFamily: "SF Pro Display",
       ),
