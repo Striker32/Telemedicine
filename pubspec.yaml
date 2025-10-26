@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  image_picker: ^0.8.7+6
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -62,13 +64,14 @@ flutter:
   assets:
     - assets/fonts/
     - assets/images/icons/
+    - assets/images/app/
 
   fonts:
     - family: SF Pro Display
       fonts:
         - asset: assets/fonts/SFPRO/SFProText-Light.ttf
           weight: 300
-        - asset: assets/fonts/SFPRO/SFProText-Medium.ttf
+        - asset: assets/fonts/SFPRO/SFProText-Regular.ttf
           weight: 400
         - asset: assets/fonts/SFPRO/SFProText-Medium.ttf
           weight: 500

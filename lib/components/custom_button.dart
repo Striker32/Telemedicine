@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 
-
 class CustomButton extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final fontWeight;
   final color;
 
-
   const CustomButton({
     super.key,
-    required this.label,   // обязательно
+    required this.label, // обязательно
     this.onTap, // необязательно
-    this.fontWeight = FontWeight.w600,// необязательно
+    this.fontWeight = FontWeight.w600, // необязательно
     this.color = Colors.red,
   });
 
@@ -27,16 +25,16 @@ class CustomButton extends StatelessWidget {
           shape: const RoundedRectangleBorder(),
           backgroundColor: Colors.white,
           foregroundColor: color,
+          padding: const EdgeInsets.symmetric(vertical: 12.5), // костыль, чтобы divider правильно отображался
         ),
         child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: 'SF Pro Display',
-              fontWeight: fontWeight,
-              color: color,
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontFamily: 'SF Pro Display',
+            fontWeight: fontWeight,
+            color: color,
           ),
-
         ),
       ),
     );

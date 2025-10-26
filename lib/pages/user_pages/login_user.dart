@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../components/back_button.dart' show AppBarBackButton;
+import '../../components/Checkbox.dart';
+import '../../components/AppBarButton.dart' show AppBarButton;
 
 class LoginPageUser extends StatelessWidget {
   const LoginPageUser({super.key});
@@ -25,7 +26,7 @@ class LoginPageUser extends StatelessWidget {
         titleSpacing: 0, // убираем отступы слева
         title: Align(
           alignment: Alignment.centerLeft,
-          child: AppBarBackButton(),
+          child: AppBarButton(),
         ),
       ),
 

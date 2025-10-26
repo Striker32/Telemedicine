@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:last_telemedicine/themes/AppColors.dart';
 
 import '../../components/Checkbox.dart';
 import '../../components/AppBarButton.dart' show AppBarButton;
+import '../../themes/AppColors.dart';
 
-class RegisterPageUser extends StatelessWidget {
-  const RegisterPageUser({super.key});
+class LoginPageDoctor extends StatelessWidget {
+  const LoginPageDoctor({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // цветовая палитра
-
-    final Color pinkBg = const Color(0xFFFFF0F3); // пример светло-розового фона кнопки
-    final Color pinkText = const Color(0xFFFF6B86); // пример розового текста кнопки
 
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
@@ -43,7 +39,7 @@ class RegisterPageUser extends StatelessWidget {
 
               // Заголовок
               const Text(
-                'Регистрация',
+                'Авторизация',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'SF Pro Display',
@@ -59,7 +55,7 @@ class RegisterPageUser extends StatelessWidget {
 
               // Подзаголовок
               Text(
-                'Пожалуйста, зарегистрируйтесь для\nдальнейшего пользования приложением.',
+                'Пожалуйста, введите данные, которые\nВам предоставила поликлинника.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'SF Pro Display',
@@ -70,57 +66,17 @@ class RegisterPageUser extends StatelessWidget {
 
               const SizedBox(height: 22),
 
-              // Ссылка "У меня уже есть профиль"
-              TextButton(
-                onPressed: () {
-                  // TODO: переход на вход
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'У меня уже есть профиль',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'SF Pro Display',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey.shade400,
-                  ),
-                ),
-              ),
 
               const SizedBox(height: 80),
 
               // Divider before first field (как в макете)
               const Divider(height: 1, thickness: 1, color: Colors.black12),
 
-              // Поле: Имя и Фамилия
-              TextFormField(
-                decoration: const InputDecoration(
-                  hintText: '  Имя и Фамилия пациента',
-                  hintStyle: TextStyle(
-                    fontFamily: 'SF Pro Display',
-                    color: Colors.grey,
-                    fontSize: 20, // как просил — hintText = 20px
-                    fontWeight: FontWeight.w400,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 18),
-                ),
-                style: const TextStyle(
-                  fontFamily: 'SF Pro Display',
-                  fontSize: 20,
-                ),
-              ),
-
-              const Divider(height: 1, thickness: 1, color: Colors.black12),
 
 
-              // Телефон: +7 и поле
+
+
               Container(
-                // сделать палку снизу
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Colors.black12, width: 1),
@@ -128,27 +84,7 @@ class RegisterPageUser extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(color: Colors.black12, width: 1),
-                        ),
-                      ),
-                      width: 72,
-                      padding: const EdgeInsets.symmetric(vertical: 18), // размер палка справа от +7
-                      alignment: Alignment.centerLeft,
-                      // граница между кодом и полем — реализована визуально через контейнер
-                      child: Center(
-                        child: const Text(
-                          '+7',
-                          style: TextStyle(
-                            fontFamily: 'SF Pro Display',
-                            fontSize: 20,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
+
 
                     const SizedBox(width: 12),
 
@@ -156,7 +92,7 @@ class RegisterPageUser extends StatelessWidget {
                       child: TextFormField(
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
-                          hintText: 'Ваш номер телефона',
+                          hintText: 'Логин',
                           hintStyle: TextStyle(
                             fontFamily: 'SF Pro Display',
                             color: Colors.grey,
@@ -228,10 +164,33 @@ class RegisterPageUser extends StatelessWidget {
                 ],
               ),
 
+              const SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Клятва гиппократа',
+                    style: TextStyle(
+                      fontFamily: 'SF Pro Display',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  // В макете круглый свайч справа
+                  // Использую значение false по умолчанию — заменить на состояние по необходимости.
+                  Checkboxswitch(),
+                ],
+              ),
+
+
+
               const SizedBox(height: 28),
 
+
               // Пустое пространство перед кнопкой, чтобы кнопка не прилипала к полю
-              const SizedBox(height: 24),
+              const SizedBox(height: 50),
 
               // Кнопка "Продолжить"
               SizedBox(
@@ -259,7 +218,7 @@ class RegisterPageUser extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: dividerOfContinue), // нижний отступ
+// нижний отступ
             ],
           ),
         ),

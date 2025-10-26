@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/components/AppBarButton.dart';
 
-class SettingsPage extends StatefulWidget {
+import '../../components/CustomAppBar.dart';
+import '../../components/DividerLine.dart';
+import '../../components/SettingsRow.dart';
+import '../../components/custom_button.dart';
+import '../../themes/AppColors.dart';
+
+class ProfileSettingsPageUser extends StatefulWidget {
   final String appVersion;
 
-  const SettingsPage({Key? key, this.appVersion = '1.02'}) : super(key: key);
+  const ProfileSettingsPageUser({Key? key, this.appVersion = '1.02'})
+    : super(key: key);
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<ProfileSettingsPageUser> createState() =>
+      _ProfileSettingsPageUserState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
   String _currentLanguage = 'Русский';
 
   void _openPrivacyPolicy() {
@@ -28,58 +37,43 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void _changeLanguage() async {
-    // Пример: открыть страницу выбора языка и ждать результата
-    final result = await Navigator.push<String>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => LanguageSelectionPage(selected: _currentLanguage),
-      ),
-    );
-    if (result != null && result != _currentLanguage) {
-      setState(() => _currentLanguage = result);
-      // Здесь можно вызвать сохранение в настройки/сервер
-    }
-  }
-
-  void _contactSupport() {
-    // Пример: открыть почтовый клиент, чат, или перейти на страницу поддержки
-    // Реализация зависит от вашей логики
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Связаться с поддержкой'),
-        content: const Text('Открыть почту или чат поддержки.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('ОК'),
-          ),
-        ],
-      ),
-    );
-  }
+  // void _contactSupport() {
+  //   // Пример: открыть почтовый клиент, чат, или перейти на страницу поддержки
+  //   // Реализация зависит от вашей логики
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text('Связаться с поддержкой'),
+  //       content: const Text('Открыть почту или чат поддержки.'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('Отмена'),
+  //         ),
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('ОК'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     final divider = const Divider(height: 1, thickness: 1);
-    final sectionHeaderStyle = TextStyle(color: Colors.grey[600], fontSize: 13);
+    final sectionHeaderStyle = TextStyle(
+      color: AppColors.grey600,
+      fontSize: 13,
+    );
 
     return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(color: Colors.red),
-        centerTitle: true,
-        title: const Text('Настройки', style: TextStyle(color: Colors.black)),
-        backgroundColor: Color(0xFFEFEFF4),
-        elevation: 0.5,
-      ),
+      appBar: CustomAppBar(titleText: 'Настройки', leading: AppBarButton()),
       body: SafeArea(
         child: Column(
           children: [
+            DividerLine(),
+
             // Список настроек в Expanded
             Expanded(
               child: ListView(
@@ -92,25 +86,27 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: sectionHeaderStyle,
                     ),
                   ),
-                  Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      children: [
-                        _SettingsTile(
-                          text: 'Политика конфиденциальности',
-                          onTap: _openPrivacyPolicy,
-                        ),
-                        divider,
-                        _SettingsTile(
-                          text: 'Медицинский документ',
-                          onTap: _openMedicalDocument,
-                        ),
-                      ],
-                    ),
+
+                  Column(
+                    children: [
+                      DividerLine(),
+
+                      SettingsRow(
+                        title: 'Политика конфиденциальности',
+                        onTap: _openMedicalDocument,
+                        showArrow: true,
+                      ),
+
+                      DividerLine(),
+
+                      SettingsRow(
+                        title: 'Медицинский документ',
+                        onTap: _openMedicalDocument,
+                        showArrow: true,
+                      ),
+
+                      DividerLine(),
+                    ],
                   ),
 
                   // Section: Язык интерфейса
@@ -121,33 +117,31 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: sectionHeaderStyle,
                     ),
                   ),
-                  Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: _SettingsTile(
-                      text: 'Язык',
+
+                  Opacity(
+                    opacity: 0.25, // 75% прозрачности
+                    child: SettingsRow(
+                      title: 'Язык',
                       trailing: Text(
                         _currentLanguage,
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(color: AppColors.grey600),
                       ),
-                      onTap: _changeLanguage,
+                      showArrow: true,
                     ),
                   ),
 
                   // Contact support
+                  DividerLine(),
+
                   const SizedBox(height: 28),
-                  Center(
-                    child: TextButton(
-                      onPressed: _contactSupport,
-                      child: const Text(
-                        'Связаться с поддержкой',
-                        style: TextStyle(color: Colors.red, fontSize: 16),
-                      ),
-                    ),
+
+                  DividerLine(),
+                  const CustomButton(
+                    label: 'Связаться с поддержкой',
+                    color: Colors.red,
                   ),
+
+                  DividerLine(),
                 ],
               ),
             ),
@@ -160,13 +154,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   Text(
                     'Версия приложения',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: AppColors.grey600),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     widget.appVersion,
                     style: const TextStyle(
-                      color: Colors.grey,
+                      color: AppColors.grey500,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -176,49 +170,12 @@ class _SettingsPageState extends State<SettingsPage> {
           ],
         ),
       ),
-      backgroundColor: const Color(0xFFEFEFF4),
+      backgroundColor: AppColors.background,
     );
   }
 }
 
 /// Переиспользуемый виджет строки настройки
-class _SettingsTile extends StatelessWidget {
-  final String text;
-  final Widget? trailing;
-  final VoidCallback onTap;
-
-  const _SettingsTile({
-    Key? key,
-    required this.text,
-    required this.onTap,
-    this.trailing,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  text,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                ),
-              ),
-              if (trailing != null) ...[trailing!, const SizedBox(width: 8)],
-              const Icon(Icons.chevron_right, color: Colors.grey),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 /// Заглушка: страница политики конфиденциальности
 class PrivacyPolicyPage extends StatelessWidget {
@@ -243,31 +200,31 @@ class MedicalDocumentPage extends StatelessWidget {
 }
 
 /// Страница выбора языка (возвращает выбранный язык через Navigator.pop)
-class LanguageSelectionPage extends StatelessWidget {
-  final String? selected;
-
-  const LanguageSelectionPage({Key? key, this.selected}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final languages = ['Русский', 'English', 'Français'];
-    return Scaffold(
-      appBar: AppBar(title: const Text('Выберите язык')),
-      body: ListView.separated(
-        itemCount: languages.length,
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          final lang = languages[index];
-          final isSelected = lang == selected;
-          return ListTile(
-            title: Text(lang),
-            trailing: isSelected
-                ? const Icon(Icons.check, color: Colors.blue)
-                : null,
-            onTap: () => Navigator.pop(context, lang),
-          );
-        },
-      ),
-    );
-  }
-}
+// class LanguageSelectionPage extends StatelessWidget {
+//   final String? selected;
+//
+//   const LanguageSelectionPage({Key? key, this.selected}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final languages = ['Русский', 'English', 'Français'];
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Выберите язык')),
+//       body: ListView.separated(
+//         itemCount: languages.length,
+//         separatorBuilder: (_, __) => const Divider(height: 1),
+//         itemBuilder: (context, index) {
+//           final lang = languages[index];
+//           final isSelected = lang == selected;
+//           return ListTile(
+//             title: Text(lang),
+//             trailing: isSelected
+//                 ? const Icon(Icons.check, color: AppColors.primaryBlue)
+//                 : null,
+//             onTap: () => Navigator.pop(context, lang),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
