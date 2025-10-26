@@ -20,6 +20,10 @@ import 'package:last_telemedicine/firebase_options.dart';
 import 'package:last_telemedicine/pages/legacy/login_page.dart';
 import 'package:last_telemedicine/themes/legacy/main_mode.dart';
 
+// Страницы доктора
+import 'package:last_telemedicine/pages/doctor_pages/main_doctor.dart';
+
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -33,10 +37,11 @@ class Myapp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SettingsPage(),
+      home: MainDoctor(),
       theme: ThemeData(
         fontFamily: "SF Pro Display",
       ),
     );
   }
+
 }
