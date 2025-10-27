@@ -818,6 +818,121 @@ class ApplicationsPage extends StatelessWidget {
   }
 }
 
+// ================= История заявок =================
+
+class _HistoryApplicationsEmptyView extends StatelessWidget {
+  const _HistoryApplicationsEmptyView();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 10),
+          const Text(
+            "3 архивных заявки",
+            style: TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+          const SizedBox(height: 0),
+
+          ListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(top: 2),
+            children: const [
+              HistoryApplicationCard(
+                title: "Стреляющая боль бокового верхнего резца",
+                user: "Георгий",
+                datetime: "23.03.2025 16:48",
+                doctor: "Стоматолог",
+                description:
+                "Несколько дней мучает зубная боль. Сначала реагировал только на холодное и горячее, а сейчас болит постоянно и иногда отдаёт пульсирующей болью. Обезболивающие почти не помогают. Нужна консультация стоматолога, чтобы разобраться в причине и начать лечение",
+                city: "Санкт-Петербург",
+                cost: 8000,
+                rating: '4',
+                responder: [
+                  {
+                    'id': 'doc001',
+                    'name': 'Иван И.',
+                    'surname': 'Иванов',
+                    'rating': 4.6,
+                    'completed': 128,
+                    'specialization': 'Стоматолог',
+                    'phone': '+7 900 000 00 00',
+                    'email': 'ivan@example.com',
+                    'city': 'Москва',
+                    'experience': '10 лет',
+                    'price': '5000р',
+                    'workplace': 'Клиника Здоровья',
+                    'about': 'Опытный специалист в терапевтической стоматологии',
+                  },
+                ],
+              ),
+              HistoryApplicationCard(
+                title: "*окшгп* *уэугеээ* помогите",
+                user: "Серега",
+                datetime: "01.01.2025 11:48",
+                doctor: "Проктолог",
+                description:
+                "Несколько дней мучает зубная боль. Сначала реагировал только на холодное и горячее, а сейчас болит постоянно и иногда отдаёт пульсирующей болью. Обезболивающие почти не помогают. Нужна консультация стоматолога, чтобы разобраться в причине и начать лечение",
+                city: "Санкт-Петербург",
+                cost: 8000,
+                responder: [
+                  {
+                    'id': 'doc001',
+                    'name': 'Иван И.',
+                    'surname': 'Иванов',
+                    'rating': 4.6,
+                    'completed': 128,
+                    'specialization': 'Стоматолог',
+                    'phone': '+7 900 000 00 00',
+                    'email': 'ivan@example.com',
+                    'city': 'Москва',
+                    'experience': '10 лет',
+                    'price': '5000р',
+                    'workplace': 'Клиника Здоровья',
+                    'about': 'Опытный специалист в терапевтической стоматологии',
+                  },
+                ],
+              ),
+              HistoryApplicationCard(
+                title: "Эм ну я эм эм",
+                user: "Алексей",
+                datetime: "03.03.2025 04:00",
+                doctor: "Логопед",
+                description:
+                "Несколько дней мучает зубная боль. Сначала реагировал только на холодное и горячее, а сейчас болит постоянно и иногда отдаёт пульсирующей болью. Обезболивающие почти не помогают. Нужна консультация стоматолога, чтобы разобраться в причине и начать лечение",
+                city: "Санкт-Петербург",
+                cost: 8000,
+                rating: '2',
+                responder: [
+                  {
+                    'id': 'doc001',
+                    'name': 'Иван И.',
+                    'surname': 'Иванов',
+                    'rating': 4.6,
+                    'completed': 128,
+                    'specialization': 'Стоматолог',
+                    'phone': '+7 900 000 00 00',
+                    'email': 'ivan@example.com',
+                    'city': 'Москва',
+                    'experience': '10 лет',
+                    'price': '5000р',
+                    'workplace': 'Клиника Здоровья',
+                    'about': 'Опытный специалист в терапевтической стоматологии',
+                  },
+                ],
+              ),
+
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ==================== Заявки =====================
 class _ApplicationsEmptyView extends StatelessWidget {
   const _ApplicationsEmptyView();
 
@@ -834,7 +949,55 @@ class _ApplicationsEmptyView extends StatelessWidget {
           const SizedBox(height: 0),
 
           // Кнопка "Создать заявку" с вызовом popup
-          // GestureDetector(...),
+          // GestureDetector(
+          //   onTap: () {
+          //     showModalBottomSheet(
+          //       context: context,
+          //       isScrollControlled: true,
+          //       backgroundColor: Colors.transparent,
+          //       builder: (context) => const CreateApplicationPopup(),
+          //     );
+          //   },
+          //   child: Container(
+          //     margin: const EdgeInsets.symmetric(horizontal: 10),
+          //     width: double.infinity,
+          //     padding: const EdgeInsets.symmetric(vertical: 24),
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       borderRadius: BorderRadius.circular(12),
+          //       boxShadow: [
+          //         BoxShadow(
+          //           color: Colors.black.withOpacity(0.05),
+          //           blurRadius: 4,
+          //           offset: const Offset(0, 2),
+          //         ),
+          //       ],
+          //     ),
+          //     child: const Column(
+          //       children: [
+          //         Icon(Icons.add_circle, color: Colors.red, size: 32),
+          //         SizedBox(height: 8),
+          //         Text(
+          //           "Создать заявку",
+          //           style: TextStyle(
+          //             fontSize: 16,
+          //             fontWeight: FontWeight.w600,
+          //             color: Colors.red,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 100),
+          //   child: Text(
+          //     "В данном разделе Вы можете создать индивидуальную заявку и описать свою проблему, на которую откликнется нужный Вам врач.",
+          //     textAlign: TextAlign.center,
+          //     style: const TextStyle(fontSize: 13, color: Colors.black54),
+          //   ),
+          // ),
 
           ListView(
             shrinkWrap: true,
@@ -1342,120 +1505,6 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ================= История заявок =================
-
-class _HistoryApplicationsEmptyView extends StatelessWidget {
-  const _HistoryApplicationsEmptyView();
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-          const Text(
-            "3 архивных заявки",
-            style: TextStyle(fontSize: 12, color: Colors.black54),
-          ),
-          const SizedBox(height: 0),
-
-          ListView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(top: 2),
-            children: const [
-              HistoryApplicationCard(
-                title: "Стреляющая боль бокового верхнего резца",
-                user: "Георгий",
-                datetime: "23.03.2025 16:48",
-                doctor: "Стоматолог",
-                description:
-                "Несколько дней мучает зубная боль. Сначала реагировал только на холодное и горячее, а сейчас болит постоянно и иногда отдаёт пульсирующей болью. Обезболивающие почти не помогают. Нужна консультация стоматолога, чтобы разобраться в причине и начать лечение",
-                city: "Санкт-Петербург",
-                cost: 8000,
-                rating: '4',
-                responder: [
-                  {
-                    'id': 'doc001',
-                    'name': 'Иван И.',
-                    'surname': 'Иванов',
-                    'rating': 4.6,
-                    'completed': 128,
-                    'specialization': 'Стоматолог',
-                    'phone': '+7 900 000 00 00',
-                    'email': 'ivan@example.com',
-                    'city': 'Москва',
-                    'experience': '10 лет',
-                    'price': '5000р',
-                    'workplace': 'Клиника Здоровья',
-                    'about': 'Опытный специалист в терапевтической стоматологии',
-                  },
-                ],
-              ),
-              HistoryApplicationCard(
-                title: "*окшгп* *уэугеээ* помогите",
-                user: "Серега",
-                datetime: "01.01.2025 11:48",
-                doctor: "Проктолог",
-                description:
-                "Несколько дней мучает зубная боль. Сначала реагировал только на холодное и горячее, а сейчас болит постоянно и иногда отдаёт пульсирующей болью. Обезболивающие почти не помогают. Нужна консультация стоматолога, чтобы разобраться в причине и начать лечение",
-                city: "Санкт-Петербург",
-                cost: 8000,
-                responder: [
-                  {
-                    'id': 'doc001',
-                    'name': 'Иван И.',
-                    'surname': 'Иванов',
-                    'rating': 4.6,
-                    'completed': 128,
-                    'specialization': 'Стоматолог',
-                    'phone': '+7 900 000 00 00',
-                    'email': 'ivan@example.com',
-                    'city': 'Москва',
-                    'experience': '10 лет',
-                    'price': '5000р',
-                    'workplace': 'Клиника Здоровья',
-                    'about': 'Опытный специалист в терапевтической стоматологии',
-                  },
-                ],
-              ),
-              HistoryApplicationCard(
-                title: "Эм ну я эм эм",
-                user: "Алексей",
-                datetime: "03.03.2025 04:00",
-                doctor: "Логопед",
-                description:
-                "Несколько дней мучает зубная боль. Сначала реагировал только на холодное и горячее, а сейчас болит постоянно и иногда отдаёт пульсирующей болью. Обезболивающие почти не помогают. Нужна консультация стоматолога, чтобы разобраться в причине и начать лечение",
-                city: "Санкт-Петербург",
-                cost: 8000,
-                rating: '2',
-                responder: [
-                  {
-                    'id': 'doc001',
-                    'name': 'Иван И.',
-                    'surname': 'Иванов',
-                    'rating': 4.6,
-                    'completed': 128,
-                    'specialization': 'Стоматолог',
-                    'phone': '+7 900 000 00 00',
-                    'email': 'ivan@example.com',
-                    'city': 'Москва',
-                    'experience': '10 лет',
-                    'price': '5000р',
-                    'workplace': 'Клиника Здоровья',
-                    'about': 'Опытный специалист в терапевтической стоматологии',
-                  },
-                ],
-              ),
-
-            ],
-          ),
-        ],
       ),
     );
   }
