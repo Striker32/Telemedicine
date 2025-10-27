@@ -131,7 +131,6 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                   ),
 
                   // Contact support
-                  DividerLine(),
 
                   const SizedBox(height: 28),
 
