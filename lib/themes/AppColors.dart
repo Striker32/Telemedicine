@@ -30,6 +30,9 @@ class AppColors {
 
       static const Color additionalAccent = Color(0xFFFFECF1);
 
+      // для заднего фона в profile_from_perspective_doctor, название такое, т.к. в брендбуке его нету
+      static const Color foregroundUSELED = Color(0xFFFAFAFA);
+
 
 
       static const Color black = Color(0xFF000000);
