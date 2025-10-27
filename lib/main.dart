@@ -11,6 +11,7 @@ import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
 import 'package:last_telemedicine/pages/user_pages/register_user.dart';
 import 'package:last_telemedicine/pages/user_pages/applications_user.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 import 'package:last_telemedicine/themes/TelemedicineTheme.dart';
 import 'Services/Bottom_Navigator.dart';
@@ -39,7 +40,7 @@ class Myapp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ApplicationsPageDoctor(),
+      home: MainScreen(),
       theme: ThemeData(
         fontFamily: "SF Pro Display",
       ),

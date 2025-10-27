@@ -141,7 +141,7 @@ class _ProfilePageState extends State<ChangePageUser> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Введите свое емя и добавьте по желанию'
+                'Введите свое имя и добавьте по желанию'
                 '\nфотографию профиля',
                 style: TextStyle(
                   fontSize: 14,

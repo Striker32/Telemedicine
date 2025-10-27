@@ -83,23 +83,31 @@ class _ProfilePageState extends State<NewsFeedPage> {
 
                     const SizedBox(height: 12),
 
-                    NewsCard(
-                      date: '9 февраля 2025 15:45',
-                      title: 'Дистанционные\nконсультации у терапевта',
-                      image: AssetImage(
-                        "assets/images/app/News_pallet_image2.png",
-                      ),
+                    Image(
+                      image: AssetImage("assets/images/app/News_2.png"),
+                      fit: BoxFit.cover,
                     ),
+
+                    // NewsCard(
+                    //   date: '9 февраля 2025 15:45',
+                    //   title: 'Дистанционные\nконсультации у терапевта',
+                    //   image:
+                    // ),
 
                     const SizedBox(height: 12),
 
-                    NewsCard(
-                      date: '9 февраля 2025 15:45',
-                      title: 'Следите за приёмом\nв личном кабинете',
-                      image: AssetImage(
-                        "assets/images/app/News_pallet_image1.png",
-                      ),
+                    Image(
+                      image: AssetImage("assets/images/app/News_1.png"),
+                      fit: BoxFit.cover,
                     ),
+
+                    // NewsCard(
+                    //   date: '9 февраля 2025 15:45',
+                    //   title: 'Следите за приёмом\nв личном кабинете',
+                    //   image: AssetImage(
+                    //     "assets/images/app/News_1.png",
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

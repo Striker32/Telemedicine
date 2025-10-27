@@ -3,6 +3,8 @@ import 'package:last_telemedicine/themes/AppColors.dart';
 
 import '../../components/Checkbox.dart';
 import '../../components/AppBarButton.dart' show AppBarButton;
+import '../../components/CustomAppBar.dart';
+import 'login_user.dart';
 
 class RegisterPageUser extends StatelessWidget {
   const RegisterPageUser({super.key});
@@ -21,14 +23,9 @@ class RegisterPageUser extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        leading: AppBarButton(label: 'Назад', onTap: () {}),
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: false, // убираем стандартные рамки
-        titleSpacing: 0, // убираем отступы слева
-        title: Align(
-          alignment: Alignment.centerLeft,
-          child: AppBarButton(),
-        ),
       ),
 
 
@@ -73,7 +70,10 @@ class RegisterPageUser extends StatelessWidget {
               // Ссылка "У меня уже есть профиль"
               TextButton(
                 onPressed: () {
-                  // TODO: переход на вход
+                  Navigator.push(
+                    context, // 'context' здесь очень важен!
+                    MaterialPageRoute(builder: (context) => LoginPageUser()), // Замените DoctorScreen() на ваш виджет
+                  );
                 },
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
@@ -238,7 +238,10 @@ class RegisterPageUser extends StatelessWidget {
                 height: 64,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: действие продолжить
+                    Navigator.push(
+                      context, // 'context' здесь очень важен!
+                      MaterialPageRoute(builder: (context) => LoginPageUser()), // Замените DoctorScreen() на ваш виджет
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.additionalAccent,

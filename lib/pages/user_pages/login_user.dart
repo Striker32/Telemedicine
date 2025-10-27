@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 
 import '../../components/Checkbox.dart';
 import '../../components/AppBarButton.dart' show AppBarButton;
+import '../../components/CustomAppBar.dart';
 
 class LoginPageUser extends StatelessWidget {
   const LoginPageUser({super.key});
@@ -20,16 +22,10 @@ class LoginPageUser extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        leading: AppBarButton(label: 'Назад', onTap: () {}),
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: false, // убираем стандартные рамки
-        titleSpacing: 0, // убираем отступы слева
-        title: Align(
-          alignment: Alignment.centerLeft,
-          child: AppBarButton(),
-        ),
       ),
-
 
       body: Center(
         child: SingleChildScrollView(
@@ -183,7 +179,7 @@ class LoginPageUser extends StatelessWidget {
                   ),
                   // В макете круглый свайч справа
                   // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  const Switch(value: false, onChanged: null),
+                  Checkboxswitch(),
                 ],
               ),
 
@@ -197,7 +193,10 @@ class LoginPageUser extends StatelessWidget {
                 height: 64,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: действие продолжить
+                    Navigator.push(
+                      context, // 'context' здесь очень важен!
+                      MaterialPageRoute(builder: (context) => BottomNavigator()), // Замените DoctorScreen() на ваш виджет
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: pinkBg,

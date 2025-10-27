@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
+import 'package:last_telemedicine/pages/Choose_profile.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_change_user.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
 
 import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
@@ -31,8 +34,18 @@ class _ProfilePageState extends State<ProfilePageUser> {
       // AppBar
       appBar: CustomAppBar(
         titleText: 'Профиль',
-        leading: AppBarButton(label: 'Настройки', onTap: () {}),
-        action: AppBarButton(label: 'Изменить', onTap: () {}),
+        leading: AppBarButton(label: 'Настройки', onTap: () {
+          Navigator.push(
+            context, // 'context' здесь очень важен!
+            MaterialPageRoute(builder: (context) => ProfileSettingsPageUser()), // Замените DoctorScreen() на ваш виджет
+          );
+        }),
+        action: AppBarButton(label: 'Изменить', onTap: () {
+          Navigator.push(
+            context, // 'context' здесь очень важен!
+            MaterialPageRoute(builder: (context) => ChangePageUser()), // Замените DoctorScreen() на ваш виджет
+          );
+        }),
       ),
       body: SafeArea(
         child: Column(
@@ -147,7 +160,12 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
                 const DividerLine(),
 
-                const CustomButton(label: 'Выйти', color: Colors.red),
+                CustomButton(onTap: () {
+                  Navigator.push(
+                    context, // 'context' здесь очень важен!
+                    MaterialPageRoute(builder: (context) => ChooseProfile()), // Замените DoctorScreen() на ваш виджет
+                  );
+                },label: 'Выйти', color: Colors.red),
 
                 const DividerLine(height: 1.2,),
 

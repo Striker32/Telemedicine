@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
+import 'package:last_telemedicine/pages/user_pages/applications_user.dart';
 
+import '../../Services/Bottom_Navigator.dart';
 import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/DoctorRespondButton.dart';
@@ -33,7 +35,12 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
       backgroundColor: AppColors.white,
       appBar: CustomAppBar(
         titleText: 'Информация',
-        leading: AppBarButton(label: 'Назад', onTap: () {}),
+        leading: AppBarButton(label: 'Назад', onTap: () {
+          Navigator.push(
+            context, // 'context' здесь очень важен!
+            MaterialPageRoute(builder: (context) => BottomNavigator()), // Замените DoctorScreen() на ваш виджет
+          );
+        }),
         action: AppBarButton(label: 'Выбрать', onTap: () {}),
       ),
       body: SafeArea(
@@ -82,7 +89,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
                                 Text(
-                                  'Речнекова Мария Д.',
+                                  'Иванов Иван И.',
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
