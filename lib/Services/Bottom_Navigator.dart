@@ -22,7 +22,7 @@ class BottomNavigator extends StatefulWidget {
 class _BottomNavigatorState extends State<BottomNavigator> {
   int _currentIndex = 2;
 
-  final List<Widget> _pages = [MainDoctor(), ApplicationsPageDoctor(), ProfilePageDoctor()];
+  final List<Widget> _pages = [NewsFeedPage(), ApplicationsPage(), ProfilePageUser()];
 
   void _navigateBottomBar(int index) {
     setState(() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 
@@ -1803,7 +1804,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
 
                       return InkWell(
                         onTap: () {
-                          // TODO: открыть профиль врача
+                          Navigator.push(
+                            context, // 'context' здесь очень важен!
+                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers()), // Замените DoctorScreen() на ваш виджет
+                          );
                         },
                         child: Container(
                           decoration: const BoxDecoration(
@@ -2424,7 +2428,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
                       return InkWell(
                         onTap: () {
-                          // TODO: открыть профиль врача
+                          Navigator.push(
+                            context, // 'context' здесь очень важен!
+                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers()), // Замените DoctorScreen() на ваш виджет
+                          );
                         },
                         child: Container(
                           // Отдельный белый прямоугольник внутри серой панели,
