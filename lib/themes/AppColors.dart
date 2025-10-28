@@ -20,13 +20,18 @@ class AppColors {
 
       // ЗАПАСНОЙ Т.К. Я НЕ УВЕРЕН КАКОЙ ИМЕННО ЦВЕТ У ЗАДНЕГО ФОНА
       static const Color background2 = Color(0xFFEFEFF4);
+      static const Color background3 = Color(0xFFF5F5F7);
 
       // ТОТ, КОТОРЫЙ УКАЗАН В ДИЗАЙНЕ
       static const Color background = Color(0xFFFBFCFD);
 
+
       static const Color addLightText = Color(0xFF9BA1A5);
 
       static const Color mainColor = Color(0xFFFF4361);
+
+      // Для палочек-полосок
+      static const Color dividerLine = Color(0xFF4A4B4E);
 
       static const Color additionalAccent = Color(0xFFFFECF1);
 
@@ -43,7 +48,7 @@ class AppColors {
 
 // settings_page.dart & profile_page.dart — акцентный красный (эквивалент Colors.red)
 // используется для BackButton, ссылок и кнопок "Изменить"/"Настройки"
-      static const Color accentRed = Color(0xFFF44336);
+      static const Color accentRed = Color(0xFFFFECF1);
 
 
 // components/custom_button.dart — светлый вариант red.shade200 (используется в CustomButton)
@@ -51,7 +56,7 @@ class AppColors {
 
 
 // profile_page.dart — заголовки и основной текст (kTitleColor, kPrimaryText)
-      static const Color primaryText = Color(0xFF111111);
+      static const Color primaryText = Color(0xFF1D1D1F);
 
 
 // profile_page.dart — второстепенный текст (kSecondaryText)

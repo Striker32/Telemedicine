@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
-
 import '../themes/AppColors.dart';
 
 class DividerLine extends StatelessWidget {
-  final double lenght;
-  final Color colorDivider;
-  final double height;
+  final double length; // ← поправил опечатку: lenght → length
+  final Color color;
+  final double thickness;
+
   const DividerLine({
     Key? key,
-    this.lenght = 0.0,
-    this.height = 1.0,
-    this.colorDivider = AppColors.greyDivider,
+    this.length = 0.0,
+    this.thickness = 1.0,
+    this.color = AppColors.greyDivider,
   }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: lenght),
-      child: Divider(height: height, color: colorDivider),
+      padding: EdgeInsets.symmetric(horizontal: length),
+      child: Container(
+        height: thickness,
+        color: color,
+      ),
     );
   }
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
+import 'package:last_telemedicine/components/DividerLine.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
 
 import '../../components/Checkbox.dart';
 import '../../components/AppBarButton.dart' show AppBarButton;
 import '../../components/CustomAppBar.dart';
+import '../../themes/AppColors.dart';
 
 class LoginPageUser extends StatelessWidget {
   const LoginPageUser({super.key});
@@ -29,7 +32,7 @@ class LoginPageUser extends StatelessWidget {
 
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
+          padding: const EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -69,7 +72,7 @@ class LoginPageUser extends StatelessWidget {
               const SizedBox(height: 80),
 
               // Divider before first field (как в макете)
-              const Divider(height: 1, thickness: 1, color: Colors.black12),
+              const DividerLine(),
 
 
 
@@ -78,7 +81,7 @@ class LoginPageUser extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.black12, width: 1),
+                    bottom: BorderSide(color: AppColors.greyDivider, width: 1),
                   ),
                 ),
                 child: Row(
@@ -86,7 +89,7 @@ class LoginPageUser extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         border: Border(
-                          right: BorderSide(color: Colors.black12, width: 1),
+                          right: BorderSide(color: AppColors.greyDivider, width: 1),
                         ),
                       ),
                       width: 72,
@@ -137,7 +140,7 @@ class LoginPageUser extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.black12, width: 1),
+                    bottom: BorderSide(color: AppColors.greyDivider, width: 1),
                   ),
                 ),
                 child: TextFormField(
@@ -160,7 +163,7 @@ class LoginPageUser extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
 
 
 
@@ -183,42 +186,37 @@ class LoginPageUser extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 28),
-
-              // Пустое пространство перед кнопкой, чтобы кнопка не прилипала к полю
-              const SizedBox(height: 150),
-
-              // Кнопка "Продолжить"
-              SizedBox(
-                height: 64,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context, // 'context' здесь очень важен!
-                      MaterialPageRoute(builder: (context) => BottomNavigator()), // Замените DoctorScreen() на ваш виджет
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: pinkBg,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
-                  child: Text(
-                    'Продолжить',
-                    style: TextStyle(
-                      fontFamily: 'SF Pro Display',
-                      fontSize: 22,
-                      fontWeight: FontWeight.w500,
-                      color: pinkText,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: dividerOfContinue), // нижний отступ
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        child: SizedBox(
+          height: 64,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => BottomNavigator()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.additionalAccent,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+            child: Text(
+              'Продолжить',
+              style: TextStyle(
+                fontFamily: 'SF Pro Display',
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: AppColors.mainColor,
+              ),
+            ),
           ),
         ),
       ),

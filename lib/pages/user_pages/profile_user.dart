@@ -4,6 +4,7 @@ import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/pages/Choose_profile.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_change_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
@@ -64,20 +65,15 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  horizontal: 15,
+                  vertical: 15,
                 ),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: const Color(0xFFE0E0E6),
-                      child: const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                      // Для реальной аватарки: backgroundImage: AssetImage(...) / NetworkImage(...)
+                    SvgPicture.asset(
+                      "assets/images/icons/userProfile.svg",
+                      width: 60,
+                      height: 60,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -108,7 +104,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
 
             // Заголовок "Контактные данные"
             const Padding(
@@ -123,7 +119,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
             const DividerLine(),
 
@@ -141,22 +137,20 @@ class _ProfilePageState extends State<ProfilePageUser> {
             const DividerLine(),
 
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
             // Кнопки действий
             Column(
               children: [
 
-                const DividerLine(),
 
                 CustomButton(
                   label: 'Изменить пароль',
                   color: Colors.red.shade200,
                 ),
 
-                const DividerLine(),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 30),
 
                 const DividerLine(),
 
@@ -167,7 +161,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                   );
                 },label: 'Выйти', color: Colors.red),
 
-                const DividerLine(height: 1.2,),
+                const DividerLine(),
 
               ],
             ),

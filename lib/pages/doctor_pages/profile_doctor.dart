@@ -254,7 +254,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                       const CustomButton(label: 'Выйти', color: Colors.red),
 
-                      const DividerLine(height: 1.2),
+                      const DividerLine(),
                     ],
                   ),
 

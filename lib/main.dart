@@ -13,6 +13,7 @@ import 'package:last_telemedicine/pages/user_pages/register_user.dart';
 import 'package:last_telemedicine/pages/user_pages/applications_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
+import 'package:last_telemedicine/themes/AppColors.dart';
 import 'package:last_telemedicine/themes/TelemedicineTheme.dart';
 import 'Services/Bottom_Navigator.dart';
 import 'firebase_options.dart';
@@ -43,6 +44,9 @@ class Myapp extends StatelessWidget {
       home: MainScreen(),
       theme: ThemeData(
         fontFamily: "SF Pro Display",
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: AppColors.mainColor, // ← цвет курсора
+        ),
       ),
     );
   }
