@@ -31,7 +31,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   bool _isEditing = false;
 
-  File _selectedImage = File('assets/images/app/avatar.png');
+  File _selectedImage = File('assets/images/app/heartStart.png');
 
   final TextEditingController _phoneController = TextEditingController(
     text: '+ 7 900 502 93',
@@ -306,7 +306,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                     color: Colors.red,
                   ),
 
-                  const DividerLine(height: 1.2),
+                  const DividerLine(),
                 ],
               ),
 

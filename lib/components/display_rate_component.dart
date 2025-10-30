@@ -26,18 +26,11 @@ class RatingBadge extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 40,
-          height: 24,
+          width: 41,
+          height: 25,
           decoration: BoxDecoration(
             color: badgeColor,
             borderRadius: BorderRadius.circular(badgeSize / 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
           ),
           alignment: Alignment.center,
           child: Text(

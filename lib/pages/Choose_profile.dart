@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:last_telemedicine/pages/doctor_pages/login_doctor.dart';
-import 'package:last_telemedicine/pages/legacy/home_page.dart';
-import 'package:last_telemedicine/pages/legacy/login_page.dart';
-
-import 'package:last_telemedicine/auth/login_or_register.dart';
 import 'package:last_telemedicine/pages/user_pages/register_user.dart';
+
+import '../themes/AppColors.dart';
 
 class ChooseProfile extends StatelessWidget {
   const ChooseProfile({super.key});
@@ -14,98 +13,104 @@ class ChooseProfile extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Заголовок
-              const Text(
-                "Выберите профиль",
-                style: TextStyle(
-                  fontFamily: "SF Pro Display",
-                  fontSize: 32,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Иконка пользователя
-              CircleAvatar(
-                radius: 75,
-                backgroundColor: Colors.grey.shade200,
-                child: const Icon(
-                  Icons.person,
-                  size: 120,
-                  color: Colors.black87,
-                ),
-              ),
-
-              const SizedBox(height: 300),
-
-              // Кнопка Пациент
-              SizedBox(
-                width: 370,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pink.shade50,
-                    foregroundColor: Colors.redAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Верхняя часть — заголовок и иконка по центру
+            Column(
+              children: [
+                const SizedBox(height: 120),
+                const Center(
+                  child: Text(
+                    "Выберите профиль",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.primaryText,
+                      fontFamily: "SF Pro Display",
+                      fontSize: 32,
+                      fontWeight: FontWeight.w200,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RegisterPageUser(),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: SvgPicture.asset(
+                    "assets/images/icons/userProfile-hello.svg",
+                    width: 120,
+                    height: 120,
+                  ),
+                ),
+              ],
+            ),
+
+            // Нижняя часть — кнопки по центру и прижаты к низу
+            Column(
+              children: [
+                SizedBox(
+                  width: 370,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accentRed,
+                      foregroundColor: AppColors.mainColor,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    );
-                  },
-                  child: const Text(
-                    "Пациент",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: "SF Pro Display",
-                      fontWeight: FontWeight.w500,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterPageUser(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Пациент",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: "SF Pro Display",
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // Кнопка Врач
-              SizedBox(
-                width: 370,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade100,
-                    foregroundColor: Colors.black87,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 370,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.background3,
+                      foregroundColor: AppColors.primaryText,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context, // 'context' здесь очень важен!
-                      MaterialPageRoute(builder: (context) => LoginPageDoctor()), // Замените DoctorScreen() на ваш виджет
-                    );
-                  },
-                  child: const Text(
-                    "Врач",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontFamily: "SF Pro Display",
-                      fontWeight: FontWeight.w500,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPageDoctor(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Врач",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: "SF Pro Display",
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ],
         ),
       ),
     );

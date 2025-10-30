@@ -61,7 +61,6 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
 
   @override
   Widget build(BuildContext context) {
-    final divider = const Divider(height: 1, thickness: 1);
     final sectionHeaderStyle = TextStyle(
       color: AppColors.grey600,
       fontSize: 13,
@@ -72,7 +71,6 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
       body: SafeArea(
         child: Column(
           children: [
-            DividerLine(),
 
             // Список настроек в Expanded
             Expanded(
@@ -80,7 +78,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                 children: [
                   // Section: Основные документы
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+                    padding: const EdgeInsets.fromLTRB(15, 30, 15, 10),
                     child: Text(
                       'Основные документы',
                       style: sectionHeaderStyle,
@@ -111,7 +109,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
 
                   // Section: Язык интерфейса
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    padding: const EdgeInsets.fromLTRB(15, 30, 15, 10),
                     child: Text(
                       'Изменить язык интерфейса',
                       style: sectionHeaderStyle,
@@ -132,12 +130,12 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
 
                   // Contact support
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 30),
 
                   DividerLine(),
                   const CustomButton(
                     label: 'Связаться с поддержкой',
-                    color: Colors.red,
+                    color: AppColors.mainColor,
                   ),
 
                   DividerLine(),
@@ -147,18 +145,19 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
 
             // Версия приложения снизу
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 30),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     'Версия приложения',
-                    style: TextStyle(color: AppColors.grey600),
+                    style: TextStyle(color: AppColors.grey600, fontSize: 16),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     widget.appVersion,
                     style: const TextStyle(
+                      fontSize: 16,
                       color: AppColors.grey500,
                       fontWeight: FontWeight.w500,
                     ),
@@ -169,7 +168,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
           ],
         ),
       ),
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.background2,
     );
   }
 }

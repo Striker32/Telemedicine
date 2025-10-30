@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/SettingsRow.dart';
@@ -54,26 +54,20 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                       color: Colors.white,
                       border: Border(
                         bottom: BorderSide(color: Colors.black12, width: 1),
-                        top: BorderSide(color: Colors.black12, width: 1),
                       ),
                     ),
 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 8,
+                        vertical: 15,
                       ),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 40,
-                            backgroundColor: const Color(0xFFE0E0E6),
-                            child: const Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.white,
-                            ),
-                            // Для реальной аватарки: backgroundImage: AssetImage(...) / NetworkImage(...)
+                          SvgPicture.asset(
+                            "assets/images/icons/userProfile.svg",
+                            width: 60,
+                            height: 60,
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -111,7 +105,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   // Заголовок "Контактные данные"
                   const Padding(
@@ -126,7 +120,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
                   const DividerLine(),
 
@@ -146,7 +140,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                   const DividerLine(),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
 
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
@@ -160,7 +154,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
                   const DividerLine(),
 
@@ -182,7 +176,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                   const DividerLine(),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
 
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
@@ -196,7 +190,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
                   const DividerLine(),
 
@@ -204,7 +198,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                   const DividerLine(),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
 
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16),
@@ -218,7 +212,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
 
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -227,9 +221,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     ),
                     color: Colors.white,
                     child: Text(
-                      'Внимание, Сталкер, приближается выброс, в укрытие!\n'
-                          'Сертифицированный стоматолог с опытом работы более 13 лет'
-                          '  Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен,'
+                          'Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен,'
                           ' а также проведении профессиональной гигиены полости рта'
                           '  Помогаю пациентам сохранить здоровье зубов и красивую улыбку,'
                           ' подбираю индивидуальный подход к каждому случаю  '
@@ -243,25 +235,23 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
 
                   // Кнопки действий
                   Column(
                     children: [
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
 
                       const DividerLine(),
 
                       const CustomButton(label: 'Выйти', color: Colors.red),
 
-                      const DividerLine(height: 1.2),
+                      const DividerLine(),
                     ],
                   ),
 
-                  const SizedBox(height: 20),
-
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 30),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -276,8 +266,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 32),
 
                 ],
               ),

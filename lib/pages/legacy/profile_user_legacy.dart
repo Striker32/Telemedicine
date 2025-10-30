@@ -168,7 +168,7 @@ class _ProfilePageState extends State<LegacyProfilePageUser> {
                   );
                 },label: 'Выйти', color: Colors.red),
 
-                const DividerLine(height: 1.2,),
+                const DividerLine(),
 
               ],
             ),

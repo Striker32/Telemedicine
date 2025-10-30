@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/pages/News_feed.dart';
 import 'package:last_telemedicine/pages/user_pages/applications_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
@@ -23,6 +24,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   int _currentIndex = 2;
 
   final List<Widget> _pages = [NewsFeedPage(), ApplicationsPage(), ProfilePageUser()];
+  // final List<Widget> _pages = [MainDoctor(), ApplicationsPageDoctor(), ProfilePageDoctor()];
 
   void _navigateBottomBar(int index) {
     setState(() {
@@ -33,16 +35,19 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: _pages[_currentIndex],
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          DividerLine(), // ← полоска сверху
           BottomNavigationBar(
+            elevation: 0,
             backgroundColor: Colors.white,
             currentIndex: _currentIndex,
             onTap: _navigateBottomBar,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: const Color(0xFFFF497C),
+            selectedItemColor: const Color(0xFFFF4361),
             unselectedItemColor: Colors.grey,
             items: [
               const BottomNavigationBarItem(
@@ -50,7 +55,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                 label: 'Лента',
                 activeIcon: ImageIcon(
                   AssetImage('assets/images/icons/feed_icon.png'),
-                  color: Color(0xFFFF497C),
+                  color: Color(0xFFFF4361),
                 ),
               ),
               const BottomNavigationBarItem(
@@ -58,31 +63,29 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                 label: 'Заявки',
                 activeIcon: ImageIcon(
                   AssetImage('assets/images/icons/heart_icon.png'),
-                  color: Color(0xFFFF497C),
+                  color: Color(0xFFFF4361),
                 ),
               ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                'assets/images/icons/userProfile.svg',
-                width: 24,
-                height: 24,
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  'assets/images/icons/userProfile.svg',
+                  width: 24,
+                  height: 24,
+                ),
+                activeIcon: SvgPicture.asset(
+                  'assets/images/icons/userProfileРозовый.svg',
+                  width: 24,
+                  height: 24,
+                ),
+                label: 'Профиль',
               ),
-              activeIcon: SvgPicture.asset(
-                'assets/images/icons/userProfileРозовый.svg',
-                width: 24,
-                height: 24,
-              ),
-              label: 'Профиль',
-            ),
             ],
           ),
-          Container(
-            height: 30,
-            color: Colors.white, // ← тот же цвет, что и у бара
-          ),
+          const SizedBox(height: 30), // ← отступ снизу
         ],
       ),
     );
+
   }
 
 }

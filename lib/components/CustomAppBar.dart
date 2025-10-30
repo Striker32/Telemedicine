@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
 
 // Наш универсальный AppBar, который реализует PreferredSizeWidget
@@ -21,7 +22,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.titleText,
     this.action,
     this.backgroundColor = AppColors.background,
-    this.elevation = 0.5,
+    this.elevation = 0.0,
   }) : super(key: key);
 
   @override
@@ -31,19 +32,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor,
       elevation: elevation,
       shadowColor: Colors.black.withOpacity(0.5),
+      centerTitle: true,
 
-      // 1. Используем Stack для идеального центрирования
       title: Stack(
-        // Позволяем Stack'у рисовать элементы по всей ширине AppBar
         children: [
-          // 2. Левый виджет (кнопка "назад")
           if (leading != null)
             Align(
               alignment: Alignment.centerLeft,
               child: leading,
             ),
-
-          // 3. Центральный виджет (заголовок)
           if (titleText != null)
             Align(
               alignment: Alignment.center,
@@ -57,8 +54,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-
-          // 4. Правый виджет (кнопка "готово")
           if (action != null)
             Align(
               alignment: Alignment.centerRight,
@@ -66,7 +61,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
         ],
       ),
-      centerTitle: true,
+
+      // 👇 вот тут добавляется DividerLine
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: DividerLine(),
+      ),
     );
   }
 
