@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AvatarWithPicker extends StatefulWidget {
-  const AvatarWithPicker({super.key});
+  const AvatarWithPicker({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _AvatarWithPickerState createState() => _AvatarWithPickerState();

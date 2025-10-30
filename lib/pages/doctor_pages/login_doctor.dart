@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../Services/Bottom_Navigator.dart';
 import '../../components/Checkbox.dart';
 import '../../components/AppBarButton.dart' show AppBarButton;
+import '../../components/CustomAppBar.dart';
 import '../../themes/AppColors.dart';
 
 class LoginPageDoctor extends StatelessWidget {
@@ -17,15 +19,11 @@ class LoginPageDoctor extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
+      appBar: CustomAppBar(
+        leading: AppBarButton(label: 'Назад', onTap: () {}),
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: false, // убираем стандартные рамки
-        titleSpacing: 0, // убираем отступы слева
-        title: Align(
-          alignment: Alignment.centerLeft,
-          child: AppBarButton(),
-        ),
       ),
+
 
 
       body: Center(
@@ -197,7 +195,10 @@ class LoginPageDoctor extends StatelessWidget {
                 height: 64,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: действие продолжить
+                    Navigator.push(
+                      context, // 'context' здесь очень важен!
+                      MaterialPageRoute(builder: (context) => BottomNavigator()), // Замените DoctorScreen() на ваш виджет
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.additionalAccent,

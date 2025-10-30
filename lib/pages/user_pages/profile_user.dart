@@ -1,44 +1,119 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:last_telemedicine/components/Avatar/AvatarWithPicker.dart';
+import 'package:last_telemedicine/components/SettingsRow.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
+import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 
+import '../../components/Avatar/DisplayAvatar.dart';
 import '../../components/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
-import '../../components/SettingsRow.dart';
 import '../../components/AppBarButton.dart';
 import '../../themes/AppColors.dart';
+import '../Choose_profile.dart';
 
-class ProfilePageUser1 extends StatefulWidget {
-  const ProfilePageUser1({Key? key}) : super(key: key);
+class ProfilePageUser extends StatefulWidget {
+  const ProfilePageUser({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePageUser1> createState() => _ProfilePageState();
+  State<ProfilePageUser> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePageUser1> {
+class _ProfilePageState extends State<ProfilePageUser> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
-  static const Color kSecondaryText = Color(
-    0xFF9BA1A5,
-  ); // цвет значения в контактных данных
+  static const Color kDivider = Color(0x3C3C43); // цвет разделителя
 
+  bool _isEditing = false;
+
+  File _selectedImage = File('assets/images/app/avatar.png');
+
+  final TextEditingController _phoneController = TextEditingController(
+    text: '+ 7 900 502 93',
+  );
+
+  final TextEditingController _emailController = TextEditingController(
+    text: 'example@mail.ru',
+  );
+
+  final TextEditingController _nameController = TextEditingController(
+    text: 'Георгий',
+  );
+
+  final TextEditingController _surnameController = TextEditingController();
+
+  String _currentCity = 'Санкт-Петербург';
+
+  void _changeCityFuncion() async {
+    // Пример: открыть страницу выбора языка и ждать результата
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => ChangeCityPage(selected: _currentCity)),
+    );
+    if (result != null && result != _currentCity) {
+      setState(() => _currentCity = result);
+      // Здесь можно вызвать сохранение в настройки/сервер
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackground,
-      // AppBar
       appBar: CustomAppBar(
         titleText: 'Профиль',
-        leading: AppBarButton(label: 'Настройки', onTap: () {}),
-        action: AppBarButton(label: 'Изменить', onTap: () {}),
+        // Управляем кнопками в AppBar в зависимости от _isEditing
+        leading: _isEditing
+            ? AppBarButton(
+                label: 'Отмена',
+                onTap: () {
+                  setState(() {
+                    _isEditing = false;
+                    // Здесь можно сбросить изменения в контроллерах, если нужно
+                  });
+                },
+              )
+            : AppBarButton(
+                // Заменяем кнопку "Готово" на "Изменить"
+                label: 'Настройки',
+                onTap: () {
+                  Navigator.push(
+                    context, // 'context' здесь очень важен!
+                    MaterialPageRoute(
+                      builder: (context) => ProfileSettingsPageUser(),
+                    ), // Замените DoctorScreen() на ваш виджет
+                  );
+                },
+              ), // ваша кнопка "назад"
+        action: _isEditing
+            ? AppBarButton(
+                label: 'Готово',
+                onTap: () {
+                  // ПРОПИСАТЬ ЛОГИКУ СОХРАНЕНИЯ ДАННЫХ
+                  setState(() {
+                    _isEditing = false;
+                  });
+                },
+              )
+            : AppBarButton(
+                // Заменяем кнопку "Готово" на "Изменить"
+                label: 'Изменить',
+                onTap: () {
+                  setState(() {
+                    _isEditing = true;
+                  });
+                },
+              ),
       ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-
             // Блок аватара, имени и телефона
             Container(
               decoration: BoxDecoration(
@@ -56,35 +131,59 @@ class _ProfilePageState extends State<ProfilePageUser1> {
                 ),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: const Color(0xFFE0E0E6),
-                      child: const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                      // Для реальной аватарки: backgroundImage: AssetImage(...) / NetworkImage(...)
-                    ),
+                    _isEditing
+                        ? AvatarWithPicker(
+                            initialImage:
+                                _selectedImage, // Передаем текущее изображение
+                            onImageSelected: (file) {
+                              // Получаем выбранный файл обратно
+                              setState(() {
+                                _selectedImage = file;
+                              });
+                            },
+                          )
+                        : DisplayAvatar(image: _selectedImage),
+
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Георгий',
+                        children: [
+                          TextField(
+                            controller: _nameController,
+                            readOnly: !_isEditing,
+                            textAlign: TextAlign.start,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                            ),
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                               color: kPrimaryText,
                             ),
                           ),
-                          Text(
-                            '+7 900 502 9229',
+
+                          DividerLine(),
+
+                          TextField(
+                            controller: _surnameController,
+                            readOnly: !_isEditing,
+                            textAlign: TextAlign.start,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              hintText: 'Фамилия',
+                              hintStyle: TextStyle(
+                                color: AppColors.addLightText,
+                              ),
+                            ),
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: kSecondaryText,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: kPrimaryText,
                             ),
                           ),
                         ],
@@ -95,7 +194,26 @@ class _ProfilePageState extends State<ProfilePageUser1> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+
+            if (_isEditing)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'Введите свое имя и добавьте по желанию\nфотографию профиля',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF677076),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
 
             // Заголовок "Контактные данные"
             const Padding(
@@ -114,47 +232,75 @@ class _ProfilePageState extends State<ProfilePageUser1> {
 
             const DividerLine(),
 
-            // Поля информации — без иконок, с тонкими разделителями
-            const SettingsRow(title: 'Номер телефона', value: '+7 900 502 9229'),
+            DividerLine(),
+
+            SettingsRow(
+              title: 'Сменить номер',
+              titleColor: AppColors.addLightText,
+              controller: _phoneController,
+              isEditable: _isEditing,
+            ),
+
+            DividerLine(),
+
+            SettingsRow(
+              title: 'Сменить почту',
+              titleColor: AppColors.addLightText,
+              controller: _emailController,
+              isEditable: _isEditing,
+            ),
+
+            DividerLine(),
+
+            SettingsRow(
+              title: _currentCity,
+              titleColor: AppColors.addLightText,
+              showArrow: true,
+              onTap: _isEditing ? _changeCityFuncion : null,
+            ),
 
             const DividerLine(),
 
-            const SettingsRow(title: 'Почта', value: 'example@mail.ru'),
-
-            const DividerLine(),
-
-            const SettingsRow(title: 'Город', value: 'Санкт-Петербург'),
-
-            const DividerLine(),
-
-
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // Кнопки действий
             Column(
               children: [
-
                 const DividerLine(),
 
                 CustomButton(
                   label: 'Изменить пароль',
                   color: Colors.red.shade200,
-                  onTap: (){},
                 ),
 
                 const DividerLine(),
 
-                const SizedBox(height: 12),
-
-                const DividerLine(),
-
-                const CustomButton(label: 'Выйти', color: Colors.red),
-
-                const DividerLine(height: 1.2,),
-
               ],
             ),
 
+            if (!_isEditing)
+              Column(
+                children: [
+                  const SizedBox(height: 24),
+
+                  const DividerLine(),
+
+                  CustomButton(
+                    onTap: () {
+                      Navigator.push(
+                        context, // 'context' здесь очень важен!
+                        MaterialPageRoute(
+                          builder: (context) => ChooseProfile(),
+                        ), // Замените DoctorScreen() на ваш виджет
+                      );
+                    },
+                    label: 'Выйти',
+                    color: Colors.red,
+                  ),
+
+                  const DividerLine(height: 1.2),
+                ],
+              ),
 
             const Spacer(),
           ],

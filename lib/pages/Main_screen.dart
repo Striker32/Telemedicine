@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:last_telemedicine/pages/Choose_profile.dart';
 
 import '../themes/AppColors.dart';
 
@@ -72,7 +73,10 @@ class MainScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        // TODO: переход к экрану врача
+                        Navigator.push(
+                          context, // 'context' здесь очень важен!
+                          MaterialPageRoute(builder: (context) => ChooseProfile()), // Замените DoctorScreen() на ваш виджет
+                        );
                       },
                       child: const Text(
                         "Начать",

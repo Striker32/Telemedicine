@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/pages/doctor_pages/login_doctor.dart';
 import 'package:last_telemedicine/pages/legacy/home_page.dart';
 import 'package:last_telemedicine/pages/legacy/login_page.dart';
 
 import 'package:last_telemedicine/auth/login_or_register.dart';
+import 'package:last_telemedicine/pages/user_pages/register_user.dart';
 
 class ChooseProfile extends StatelessWidget {
   const ChooseProfile({super.key});
@@ -57,7 +59,7 @@ class ChooseProfile extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LoginOrRegister(),
+                        builder: (context) => RegisterPageUser(),
                       ),
                     );
                   },
@@ -87,7 +89,10 @@ class ChooseProfile extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // TODO: переход к экрану врача
+                    Navigator.push(
+                      context, // 'context' здесь очень важен!
+                      MaterialPageRoute(builder: (context) => LoginPageDoctor()), // Замените DoctorScreen() на ваш виджет
+                    );
                   },
                   child: const Text(
                     "Врач",
