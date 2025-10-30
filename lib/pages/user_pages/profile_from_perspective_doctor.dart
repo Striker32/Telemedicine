@@ -33,7 +33,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
       backgroundColor: AppColors.white,
       appBar: CustomAppBar(
         titleText: 'Информация',
-        leading: AppBarButton(label: 'Назад', onTap: () {}),
+        leading: AppBarButton(label: 'Назад'),
         action: AppBarButton(label: 'Выбрать', onTap: () {}),
       ),
       body: SafeArea(

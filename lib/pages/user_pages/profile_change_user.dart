@@ -11,23 +11,20 @@ import '../../components/DividerLine.dart';
 import '../../components/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 
-class ChangePageUser extends StatefulWidget {
-  const ChangePageUser({Key? key}) : super(key: key);
+class ProfilePageUser extends StatefulWidget {
+  const ProfilePageUser({Key? key}) : super(key: key);
 
   @override
-  State<ChangePageUser> createState() => _ProfilePageState();
+  State<ProfilePageUser> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ChangePageUser> {
+class _ProfilePageState extends State<ProfilePageUser> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
-  static const Color kTitleColor = Color(0xFF111111); // цвет "Профиль"
-  static const Color kLinkColor = Colors.red; // цвет "Настройки" и "Изменить"
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
-  static const Color kSecondaryText = Color(
-    0xFF9BA1A5,
-  ); // цвет значения в контактных данных
   static const Color kDivider = Color(0x3C3C43); // цвет разделителя
+
+  bool _isEditing = false;
 
   final TextEditingController _phoneController = TextEditingController(
     text: '+ 7 900 502 93',
@@ -63,8 +60,40 @@ class _ProfilePageState extends State<ChangePageUser> {
       backgroundColor: kBackground,
       appBar: CustomAppBar(
         titleText: 'Профиль',
-        leading: AppBarButton(),
-        action: AppBarButton(label: 'Готово', onTap: () {}),
+        // Управляем кнопками в AppBar в зависимости от _isEditing
+        leading: _isEditing
+            ? AppBarButton(
+          label: 'Отмена',
+          onTap: () {
+            setState(() {
+              _isEditing = false;
+              // Здесь можно сбросить изменения в контроллерах, если нужно
+            });
+          },
+        )
+            : AppBarButton( // Заменяем кнопку "Готово" на "Изменить"
+          label: 'Изменить',
+          onTap: () {
+            setState(() {
+              _isEditing = true;
+            });
+          },
+        ), // ваша кнопка "назад"
+        action: _isEditing
+            ? AppBarButton(
+          label: 'Готово',
+          onTap: () {
+            // Здесь логика сохранения данных
+            setState(() {
+              _isEditing = false;
+            });
+          },
+        )
+            : AppBarButton( // Заменяем кнопку "Готово" на "Изменить"
+          label: 'Настройки',
+          onTap: () {
+          },
+        ),
       ),
       body: SafeArea(
         child: Column(
@@ -232,6 +261,7 @@ class _ProfilePageState extends State<ChangePageUser> {
             ),
 
             const Spacer(),
+
           ],
         ),
       ),

@@ -42,7 +42,7 @@ class MainScreen extends StatelessWidget {
                   const SizedBox(height: 15),
 
                   Padding(
-                    padding: const EdgeInsets.only(right: 30),
+                    padding: const EdgeInsets.only(right: 10),
                     child: Text(
                       "Наше приложение поможет быстро найти "
                           "\nнужного врача: в вашем городе или из любого"

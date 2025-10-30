@@ -8,14 +8,14 @@ import '../../components/SettingsRow.dart';
 import '../../components/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 
-class ProfilePageUser extends StatefulWidget {
-  const ProfilePageUser({Key? key}) : super(key: key);
+class ProfilePageUser1 extends StatefulWidget {
+  const ProfilePageUser1({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePageUser> createState() => _ProfilePageState();
+  State<ProfilePageUser1> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePageUser> {
+class _ProfilePageState extends State<ProfilePageUser1> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
@@ -139,6 +139,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                 CustomButton(
                   label: 'Изменить пароль',
                   color: Colors.red.shade200,
+                  onTap: (){},
                 ),
 
                 const DividerLine(),

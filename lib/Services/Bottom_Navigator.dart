@@ -16,7 +16,7 @@ class BottomNavigator extends StatefulWidget {
 class _BottomNavigatorState extends State<BottomNavigator> {
   int _currentIndex = 2;
 
-  final List<Widget> _pages = [ChangeCityPage(), ChangePageUser(), ProfileSettingsPageUser()];
+  final List<Widget> _pages = [ChangeCityPage(), ProfilePageUser(), ProfileSettingsPageUser()];
 
   void _navigateBottomBar(int index) {
     setState(() {
