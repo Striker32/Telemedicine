@@ -16,6 +16,9 @@ import '../../components/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 import '../Choose_profile.dart';
 
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+
 class ProfilePageUser extends StatefulWidget {
   const ProfilePageUser({Key? key}) : super(key: key);
 
@@ -30,7 +33,23 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   bool _isEditing = false;
 
-  File _selectedImage = File('assets/images/app/heartStart.png');
+  File? _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDefaultAvatar();
+  }
+
+  Future<void> _loadDefaultAvatar() async {
+    final byteData = await rootBundle.load('assets/images/app/userProfile.png');
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/userProfile.png');
+    await file.writeAsBytes(byteData.buffer.asUint8List());
+    setState(() {
+      _selectedImage = file;
+    });
+  }
 
   final TextEditingController _phoneController = TextEditingController(
     text: '+ 7 900 502 93',
@@ -126,32 +145,29 @@ class _ProfilePageState extends State<ProfilePageUser> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
-                  bottom: BorderSide(color: Colors.black12, width: 1),
-                  top: BorderSide(color: Colors.black12, width: 1),
+                  bottom: BorderSide(color: AppColors.dividerLine, width: 1),
                 ),
               ),
 
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  horizontal: 15,
+                  vertical: 10,
                 ),
                 child: Row(
                   children: [
                     _isEditing
                         ? AvatarWithPicker(
-                            initialImage:
-                                _selectedImage, // Передаем текущее изображение
-                            onImageSelected: (file) {
-                              // Получаем выбранный файл обратно
-                              setState(() {
-                                _selectedImage = file;
-                              });
-                            },
-                          )
+                      initialImage: _selectedImage,
+                      onImageSelected: (file) {
+                        setState(() {
+                          _selectedImage = file;
+                        });
+                      },
+                    )
                         : DisplayAvatar(image: _selectedImage),
 
-                    const SizedBox(width: 16),
+                const SizedBox(width: 15),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,13 +182,17 @@ class _ProfilePageState extends State<ProfilePageUser> {
                               isDense: true,
                             ),
                             style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
                               color: kPrimaryText,
                             ),
                           ),
 
+                          SizedBox(height: 3),
+
                           DividerLine(),
+
+                          SizedBox(height: 3),
 
                           TextField(
                             controller: _surnameController,
@@ -188,8 +208,8 @@ class _ProfilePageState extends State<ProfilePageUser> {
                               ),
                             ),
                             style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
                               color: kPrimaryText,
                             ),
                           ),
@@ -201,7 +221,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
             if (_isEditing)
               Column(
@@ -212,13 +232,13 @@ class _ProfilePageState extends State<ProfilePageUser> {
                     child: Text(
                       'Введите свое имя и добавьте по желанию\nфотографию профиля',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF677076),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 30),
                 ],
               ),
 
@@ -228,14 +248,14 @@ class _ProfilePageState extends State<ProfilePageUser> {
               child: Text(
                 'Контактные данные',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w400,
                   color: Color(0xFF677076),
                 ),
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
             const DividerLine(),
 
@@ -268,7 +288,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
             const DividerLine(),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
 
             // Кнопки действий
             Column(
@@ -288,7 +308,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
             if (!_isEditing)
               Column(
                 children: [
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 30),
 
                   const DividerLine(),
 
@@ -302,7 +322,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                       );
                     },
                     label: 'Выйти',
-                    color: Colors.red,
+                    color: AppColors.mainColor,
                   ),
 
                   const DividerLine(),

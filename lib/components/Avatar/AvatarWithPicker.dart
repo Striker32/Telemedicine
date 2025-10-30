@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AvatarWithPicker extends StatefulWidget {
   final File? initialImage;
@@ -50,20 +51,20 @@ class _AvatarWithPickerState extends State<AvatarWithPicker> {
         alignment: Alignment.center,
         children: [
           CircleAvatar(
-            radius: 40,
+            radius: 30,
             backgroundColor: const Color(0xFFE0E0E6),
             backgroundImage: _selectedImage != null
                 ? FileImage(_selectedImage!)
                 : null,
             child: _selectedImage == null
-                ? const Icon(Icons.person, size: 40, color: Colors.white)
+                ? const Icon(Icons.person, size: 30, color: Colors.white)
                 : null,
           ),
 
           ClipOval(
             child: Container(
-              width: 80,
-              height: 80,
+              width: 60,
+              height: 60,
               color: Colors.black.withOpacity(0.35), // уровень затемнения
             ),
           ),
@@ -74,12 +75,12 @@ class _AvatarWithPickerState extends State<AvatarWithPicker> {
           shape: const CircleBorder(),
           child: InkResponse(
             //onTap: onTap,
-            radius: 40,
+            radius: 30,
             containedInkWell: true,
             customBorder: const CircleBorder(),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 30,
+              height: 30,
               alignment: Alignment.center,
               // Если хотите, чтобы иконка была в белом круге:
               // child: Container(
@@ -88,7 +89,12 @@ class _AvatarWithPickerState extends State<AvatarWithPicker> {
               //   decoration: BoxDecoration(color: Colors.white70, shape: BoxShape.circle),
               //   child: const Icon(Icons.camera_alt, color: Colors.white, size: 18),
               // ),
-              child: const Icon(Icons.camera_alt, color: Colors.white, size: 32),
+              child: SvgPicture.asset(
+                'assets/images/icons/camera.svg', // ← путь к твоему SVG-файлу
+                width: 26,
+                height: 20,
+              ),
+
             ),
           ),
         ),
