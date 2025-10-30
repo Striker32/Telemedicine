@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AvatarWithPicker extends StatefulWidget {
+  final File? initialImage;
+  final Function(File) onImageSelected;
+
   const AvatarWithPicker({
     Key? key,
+    required this.onImageSelected,
+    this.initialImage,
   }) : super(key: key);
 
   @override
@@ -13,17 +18,13 @@ class AvatarWithPicker extends StatefulWidget {
 
 class _AvatarWithPickerState extends State<AvatarWithPicker> {
 
-  // final double radius;
-  // final ImageProvider? image;
-  //
-  // _AvatarWithPickerState({
-  //   Key? key,
-  //   this.radius = 40,
-  //   this.image,
-  // }) : super(key: key);
-  //
-
   File? _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedImage = widget.initialImage; // <--- 3. УСТАНАВЛИВАЕМ НАЧАЛЬНОЕ ИЗОБРАЖЕНИЕ
+  }
 
   Future _pickImageFromGallery() async {
     final returnedImage = await ImagePicker().pickImage(
@@ -32,13 +33,17 @@ class _AvatarWithPickerState extends State<AvatarWithPicker> {
 
     if (returnedImage == null) return;
 
+    final imageFile = File(returnedImage.path);
     setState(() {
-      _selectedImage = File(returnedImage!.path);
+      _selectedImage = imageFile;
     });
+    widget.onImageSelected(imageFile); // <--- 4. ВОЗВРАЩАЕМ ВЫБРАННЫЙ ФАЙЛ
   }
+
 
   @override
   Widget build(BuildContext context) {
+
     return InkWell(
       onTap: _pickImageFromGallery,
       child: Stack(

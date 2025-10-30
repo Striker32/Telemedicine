@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:last_telemedicine/components/AvatarWithPicker.dart';
+import 'package:last_telemedicine/components/Avatar/AvatarWithPicker.dart';
 import 'package:last_telemedicine/components/SettingsRow.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/pages/Choose_profile.dart';
-import 'package:last_telemedicine/pages/user_pages/profile_change_user.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
 
 import '../../components/CustomAppBar.dart';
@@ -11,14 +11,14 @@ import '../../components/SettingsRow.dart';
 import '../../components/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 
-class ProfilePageUser1 extends StatefulWidget {
-  const ProfilePageUser1({Key? key}) : super(key: key);
+class LegacyProfilePageUser extends StatefulWidget {
+  const LegacyProfilePageUser({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePageUser1> createState() => _ProfilePageState();
+  State<LegacyProfilePageUser> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePageUser1> {
+class _ProfilePageState extends State<LegacyProfilePageUser> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени

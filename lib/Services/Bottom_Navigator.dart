@@ -9,8 +9,8 @@ import '../pages/Placeholder.dart';
 import '../pages/doctor_pages/applications_doctor.dart';
 import '../pages/doctor_pages/main_doctor.dart';
 import '../pages/doctor_pages/profile_doctor.dart';
-import '../pages/user_pages/profile_change_user.dart';
 import '../pages/user_pages/profile_user.dart';
+import '../pages/legacy/profile_user_legacy.dart';
 
 class BottomNavigator extends StatefulWidget {
   const BottomNavigator({Key? key}) : super(key: key);

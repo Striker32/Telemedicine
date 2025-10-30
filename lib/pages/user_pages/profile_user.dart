@@ -49,6 +49,58 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   String _currentCity = 'Санкт-Петербург';
 
+
+  CustomAppBar _buildAppBar() {
+    if (_isEditing) {
+      // AppBar для режима редактирования
+      return CustomAppBar(
+        titleText: 'Профиль',
+        leading: AppBarButton(
+          label: 'Отмена',
+          onTap: () {
+            setState(() {
+              _isEditing = false;
+              // Здесь логика отмены изменений, если она нужна
+            });
+          },
+        ),
+        action: AppBarButton(
+          label: 'Готово',
+          onTap: () {
+            // Логика сохранения данных
+            setState(() {
+              _isEditing = false;
+            });
+          },
+        ),
+      );
+    } else {
+      // AppBar для режима просмотра
+      return CustomAppBar(
+        titleText: 'Профиль',
+        leading: AppBarButton(
+          label: 'Настройки',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfileSettingsPageUser(),
+              ),
+            );
+          },
+        ),
+        action: AppBarButton(
+          label: 'Изменить',
+          onTap: () {
+            setState(() {
+              _isEditing = true;
+            });
+          },
+        ),
+      );
+    }
+  }
+
   void _changeCityFuncion() async {
     // Пример: открыть страницу выбора языка и ждать результата
     final result = await Navigator.push<String>(
@@ -65,51 +117,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackground,
-      appBar: CustomAppBar(
-        titleText: 'Профиль',
-        // Управляем кнопками в AppBar в зависимости от _isEditing
-        leading: _isEditing
-            ? AppBarButton(
-                label: 'Отмена',
-                onTap: () {
-                  setState(() {
-                    _isEditing = false;
-                    // Здесь можно сбросить изменения в контроллерах, если нужно
-                  });
-                },
-              )
-            : AppBarButton(
-                // Заменяем кнопку "Готово" на "Изменить"
-                label: 'Настройки',
-                onTap: () {
-                  Navigator.push(
-                    context, // 'context' здесь очень важен!
-                    MaterialPageRoute(
-                      builder: (context) => ProfileSettingsPageUser(),
-                    ), // Замените DoctorScreen() на ваш виджет
-                  );
-                },
-              ), // ваша кнопка "назад"
-        action: _isEditing
-            ? AppBarButton(
-                label: 'Готово',
-                onTap: () {
-                  // ПРОПИСАТЬ ЛОГИКУ СОХРАНЕНИЯ ДАННЫХ
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-              )
-            : AppBarButton(
-                // Заменяем кнопку "Готово" на "Изменить"
-                label: 'Изменить',
-                onTap: () {
-                  setState(() {
-                    _isEditing = true;
-                  });
-                },
-              ),
-      ),
+      appBar: _buildAppBar(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

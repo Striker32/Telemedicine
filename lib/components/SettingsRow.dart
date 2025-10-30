@@ -24,6 +24,7 @@ class SettingsRow extends StatelessWidget {
   final Widget? trailing; // Для кастомных элементов в конце, например, иконки или переключателя
   final bool showArrow; // Показывать ли стрелку "вперед"
   final Color titleColor;
+  final bool isEditable;
 
   const SettingsRow({
     Key? key,
@@ -34,6 +35,7 @@ class SettingsRow extends StatelessWidget {
     this.trailing,
     this.showArrow = false,
     this.titleColor = Colors.black,
+    this.isEditable = false,
   }) : super(key: key);
 
   @override
@@ -53,6 +55,7 @@ class SettingsRow extends StatelessWidget {
         return Expanded(
           child: TextField(
             controller: controller,
+            readOnly: !isEditable,
             textAlign: TextAlign.end,
             decoration: InputDecoration(
               border: InputBorder.none,
