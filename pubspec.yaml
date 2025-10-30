@@ -49,8 +49,9 @@ dev_dependencies:
 flutter_native_splash:
   color: "#FFFFFF" # начальный фон
   image: assets/images/app/heartStart.png # можно PNG, SVG не поддерживается нативно
-  android: true
-  ios: true
+  android_12:
+    image: assets/images/app/heartStart.png
+    color: "#FFFFFF"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
