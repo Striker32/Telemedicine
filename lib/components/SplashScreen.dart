@@ -18,27 +18,34 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 5000),
+      duration: const Duration(milliseconds: 4000),
     );
 
-    _radius = Tween<double>(begin: 0, end: 5000).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-
-    // Запускаем анимацию только после отрисовки первого кадра Flutter
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 5000), () {
-        if (mounted) _controller.forward();
+      final size = MediaQuery.of(context).size;
+      final maxRadius = size.longestSide * 1.2;
+
+      setState(() {
+        _radius = Tween<double>(begin: 0, end: maxRadius).animate(
+          CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+        );
+      });
+
+      // ⏱ Задержка перед запуском анимации
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          _controller.forward();
+        }
+      });
+
+      _controller.addStatusListener((status) {
+        if (status == AnimationStatus.completed && mounted) {
+          Navigator.pushReplacementNamed(context, '/main');
+        }
       });
     });
-
-    // Навигация на основной экран после завершения анимации
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        if (mounted) Navigator.pushReplacementNamed(context, '/main');
-      }
-    });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +68,8 @@ class _SplashScreenState extends State<SplashScreen>
           Center(
             child: Image.asset(
               'assets/images/app/heartStart.png', // убедись что путь совпадает с pubspec
-              width: 110,
-              height: 110,
+              width: 120,
+              height: 120,
               fit: BoxFit.contain,
             ),
           ),
