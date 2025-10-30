@@ -13,11 +13,11 @@ class DisplayAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      radius: 40,
+      radius: 30,
       backgroundColor: const Color(0xFFE0E0E6),
       backgroundImage: image != null ? FileImage(image!) : null,
       child: image == null
-          ? const Icon(Icons.person, size: 40, color: Colors.white)
+          ? const Icon(Icons.person, size: 30, color: Colors.white)
           : null,
     );
   }
