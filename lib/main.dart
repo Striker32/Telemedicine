@@ -49,7 +49,7 @@ class Myapp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (_) => SplashScreen(), // ← сначала splash
-        '/main': (_) => const ProfilePageUser(), // ← потом основной экран
+        '/main': (_) => const MainScreen(), // ← потом основной экран
       },
     );
   }
