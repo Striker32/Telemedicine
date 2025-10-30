@@ -18,16 +18,16 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 5000),
     );
 
-    _radius = Tween<double>(begin: 0, end: 2000).animate(
+    _radius = Tween<double>(begin: 0, end: 5000).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
     // Запускаем анимацию только после отрисовки первого кадра Flutter
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 200), () {
+      Future.delayed(const Duration(milliseconds: 5000), () {
         if (mounted) _controller.forward();
       });
     });

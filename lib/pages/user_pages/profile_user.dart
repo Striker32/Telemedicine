@@ -30,7 +30,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
-  static const Color kDivider = Color(0x3C3C43); // цвет разделителя
 
   bool _isEditing = false;
 
