@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
+import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 
@@ -795,7 +797,9 @@ class ApplicationsPage extends StatelessWidget {
                           ],
                         ),
                       ),
+                      DividerLine(),
                     ],
+
                   ),
                 ),
 
@@ -1111,6 +1115,24 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
   final _controllers = List.generate(5, (_) => TextEditingController());
   bool _urgent = false;
 
+  Future<void> _openChangeCity() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeCityPage(
+          selected: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
+        ),
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _controllers[3].text = result;
+      });
+    }
+  }
+
+
   final List<String> cities = [
     "Архангельск",
     "Вельск",
@@ -1369,35 +1391,33 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
                       ),
                     ),
                       const SizedBox(height: 4),
-                      DropdownButtonFormField<String>(
-                        value: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
-                        items: cities.map((city) => DropdownMenuItem<String>(
-                          value: city,
-                          child: Text(city, style: const TextStyle(color: Color(0xFF1D1D1F))),
-                        )).toList(),
-                        onChanged: (val) {
-                          setState(() {
-                            _controllers[3].text = val!;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Выберите город",
-                          filled: true,
-                          fillColor: const Color(0xFFF5F5F5),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
+                      GestureDetector(
+                        onTap: _openChangeCity,
+                        child: AbsorbPointer(
+                          child: TextFormField(
+                            controller: _controllers[3],
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              hintText: "Выберите город",
+                              filled: true,
+                              fillColor: const Color(0xFFF5F5F5),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              suffixIcon: const Icon(Icons.chevron_right, color: Color(0xFF9BA1A5)),
+                            ),
+                            style: const TextStyle(color: Color(0xFF1D1D1F)),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         ),
-                        style: const TextStyle(color: Color(0xFF1D1D1F)),
-                        dropdownColor: const Color(0xFFF5F5F5),
-                        menuMaxHeight: 200, // ограничение высоты списка
                       ),
+
+
                       const SizedBox(height: 12),
 
 
@@ -1550,6 +1570,8 @@ class HistoryApplicationPopup extends StatefulWidget {
 class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
   late final List<TextEditingController> _controllers;
   final bool _isEditing = false;
+
+
   final List<String> cities = ['Москва', 'Санкт-Петербург', 'Казань'];
 
   bool get _allFilled =>
@@ -2019,42 +2041,26 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                 ),
               ),
               const SizedBox(height: 4),
-              DropdownButtonFormField<String>(
-                value: _controllers[3].text.isNotEmpty
-                    ? _controllers[3].text
-                    : null,
-                items: cities.map((city) => DropdownMenuItem<String>(
-                  value: city,
-                  child: Text(city, style: const TextStyle(color: Color(0xFF1D1D1F))),
-                )).toList(),
-                onChanged: _isEditing
-                    ? (val) {
-                  setState(() {
-                    _controllers[3].text = val ?? '';
-                  });
-                }
-                    : null,
-                decoration: InputDecoration(
-                  hintText: "Выберите город",
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+              Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F5F5),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.transparent),
                 ),
-                style: const TextStyle(color: Color(0xFF1D1D1F)),
-                dropdownColor: const Color(0xFFF5F5F5),
-                menuMaxHeight: 200,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _controllers[3].text.isNotEmpty ? _controllers[3].text : 'Выберите город',
+                  style: TextStyle(
+                    color: _controllers[3].text.isNotEmpty ? const Color(0xFF1D1D1F) : const Color(0xFF9BA1A5),
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+
               const SizedBox(height: 12),
 
               // Поле 5: Предлагаемая стоимость
@@ -2147,6 +2153,23 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
   late final List<TextEditingController> _controllers;
   late bool _urgent;
   bool _isEditing = false;
+
+  Future<void> _openChangeCity() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeCityPage(
+          selected: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
+        ),
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _controllers[3].text = result;
+      });
+    }
+  }
   final List<String> cities = ['Москва', 'Санкт-Петербург', 'Казань'];
 
   bool get _allFilled =>
@@ -2620,41 +2643,58 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 ),
               ),
               const SizedBox(height: 4),
-              DropdownButtonFormField<String>(
-                value: _controllers[3].text.isNotEmpty
-                    ? _controllers[3].text
-                    : null,
-                items: cities.map((city) => DropdownMenuItem<String>(
+              _isEditing
+                  ? DropdownButtonFormField<String>(
+                value: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
+                items: cities
+                    .map((city) => DropdownMenuItem<String>(
                   value: city,
                   child: Text(city, style: const TextStyle(color: Color(0xFF1D1D1F))),
-                )).toList(),
-                onChanged: _isEditing
-                    ? (val) {
+                ))
+                    .toList(),
+                onChanged: (val) {
                   setState(() {
                     _controllers[3].text = val ?? '';
                   });
-                }
-                    : null,
+                },
                 decoration: InputDecoration(
                   hintText: "Выберите город",
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                      borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                      borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
                 style: const TextStyle(color: Color(0xFF1D1D1F)),
                 dropdownColor: const Color(0xFFF5F5F5),
                 menuMaxHeight: 200,
+              )
+                  : GestureDetector(
+                onTap: _openChangeCity,
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: _controllers[3],
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      hintText: "Выберите город",
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F5),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      suffixIcon: const Icon(Icons.chevron_right, color: Color(0xFF9BA1A5)),
+                    ),
+                    style: const TextStyle(color: Color(0xFF1D1D1F)),
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
 

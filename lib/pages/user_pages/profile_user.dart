@@ -59,7 +59,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
                 color: Colors.white,
                 border: Border(
                   bottom: BorderSide(color: Colors.black12, width: 1),
-                  top: BorderSide(color: Colors.black12, width: 1),
                 ),
               ),
 
@@ -159,7 +158,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                     context, // 'context' здесь очень важен!
                     MaterialPageRoute(builder: (context) => ChooseProfile()), // Замените DoctorScreen() на ваш виджет
                   );
-                },label: 'Выйти', color: Colors.red),
+                },label: 'Выйти', color: AppColors.mainColor),
 
                 const DividerLine(),
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../themes/AppColors.dart';
+
 /// Текстовая красная кнопка "Назад" для использования в AppBar.leading.
 /// По умолчанию вызывает Navigator.maybePop(context), но можно передать onTap.
 class AppBarButton extends StatelessWidget {
@@ -28,7 +30,7 @@ class AppBarButton extends StatelessWidget {
           fontFamily: 'SF Pro Display', // подключи шрифт в pubspec.yaml
           fontSize: 16,
           fontWeight: FontWeight.w400,
-          color: Colors.red,
+          color: AppColors.mainColor,
         ),
       ),
     );

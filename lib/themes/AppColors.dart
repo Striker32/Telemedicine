@@ -31,7 +31,7 @@ class AppColors {
       static const Color mainColor = Color(0xFFFF4361);
 
       // Для палочек-полосок
-      static const Color dividerLine = Color(0xFF4A4B4E);
+      static const Color dividerLine = Color(0xFFE5E5EA);
 
       static const Color additionalAccent = Color(0xFFFFECF1);
 

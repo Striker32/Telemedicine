@@ -26,7 +26,7 @@ class LoginPageUser extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        leading: AppBarButton(label: 'Назад', onTap: () {}),
+        leading: AppBarButton(label: 'Назад'),
         backgroundColor: Colors.white,
       ),
 

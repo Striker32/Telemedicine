@@ -19,7 +19,7 @@ class DividerLine extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: length),
       child: Container(
         height: thickness,
-        color: color,
+        color: AppColors.dividerLine,
       ),
     );
   }
