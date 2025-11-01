@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../Services/Bottom_Navigator.dart';
 import '../../components/Checkbox.dart';
-import '../../components/AppBarButton.dart' show AppBarButton;
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/AppBarButton.dart' show AppBarButton;
+import '../../components/Appbar/CustomAppBar.dart';
 import '../../themes/AppColors.dart';
 
 class LoginPageDoctor extends StatelessWidget {

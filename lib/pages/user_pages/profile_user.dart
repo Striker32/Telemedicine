@@ -9,10 +9,12 @@ import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 
+import '../../auth/auth_service.dart';
+import '../../components/Appbar/ProfileAppBar.dart';
 import '../../components/Avatar/DisplayAvatar.dart';
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
-import '../../components/AppBarButton.dart';
+import '../../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 import '../Choose_profile.dart';
 
@@ -67,58 +69,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   String _currentCity = 'Санкт-Петербург';
 
-
-  CustomAppBar _buildAppBar() {
-    if (_isEditing) {
-      // AppBar для режима редактирования
-      return CustomAppBar(
-        titleText: 'Профиль',
-        leading: AppBarButton(
-          label: 'Отмена',
-          onTap: () {
-            setState(() {
-              _isEditing = false;
-              // Здесь логика отмены изменений, если она нужна
-            });
-          },
-        ),
-        action: AppBarButton(
-          label: 'Готово',
-          onTap: () {
-            // Логика сохранения данных
-            setState(() {
-              _isEditing = false;
-            });
-          },
-        ),
-      );
-    } else {
-      // AppBar для режима просмотра
-      return CustomAppBar(
-        titleText: 'Профиль',
-        leading: AppBarButton(
-          label: 'Настройки',
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProfileSettingsPageUser(),
-              ),
-            );
-          },
-        ),
-        action: AppBarButton(
-          label: 'Изменить',
-          onTap: () {
-            setState(() {
-              _isEditing = true;
-            });
-          },
-        ),
-      );
-    }
-  }
-
   void _changeCityFuncion() async {
     // Пример: открыть страницу выбора языка и ждать результата
     final result = await Navigator.push<String>(
@@ -131,11 +81,44 @@ class _ProfilePageState extends State<ProfilePageUser> {
     }
   }
 
+  void logout() {
+    final _auth = AuthService();
+    _auth.signOut();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackground,
-      appBar: _buildAppBar(),
+      appBar: ProfileAppBar( // <-- 3. Используйте новый виджет
+        title: 'Профиль',
+        isEditing: _isEditing,
+        onEdit: () {
+          setState(() {
+            _isEditing = true;
+          });
+        },
+        onCancel: () {
+          setState(() {
+            _isEditing = false;
+            // Можно добавить логику сброса изменений
+          });
+        },
+        onDone: () {
+          setState(() {
+            _isEditing = false;
+            // Логика сохранения
+          });
+        },
+        onSettings: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfileSettingsPageUser(),
+            ),
+          );
+        },
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -262,7 +245,8 @@ class _ProfilePageState extends State<ProfilePageUser> {
             DividerLine(),
 
             SettingsRow(
-              title: 'Сменить номер',
+              viewTitle: 'Номер телефона',
+              editTitle: 'Телефон' ,
               titleColor: AppColors.addLightText,
               controller: _phoneController,
               isEditable: _isEditing,
@@ -271,7 +255,8 @@ class _ProfilePageState extends State<ProfilePageUser> {
             DividerLine(),
 
             SettingsRow(
-              title: 'Сменить почту',
+              viewTitle: 'Почта',
+              editTitle: 'Сменить почту' ,
               titleColor: AppColors.addLightText,
               controller: _emailController,
               isEditable: _isEditing,
@@ -280,9 +265,9 @@ class _ProfilePageState extends State<ProfilePageUser> {
             DividerLine(),
 
             SettingsRow(
-              title: _currentCity,
-              titleColor: AppColors.addLightText,
-              showArrow: true,
+              viewTitle: "Город",
+              editTitle: "Изменить город",
+              value: _currentCity,
               onTap: _isEditing ? _changeCityFuncion : null,
             ),
 
@@ -313,14 +298,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                   const DividerLine(),
 
                   CustomButton(
-                    onTap: () {
-                      Navigator.push(
-                        context, // 'context' здесь очень важен!
-                        MaterialPageRoute(
-                          builder: (context) => ChooseProfile(),
-                        ), // Замените DoctorScreen() на ваш виджет
-                      );
-                    },
+                    onTap: () { logout();},
                     label: 'Выйти',
                     color: AppColors.mainColor,
                   ),

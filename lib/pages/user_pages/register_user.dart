@@ -3,8 +3,8 @@ import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
 
 import '../../components/Checkbox.dart';
-import '../../components/AppBarButton.dart' show AppBarButton;
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/AppBarButton.dart' show AppBarButton;
+import '../../components/Appbar/CustomAppBar.dart';
 import 'login_user.dart';
 
 class RegisterPageUser extends StatelessWidget {

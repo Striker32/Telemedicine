@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../themes/AppColors.dart';
+import '../../themes/AppColors.dart';
 
 /// Текстовая красная кнопка "Назад" для использования в AppBar.leading.
 /// По умолчанию вызывает Navigator.maybePop(context), но можно передать onTap.

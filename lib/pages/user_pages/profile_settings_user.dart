@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:last_telemedicine/components/AppBarButton.dart';
+import 'package:last_telemedicine/components/Appbar/AppBarButton.dart';
 
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/SettingsRow.dart';
 import '../../components/custom_button.dart';
@@ -90,7 +90,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                       DividerLine(),
 
                       SettingsRow(
-                        title: 'Политика конфиденциальности',
+                        viewTitle: 'Политика конфиденциальности',
                         onTap: _openMedicalDocument,
                         showArrow: true,
                       ),
@@ -98,7 +98,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                       DividerLine(),
 
                       SettingsRow(
-                        title: 'Медицинский документ',
+                        viewTitle: 'Медицинский документ',
                         onTap: _openMedicalDocument,
                         showArrow: true,
                       ),
@@ -119,7 +119,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                   Opacity(
                     opacity: 0.25, // 75% прозрачности
                     child: SettingsRow(
-                      title: 'Язык',
+                      viewTitle: 'Язык',
                       trailing: Text(
                         _currentLanguage,
                         style: TextStyle(color: AppColors.grey600),

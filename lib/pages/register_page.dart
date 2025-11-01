@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/legacy/My_button.dart';
 import 'package:last_telemedicine/components/legacy/my_textfield.dart';
 
-import '../components/AppBarButton.dart';
+import '../components/Appbar/AppBarButton.dart';
 
 class RegisterPage extends StatelessWidget{
   final TextEditingController _emailController = TextEditingController();

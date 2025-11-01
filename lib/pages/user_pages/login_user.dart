@@ -3,9 +3,10 @@ import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
 
+import '../../auth/auth_service.dart';
 import '../../components/Checkbox.dart';
-import '../../components/AppBarButton.dart' show AppBarButton;
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/AppBarButton.dart' show AppBarButton;
+import '../../components/Appbar/CustomAppBar.dart';
 import '../../themes/AppColors.dart';
 
 class LoginPageUser extends StatelessWidget {
@@ -15,12 +16,38 @@ class LoginPageUser extends StatelessWidget {
   Widget build(BuildContext context) {
     // цветовая палитра
 
-    final Color pinkBg = const Color(0xFFFFF0F3); // пример светло-розового фона кнопки
-    final Color pinkText = const Color(0xFFFF6B86); // пример розового текста кнопки
-
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
-    const dividerOfContinue = 10.0;
+
+    final TextEditingController _phoneController = TextEditingController();
+    final TextEditingController _pwController = TextEditingController();
+
+    void login(BuildContext context) async {
+      // caught auth service
+      final authService = AuthService();
+
+
+      // DEBUG, DELETE
+      final email = _phoneController.text;
+      final pass = _pwController.text;
+      debugPrint('DEBUG: email="$email", pass length=${pass.length}');
+
+      // try login
+      try {
+        await authService.signInWithEmailPassword(_phoneController.text, _pwController.text,);
+      }
+
+      // catch errors
+      catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(e.toString()),
+          ),
+        );
+      }
+
+    }
 
 
     return Scaffold(
@@ -113,6 +140,7 @@ class LoginPageUser extends StatelessWidget {
                     Expanded(
                       child: TextFormField(
                         keyboardType: TextInputType.phone,
+                        controller: _phoneController,
                         decoration: const InputDecoration(
                           hintText: 'Ваш номер телефона',
                           hintStyle: TextStyle(
@@ -145,6 +173,7 @@ class LoginPageUser extends StatelessWidget {
                 ),
                 child: TextFormField(
                   obscureText: true,
+                  controller: _pwController,
                   decoration: const InputDecoration(
                     hintText: '  Пароль',
                     hintStyle: TextStyle(
@@ -195,12 +224,7 @@ class LoginPageUser extends StatelessWidget {
         child: SizedBox(
           height: 64,
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => BottomNavigator()),
-              );
-            },
+            onPressed: () { login(context);},
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.additionalAccent,
               elevation: 0,

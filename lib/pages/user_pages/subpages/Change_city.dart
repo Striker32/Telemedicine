@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:last_telemedicine/components/CustomAppBar.dart';
+import 'package:last_telemedicine/components/Appbar/CustomAppBar.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
 
-import '../../../components/AppBarButton.dart';
+import '../../../components/Appbar/AppBarButton.dart';
 import '../../../themes/AppColors.dart';
 
 
@@ -47,7 +47,7 @@ class ChangeCityPage extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         titleText: 'Профиль',
-        leading: AppBarButton(label: 'Назад', onTap: () {}),
+        leading: AppBarButton(label: 'Назад'),
         action: AppBarButton(label: '', onTap: () {}),
       ),
       body: ListView.separated(

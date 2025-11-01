@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/CustomAppBar.dart';
+import '../../components/Appbar/ProfileAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/SettingsRow.dart';
-import '../../components/AppBarButton.dart';
+import '../../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
+import '../user_pages/profile_settings_user.dart';
+import '../user_pages/subpages/Change_city.dart';
 
 class ProfilePageDoctor extends StatefulWidget {
   const ProfilePageDoctor({Key? key}) : super(key: key);
@@ -18,22 +21,98 @@ class ProfilePageDoctor extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePageDoctor> {
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
-  static const Color kTitleColor = Color(0xFF111111); // цвет "Профиль"
-  static const Color kLinkColor = Colors.red; // цвет "Настройки" и "Изменить"
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
   static const Color kSecondaryText = Color(
     0xFF9BA1A5,
   ); // цвет значения в контактных данных
-  static const Color kDivider = Color(0x3C3C43); // цвет разделителя
+
+  bool _isEditing = false;
+
+  final TextEditingController _phoneController = TextEditingController(
+    text: '+ 7 900 502 93',
+  );
+
+  final TextEditingController _emailController = TextEditingController(
+    text: 'example@mail.ru',
+  );
+
+  final TextEditingController _nameController = TextEditingController(
+    text: 'Георгий',
+  );
+
+  final TextEditingController _surnameController = TextEditingController();
+
+  final TextEditingController _specializationController = TextEditingController(
+    text: 'Стоматолог',
+  );
+
+  final TextEditingController _experienceController = TextEditingController(
+    text: '13 лет',
+  );
+
+  final TextEditingController _placeOfWorkController = TextEditingController(
+    text: 'Городская больница №28',
+  );
+
+  final TextEditingController _priceController = TextEditingController(
+    text: '3900 ₽',
+  );
+
+  final TextEditingController _aboutController = TextEditingController(
+    text: 'Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен,'
+        ' а также проведении профессиональной гигиены полости рта'
+        '  Помогаю пациентам сохранить здоровье зубов и красивую улыбку,'
+        ' подбираю индивидуальный подход к каждому случаю  '
+        'Провожу консультации онлайн и разрабатываю план лечения '
+        'с учётом ваших потребностей ',
+  );
+
+  String _currentCity = 'Санкт-Петербург';
+
+  void _changeCityFuncion() async {
+    // Пример: открыть страницу выбора языка и ждать результата
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(builder: (_) => ChangeCityPage(selected: _currentCity)),
+    );
+    if (result != null && result != _currentCity) {
+      setState(() => _currentCity = result);
+      // Здесь можно вызвать сохранение в настройки/сервер
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackground,
-      appBar: CustomAppBar(
-        titleText: 'Профиль',
-        leading: AppBarButton(label: 'Настройки', onTap: () {}),
-        action: AppBarButton(label: 'Изменить', onTap: () {}),
+      appBar: ProfileAppBar( // <-- 3. Используйте новый виджет
+        title: 'Профиль',
+        isEditing: _isEditing,
+        onEdit: () {
+          setState(() {
+            _isEditing = true;
+          });
+        },
+        onCancel: () {
+          setState(() {
+            _isEditing = false;
+            // Можно добавить логику сброса изменений
+          });
+        },
+        onDone: () {
+          setState(() {
+            _isEditing = false;
+            // Логика сохранения
+          });
+        },
+        onSettings: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfileSettingsPageUser(),
+            ),
+          );
+        },
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -99,7 +178,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                             badgeColor: AppColors.additionalAccent,
                             badgeSize: 36,
                           ),
-
                         ],
                       ),
                     ),
@@ -125,18 +203,32 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                   const DividerLine(),
 
                   // Поля информации — без иконок, с тонкими разделителями
-                  const SettingsRow(
-                    title: 'Номер телефона',
-                    value: '+7 900 502 9229',
+                  SettingsRow(
+                    viewTitle: 'Номер телефона',
+                    editTitle: 'Изменить телефон' ,
+                    controller: _phoneController,
+                    isEditable: _isEditing,
+                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
 
-                  const SettingsRow(title: 'Почта', value: 'example@mail.ru'),
+                  SettingsRow(
+                      viewTitle: 'Почта',
+                      editTitle: 'Изменить почту' ,
+                      controller: _emailController,
+                      isEditable: _isEditing,
+                    controllerColor: AppColors.addLightText,
+                  ),
 
                   const DividerLine(),
 
-                  const SettingsRow(title: 'Город', value: 'Санкт-Петербург'),
+                  SettingsRow(
+                    viewTitle: "Город",
+                    editTitle: "Изменить город",
+                    value: _currentCity,
+                    onTap: _isEditing ? _changeCityFuncion : null,
+                  ),
 
                   const DividerLine(),
 
@@ -158,20 +250,32 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                   const DividerLine(),
 
-                  const SettingsRow(
-                    title: 'Специализация',
-                    value: 'Стоматолог',
+                  SettingsRow(
+                    viewTitle: 'Специализация',
+                    editTitle: 'Изменить специализацию' ,
+                    controller: _specializationController,
+                    isEditable: _isEditing,
+                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
 
-                  const SettingsRow(title: 'Опыт', value: '13 лет'),
+                  SettingsRow(
+                      viewTitle: 'Опыт',
+                      editTitle: 'Изменить опыт' ,
+                      controller: _experienceController,
+                      isEditable: _isEditing,
+                      controllerColor: AppColors.addLightText,
+                  ),
 
                   const DividerLine(),
 
-                  const SettingsRow(
-                    title: 'Место работы',
-                    value: 'Городская больница №28',
+                  SettingsRow(
+                    viewTitle: 'Место работы',
+                    editTitle: 'Изменить место работы' ,
+                    controller: _placeOfWorkController,
+                    isEditable: _isEditing,
+                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
@@ -194,7 +298,13 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                   const DividerLine(),
 
-                  const SettingsRow(title: 'Стоимость от', value: '3900 ₽'),
+                  SettingsRow(
+                    viewTitle: 'Стоимость от',
+                    editTitle: 'Изменить стоимость услуг' ,
+                    controller: _priceController,
+                    isEditable: _isEditing,
+                    controllerColor: AppColors.addLightText,
+                  ),
 
                   const DividerLine(),
 
@@ -220,17 +330,22 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                       vertical: 12,
                     ),
                     color: Colors.white,
-                    child: Text(
-                          'Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен,'
-                          ' а также проведении профессиональной гигиены полости рта'
-                          '  Помогаю пациентам сохранить здоровье зубов и красивую улыбку,'
-                          ' подбираю индивидуальный подход к каждому случаю  '
-                          'Провожу консультации онлайн и разрабатываю план лечения '
-                          'с учётом ваших потребностей ',
+                    child: TextField(
+                      controller: _aboutController,
+                      readOnly: !_isEditing,
+                      textAlign: TextAlign.start,
+                      keyboardType: TextInputType.multiline,
+                      minLines: 1,
+                      maxLines: 16,
                       style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        isDense: true,
                       ),
                     ),
                   ),
@@ -257,16 +372,16 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                       children: [
                         Text(
                           'Для изменения логина'
-                              '\nили пароля - обратитесь в поддержку',
-                          style: TextStyle(color: AppColors.grey600, fontSize: 16),
+                          '\nили пароля - обратитесь в поддержку',
+                          style: TextStyle(
+                            color: AppColors.grey600,
+                            fontSize: 16,
+                          ),
                           textAlign: TextAlign.center,
                         ),
-
-
                       ],
                     ),
                   ),
-
                 ],
               ),
             ),

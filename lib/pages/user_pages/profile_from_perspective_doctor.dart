@@ -4,12 +4,12 @@ import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:last_telemedicine/pages/user_pages/applications_user.dart';
 
 import '../../Services/Bottom_Navigator.dart';
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/DoctorRespondButton.dart';
 import '../../components/DoctorViewField.dart';
 import '../../components/SettingsRow.dart';
-import '../../components/AppBarButton.dart';
+import '../../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 
 class ProfilePageFromUserPers extends StatefulWidget {

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/auth/login_or_register.dart';
 import 'package:last_telemedicine/pages/legacy/home_page.dart';
 
+import '../Services/Bottom_Navigator.dart';
+import '../pages/Choose_profile.dart';
+
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -14,13 +17,13 @@ class AuthGate extends StatelessWidget {
           builder: (context, snapshot) {
             // user logged in
             if (snapshot.hasData) {
-              return const HomePage();
+              return const BottomNavigator();
             }
 
             // user is NOT loggen in
 
             else {
-              return const LoginOrRegister();
+              return const ChooseProfile();
             }
 
           }

@@ -5,10 +5,10 @@ import 'package:last_telemedicine/pages/Choose_profile.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
 
-import '../../components/CustomAppBar.dart';
+import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/SettingsRow.dart';
-import '../../components/AppBarButton.dart';
+import '../../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 
 class LegacyProfilePageUser extends StatefulWidget {
@@ -128,15 +128,15 @@ class _ProfilePageState extends State<LegacyProfilePageUser> {
             const DividerLine(),
 
             // Поля информации — без иконок, с тонкими разделителями
-            const SettingsRow(title: 'Номер телефона', value: '+7 900 502 9229'),
+            const SettingsRow(viewTitle: 'Номер телефона', value: '+7 900 502 9229'),
 
             const DividerLine(),
 
-            const SettingsRow(title: 'Почта', value: 'example@mail.ru'),
+            const SettingsRow(viewTitle: 'Почта', value: 'example@mail.ru'),
 
             const DividerLine(),
 
-            const SettingsRow(title: 'Город', value: 'Санкт-Петербург'),
+            const SettingsRow(viewTitle: 'Город', value: 'Санкт-Петербург'),
 
             const DividerLine(),
 

@@ -16,30 +16,40 @@
 
 import 'package:flutter/material.dart';
 
+import '../themes/AppColors.dart';
+
 class SettingsRow extends StatelessWidget {
-  final String title;
+  final String viewTitle;
+  final String? editTitle;
   final String? value; // Для отображения значения (как в InfoField)
   final TextEditingController? controller; // Для редактирования (как в InputField)
   final VoidCallback? onTap; // Для действия по нажатию (как в SettingsTileField)
   final Widget? trailing; // Для кастомных элементов в конце, например, иконки или переключателя
   final bool showArrow; // Показывать ли стрелку "вперед"
   final Color titleColor;
+  final Color controllerColor;
   final bool isEditable;
 
   const SettingsRow({
     Key? key,
-    required this.title,
+    required this.viewTitle,
+    this.editTitle,
     this.value,
     this.controller,
     this.onTap,
     this.trailing,
     this.showArrow = false,
-    this.titleColor = Colors.black,
+    this.titleColor = AppColors.black,
+    this.controllerColor = AppColors.black,
+
     this.isEditable = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    final String currentTitle = (isEditable && editTitle != null) ? editTitle! : viewTitle;
+
     // Проверка, чтобы не передать взаимоисключающие параметры
     assert(value == null ||
         controller == null, 'Cannot provide both a value and a controller.');
@@ -57,6 +67,7 @@ class SettingsRow extends StatelessWidget {
             controller: controller,
             readOnly: !isEditable,
             textAlign: TextAlign.end,
+            style: TextStyle(color: controllerColor),
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.zero,
@@ -86,7 +97,7 @@ class SettingsRow extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: TextStyle(fontSize: 16, color: titleColor)),
+            Text(currentTitle, style: TextStyle(fontSize: 16, color: titleColor)),
             const SizedBox(width: 16),
             // Гибкая правая часть
             _buildTrailingWidget(),

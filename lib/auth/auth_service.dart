@@ -15,6 +15,16 @@ class AuthService {
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e);
+      // case 'user-not-found':
+      // throw 'Пользователь с таким email не найден.';
+      // case 'wrong-password':
+      // throw 'Неверный пароль.';
+      // case 'invalid-email':
+      // throw 'Некорректный формат email адреса.';
+      // case 'user-disabled':
+      // throw 'Аккаунт этого пользователя отключен.';
+      // default:
+      // throw 'Произошла неизвестная ошибка. Попробуйте снова.';
     }
   }
   // sign up

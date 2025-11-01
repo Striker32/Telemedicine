@@ -6,9 +6,9 @@ import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 
-import '../../components/CustomAppBar.dart';
+import '../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
-import '../../components/AppBarButton.dart';
+import '../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 import '../components/Create_claim_news_feed.dart';
 import '../components/News_pallet.dart';
