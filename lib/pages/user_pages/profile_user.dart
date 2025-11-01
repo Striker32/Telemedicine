@@ -246,7 +246,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
             SettingsRow(
               viewTitle: 'Номер телефона',
-              editTitle: 'Телефон' ,
+              editTitle: 'Сменить Телефон' ,
               titleColor: AppColors.addLightText,
               controller: _phoneController,
               isEditable: _isEditing,

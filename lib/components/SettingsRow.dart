@@ -41,7 +41,6 @@ class SettingsRow extends StatelessWidget {
     this.showArrow = false,
     this.titleColor = AppColors.black,
     this.controllerColor = AppColors.black,
-
     this.isEditable = false,
   }) : super(key: key);
 
