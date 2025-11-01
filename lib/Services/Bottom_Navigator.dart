@@ -21,7 +21,7 @@ class BottomNavigator extends StatefulWidget {
 }
 
 class _BottomNavigatorState extends State<BottomNavigator> {
-  int _currentIndex = 2;
+  int _currentIndex = 2; // <- ВОТ СЮДА ПЕРЕДАВАТЬ КАКУЮ СТРАНИЦУ ОТКРЫТЬ
 
   final List<Widget> _pages = [NewsFeedPage(), ApplicationsPage(), ProfilePageUser()];
   // final List<Widget> _pages = [MainDoctor(), ApplicationsPageDoctor(), ProfilePageDoctor()];
@@ -50,32 +50,44 @@ class _BottomNavigatorState extends State<BottomNavigator> {
             selectedItemColor: const Color(0xFFFF4361),
             unselectedItemColor: Colors.grey,
             items: [
-              const BottomNavigationBarItem(
-                icon: ImageIcon(AssetImage('assets/images/icons/feed_icon.png')),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  'assets/images/icons/feed_icon.svg',
+                  width: 25.5,
+                  height: 25.5,
+                ),
+                activeIcon: SvgPicture.asset(
+                  'assets/images/icons/feed_icon.svg',
+                  width: 25.5,
+                  height: 25.5,
+                  color: Color(0xFFFF4361), // ← активный цвет
+                ),
                 label: 'Лента',
-                activeIcon: ImageIcon(
-                  AssetImage('assets/images/icons/feed_icon.png'),
-                  color: Color(0xFFFF4361),
-                ),
               ),
-              const BottomNavigationBarItem(
-                icon: ImageIcon(AssetImage('assets/images/icons/heart_icon.png')),
-                label: 'Заявки',
-                activeIcon: ImageIcon(
-                  AssetImage('assets/images/icons/heart_icon.png'),
+              BottomNavigationBarItem(
+                icon: SvgPicture.asset(
+                  'assets/images/icons/heart_icon.svg',
+                  width: 25.5,
+                  height: 25.5,
+                ),
+                activeIcon: SvgPicture.asset(
+                  'assets/images/icons/heart_icon.svg',
+                  width: 25.5,
+                  height: 25.5,
                   color: Color(0xFFFF4361),
                 ),
+                label: 'Заявки',
               ),
               BottomNavigationBarItem(
                 icon: SvgPicture.asset(
                   'assets/images/icons/userProfile.svg',
-                  width: 24,
-                  height: 24,
+                  width: 25.5,
+                  height: 25.5,
                 ),
                 activeIcon: SvgPicture.asset(
                   'assets/images/icons/userProfileРозовый.svg',
-                  width: 24,
-                  height: 24,
+                  width: 25.5,
+                  height: 25.5,
                 ),
                 label: 'Профиль',
               ),
