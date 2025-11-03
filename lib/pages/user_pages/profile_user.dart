@@ -170,19 +170,21 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                           border: InputBorder.none,
                                           contentPadding: EdgeInsets.zero,
                                           isDense: true,
+                                          visualDensity: VisualDensity.compact,
                                         ),
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          height: 1.2,
+                                          fontSize: _isEditing ? 16 : 20,
                                           fontWeight: FontWeight.w400,
                                           color: kPrimaryText,
                                         ),
                                       ),
 
-                                      SizedBox(height: 3),
-
-                                      DividerLine(),
-
-                                      SizedBox(height: 3),
+                                      if (_isEditing) ...[
+                                        SizedBox(height: 6),
+                                        DividerLine(),
+                                        SizedBox(height: 6),
+                                      ],
 
                                       TextField(
                                         controller: _surnameController,
@@ -192,15 +194,17 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                           border: InputBorder.none,
                                           contentPadding: EdgeInsets.zero,
                                           isDense: true,
+                                          visualDensity: VisualDensity.compact,
                                           hintText: 'Фамилия',
                                           hintStyle: TextStyle(
                                             color: AppColors.addLightText,
                                           ),
                                         ),
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          height: 1.2,
+                                          fontSize: _isEditing ? 16 : 20,
                                           fontWeight: FontWeight.w400,
-                                          color: kPrimaryText,
+                                          color: AppColors.addLightText,
                                         ),
                                       ),
                                     ],
@@ -254,7 +258,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
                         SettingsRow(
                           viewTitle: 'Номер телефона',
                           editTitle: 'Сменить Телефон' ,
-                          titleColor: AppColors.addLightText,
                           controller: _phoneController,
                           isEditable: _isEditing,
                         ),
@@ -264,7 +267,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
                         SettingsRow(
                           viewTitle: 'Почта',
                           editTitle: 'Сменить почту' ,
-                          titleColor: AppColors.addLightText,
                           controller: _emailController,
                           isEditable: _isEditing,
                         ),
@@ -276,6 +278,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                           editTitle: "Изменить город",
                           value: _currentCity,
                           onTap: _isEditing ? _changeCityFuncion : null,
+                          isEditable: _isEditing,
                         ),
 
                         const DividerLine(),
