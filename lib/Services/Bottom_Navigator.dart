@@ -14,17 +14,30 @@ import '../pages/user_pages/profile_user.dart';
 import '../pages/legacy/profile_user_legacy.dart';
 
 class BottomNavigator extends StatefulWidget {
-  const BottomNavigator({Key? key}) : super(key: key);
+  final int initialIndex;
+
+  const BottomNavigator({
+    Key? key,
+    this.initialIndex = 2, // ← значение по умолчанию
+  }) : super(key: key);
 
   @override
   _BottomNavigatorState createState() => _BottomNavigatorState();
 }
 
+
 class _BottomNavigatorState extends State<BottomNavigator> {
-  int _currentIndex = 2; // <- ВОТ СЮДА ПЕРЕДАВАТЬ КАКУЮ СТРАНИЦУ ОТКРЫТЬ
+  late int _currentIndex;
+  // int _currentIndex = 2; // <- ВОТ СЮДА ПЕРЕДАВАТЬ КАКУЮ СТРАНИЦУ ОТКРЫТЬ
 
   final List<Widget> _pages = [NewsFeedPage(), ApplicationsPage(), ProfilePageUser()];
   // final List<Widget> _pages = [MainDoctor(), ApplicationsPageDoctor(), ProfilePageDoctor()];
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
 
   void _navigateBottomBar(int index) {
     setState(() {
@@ -35,6 +48,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: _pages[_currentIndex],
       bottomNavigationBar: Column(

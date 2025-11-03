@@ -119,198 +119,210 @@ class _ProfilePageState extends State<ProfilePageUser> {
           );
         },
       ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Блок аватара, имени и телефона
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  bottom: BorderSide(color: AppColors.dividerLine, width: 1),
-                ),
-              ),
-
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 10,
-                ),
-                child: Row(
-                  children: [
-                    _isEditing
-                        ? AvatarWithPicker(
-                      initialImage: _selectedImage,
-                      onImageSelected: (file) {
-                        setState(() {
-                          _selectedImage = file;
-                        });
-                      },
-                    )
-                        : DisplayAvatar(image: _selectedImage),
-
-                const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextField(
-                            controller: _nameController,
-                            readOnly: !_isEditing,
-                            textAlign: TextAlign.start,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                            ),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: kPrimaryText,
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Блок аватара, имени и телефона
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border(
+                              bottom: BorderSide(color: AppColors.dividerLine, width: 1),
                             ),
                           ),
 
-                          SizedBox(height: 3),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 10,
+                            ),
+                            child: Row(
+                              children: [
+                                _isEditing
+                                    ? AvatarWithPicker(
+                                  initialImage: _selectedImage,
+                                  onImageSelected: (file) {
+                                    setState(() {
+                                      _selectedImage = file;
+                                    });
+                                  },
+                                )
+                                    : DisplayAvatar(image: _selectedImage),
 
-                          DividerLine(),
+                            const SizedBox(width: 15),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      TextField(
+                                        controller: _nameController,
+                                        readOnly: !_isEditing,
+                                        textAlign: TextAlign.start,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
+                                          isDense: true,
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: kPrimaryText,
+                                        ),
+                                      ),
 
-                          SizedBox(height: 3),
+                                      SizedBox(height: 3),
 
-                          TextField(
-                            controller: _surnameController,
-                            readOnly: !_isEditing,
-                            textAlign: TextAlign.start,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                              isDense: true,
-                              hintText: 'Фамилия',
-                              hintStyle: TextStyle(
-                                color: AppColors.addLightText,
+                                      DividerLine(),
+
+                                      SizedBox(height: 3),
+
+                                      TextField(
+                                        controller: _surnameController,
+                                        readOnly: !_isEditing,
+                                        textAlign: TextAlign.start,
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
+                                          isDense: true,
+                                          hintText: 'Фамилия',
+                                          hintStyle: TextStyle(
+                                            color: AppColors.addLightText,
+                                          ),
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: kPrimaryText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        if (_isEditing)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  'Введите свое имя и добавьте по желанию\nфотографию профиля',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF677076),
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 30),
+                            ],
+                          ),
+
+                        // Заголовок "Контактные данные"
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'Контактные данные',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.w400,
-                              color: kPrimaryText,
+                              color: Color(0xFF677076),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                        ),
 
-            const SizedBox(height: 10),
+                        const SizedBox(height: 10),
 
-            if (_isEditing)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Введите свое имя и добавьте по желанию\nфотографию профиля',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF677076),
-                      ),
+                        const DividerLine(),
+
+                        DividerLine(),
+
+                        SettingsRow(
+                          viewTitle: 'Номер телефона',
+                          editTitle: 'Сменить Телефон' ,
+                          titleColor: AppColors.addLightText,
+                          controller: _phoneController,
+                          isEditable: _isEditing,
+                        ),
+
+                        DividerLine(),
+
+                        SettingsRow(
+                          viewTitle: 'Почта',
+                          editTitle: 'Сменить почту' ,
+                          titleColor: AppColors.addLightText,
+                          controller: _emailController,
+                          isEditable: _isEditing,
+                        ),
+
+                        DividerLine(),
+
+                        SettingsRow(
+                          viewTitle: "Город",
+                          editTitle: "Изменить город",
+                          value: _currentCity,
+                          onTap: _isEditing ? _changeCityFuncion : null,
+                        ),
+
+                        const DividerLine(),
+
+                        const SizedBox(height: 30),
+
+                        // Кнопки действий
+                        Column(
+                          children: [
+                            const DividerLine(),
+
+                            CustomButton(
+                              label: 'Изменить пароль',
+                              color: Colors.red.shade200,
+                            ),
+
+                            const DividerLine(),
+
+                          ],
+                        ),
+
+                        if (!_isEditing)
+                          Column(
+                            children: [
+                              const SizedBox(height: 30),
+
+                              const DividerLine(),
+
+                              CustomButton(
+                                onTap: () { logout();},
+                                label: 'Выйти',
+                                color: AppColors.mainColor,
+                              ),
+
+                              const DividerLine(),
+                            ],
+                          ),
+
+                        const Spacer(),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 30),
-                ],
-              ),
-
-            // Заголовок "Контактные данные"
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Контактные данные',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF677076),
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            const DividerLine(),
-
-            DividerLine(),
-
-            SettingsRow(
-              viewTitle: 'Номер телефона',
-              editTitle: 'Сменить Телефон' ,
-              titleColor: AppColors.addLightText,
-              controller: _phoneController,
-              isEditable: _isEditing,
-            ),
-
-            DividerLine(),
-
-            SettingsRow(
-              viewTitle: 'Почта',
-              editTitle: 'Сменить почту' ,
-              titleColor: AppColors.addLightText,
-              controller: _emailController,
-              isEditable: _isEditing,
-            ),
-
-            DividerLine(),
-
-            SettingsRow(
-              viewTitle: "Город",
-              editTitle: "Изменить город",
-              value: _currentCity,
-              onTap: _isEditing ? _changeCityFuncion : null,
-            ),
-
-            const DividerLine(),
-
-            const SizedBox(height: 30),
-
-            // Кнопки действий
-            Column(
-              children: [
-                const DividerLine(),
-
-                CustomButton(
-                  label: 'Изменить пароль',
-                  color: Colors.red.shade200,
-                ),
-
-                const DividerLine(),
-
-              ],
-            ),
-
-            if (!_isEditing)
-              Column(
-                children: [
-                  const SizedBox(height: 30),
-
-                  const DividerLine(),
-
-                  CustomButton(
-                    onTap: () { logout();},
-                    label: 'Выйти',
-                    color: AppColors.mainColor,
-                  ),
-
-                  const DividerLine(),
-                ],
-              ),
-
-            const Spacer(),
-          ],
+              );
+            },
+          ),
         ),
-      ),
     );
   }
 }

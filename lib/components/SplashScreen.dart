@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../auth/auth_gate.dart';
+
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key? key}) : super(key: key); // убрал const если нужен
 
@@ -39,9 +41,15 @@ class _SplashScreenState extends State<SplashScreen>
       });
 
       _controller.addStatusListener((status) {
-        if (status == AnimationStatus.completed && mounted) {
-          Navigator.pushReplacementNamed(context, '/main');
-        }
+        _controller.addStatusListener((status) {
+          if (status == AnimationStatus.completed && mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const AuthGate()),
+            );
+          }
+        });
+
       });
     });
   }

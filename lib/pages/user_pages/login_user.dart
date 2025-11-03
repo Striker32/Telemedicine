@@ -28,14 +28,17 @@ class LoginPageUser extends StatelessWidget {
 
 
       // DEBUG, DELETE
-      final email = _phoneController.text;
+      final phone_num = _phoneController.text;
       final pass = _pwController.text;
-      debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
+
+      final email = '${phone_num}@telemedicine.com';
+
+      debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
       // try login
       try {
-        await authService.signInWithEmailPassword(_phoneController.text, _pwController.text,);
+        await authService.signInWithEmailPassword(email, pass);
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }

@@ -22,15 +22,15 @@ class CreateRequestButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(circleSize / 2),
-            child: Container(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12), // можно подогнать под макет
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
               width: circleSize,
               height: circleSize,
               decoration: BoxDecoration(
@@ -40,21 +40,22 @@ class CreateRequestButton extends StatelessWidget {
               alignment: Alignment.center,
               child: Icon(Icons.add, color: Colors.white, size: iconSize),
             ),
-          ),
-        ),
 
-        const SizedBox(height: 8),
+            const SizedBox(height: 8),
 
-        Text(
-          label,
-          style: labelStyle ??
-              const TextStyle(
-                color: AppColors.mainColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+            Text(
+              label,
+              style: labelStyle ??
+                  const TextStyle(
+                    color: AppColors.mainColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
+
 }

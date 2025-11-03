@@ -46,7 +46,7 @@ class Myapp extends StatelessWidget {
           cursorColor: AppColors.mainColor,
         ),
       ),
-      home: AuthGate(),
+      home: SplashScreen(),
       // initialRoute: '/',
       // routes: {
       //   '/': (_) => SplashScreen(), // ← сначала splash

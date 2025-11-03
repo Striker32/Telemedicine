@@ -80,7 +80,7 @@ class _ProfilePageState extends State<NewsFeedPage> {
                             onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => BottomNavigator()),
+                              MaterialPageRoute(builder: (_) => BottomNavigator(initialIndex: 1,)),
                             );
                           },),
                         ),

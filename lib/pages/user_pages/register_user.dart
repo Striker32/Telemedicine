@@ -30,14 +30,15 @@ class RegisterPageUser extends StatelessWidget {
     void register(BuildContext context) async  {
       final _auth =AuthService();
 
-      final email = _phoneController.text;
+      final phone_num = _phoneController.text;
       final pass = _pwController.text;
+
+      final email = '${phone_num}@telemedicine.com';
 
       debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
-
       try {
-        await _auth.signUpWithEmailPassword(_phoneController.text, _pwController.text);
+        await _auth.signUpWithEmailPassword(email, pass);
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
