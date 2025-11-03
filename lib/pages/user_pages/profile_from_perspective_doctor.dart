@@ -38,7 +38,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
         leading: AppBarButton(label: 'Назад', onTap: () {
           Navigator.push(
             context, // 'context' здесь очень важен!
-            MaterialPageRoute(builder: (context) => BottomNavigator()), // Замените DoctorScreen() на ваш виджет
+            MaterialPageRoute(builder: (context) => BottomNavigator(usertype: "user",)), // Замените DoctorScreen() на ваш виджет
           );
         }),
         action: AppBarButton(label: 'Выбрать', onTap: () {}),

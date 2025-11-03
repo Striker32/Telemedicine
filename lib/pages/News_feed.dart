@@ -78,10 +78,10 @@ class _ProfilePageState extends State<NewsFeedPage> {
                           alignment: Alignment.center,
                           child: CreateRequestButton(
                             onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => BottomNavigator(initialIndex: 1,)),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(builder: (_) => BottomNavigator(initialIndex: 1,)),
+                            // );
                           },),
                         ),
                       ],

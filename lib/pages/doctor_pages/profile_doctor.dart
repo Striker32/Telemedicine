@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../auth/auth_service.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/Appbar/ProfileAppBar.dart';
 import '../../components/DividerLine.dart';
@@ -68,6 +69,11 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   );
 
   String _currentCity = 'Санкт-Петербург';
+
+  void logout() {
+    final _auth = AuthService();
+    _auth.signOut();
+  }
 
   void _changeCityFuncion() async {
     // Пример: открыть страницу выбора языка и ждать результата
@@ -359,7 +365,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                       const DividerLine(),
 
-                      const CustomButton(label: 'Выйти', color: Colors.red),
+                      CustomButton(label: 'Выйти', color: Colors.red, onTap: () {logout();}),
 
                       const DividerLine(),
                     ],

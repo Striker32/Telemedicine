@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../../Services/Bottom_Navigator.dart';
+import '../../auth/auth_service.dart';
 import '../../components/Checkbox.dart';
 import '../../components/Appbar/AppBarButton.dart' show AppBarButton;
 import '../../components/Appbar/CustomAppBar.dart';
@@ -15,6 +18,42 @@ class LoginPageDoctor extends StatelessWidget {
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
     const dividerOfContinue = 10.0;
+
+    final TextEditingController _loginController = TextEditingController();
+    final TextEditingController _pwController = TextEditingController();
+
+    void login(BuildContext context) async {
+      // caught auth service
+      final authService = AuthService();
+
+
+      // DEBUG, DELETE
+      final phone_num = _loginController.text;
+      final pass = _pwController.text;
+
+
+      final email = '${phone_num}@doctor.com';
+
+      debugPrint('DEBUG: email="$email", pass length=${pass.length}');
+
+      // try login
+      try {
+        await authService.signInWithEmailPassword(email, pass);
+
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+
+      // catch errors
+      catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(e.toString()),
+          ),
+        );
+      }
+
+    }
 
 
     return Scaffold(
@@ -88,6 +127,7 @@ class LoginPageDoctor extends StatelessWidget {
 
                     Expanded(
                       child: TextFormField(
+                        controller: _loginController,
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
                           hintText: 'Логин',
@@ -120,6 +160,7 @@ class LoginPageDoctor extends StatelessWidget {
                   ),
                 ),
                 child: TextFormField(
+                  controller: _pwController,
                   obscureText: true,
                   decoration: const InputDecoration(
                     hintText: '  Пароль',
@@ -193,10 +234,7 @@ class LoginPageDoctor extends StatelessWidget {
           height: 64,
           child: ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => BottomNavigator()),
-              );
+              login(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.additionalAccent,

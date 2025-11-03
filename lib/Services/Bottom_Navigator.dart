@@ -15,11 +15,14 @@ import '../pages/legacy/profile_user_legacy.dart';
 
 class BottomNavigator extends StatefulWidget {
   final int initialIndex;
+  final String usertype;
 
   const BottomNavigator({
     Key? key,
-    this.initialIndex = 2, // ← значение по умолчанию
+    this.initialIndex = 0, // ← значение по умолчанию
+    required this.usertype,
   }) : super(key: key);
+
 
   @override
   _BottomNavigatorState createState() => _BottomNavigatorState();
@@ -28,90 +31,110 @@ class BottomNavigator extends StatefulWidget {
 
 class _BottomNavigatorState extends State<BottomNavigator> {
   late int _currentIndex;
+  late final String _usertype = widget.usertype;
+
   // int _currentIndex = 2; // <- ВОТ СЮДА ПЕРЕДАВАТЬ КАКУЮ СТРАНИЦУ ОТКРЫТЬ
 
-  final List<Widget> _pages = [NewsFeedPage(), ApplicationsPage(), ProfilePageUser()];
+  // NewsFeedPage(), ApplicationsPage(), ProfilePageUser()
   // final List<Widget> _pages = [MainDoctor(), ApplicationsPageDoctor(), ProfilePageDoctor()];
 
-  @override
+
+
+  late List<Widget> _pages;
+
+
   void initState() {
     super.initState();
+
+    if (widget.usertype == 'doctor') {
+      _pages = [
+        MainDoctor(),
+        ApplicationsPageDoctor(),
+        ProfilePageDoctor(),
+      ];
+    } else {
+      _pages = [
+        NewsFeedPage(), ApplicationsPage(), ProfilePageUser()
+      ];
+    }
+
     _currentIndex = widget.initialIndex;
   }
 
-  void _navigateBottomBar(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    void _navigateBottomBar(int index) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.white,
+        body: _pages[_currentIndex],
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DividerLine(), // ← полоска сверху
+            BottomNavigationBar(
+              elevation: 0,
+              backgroundColor: Colors.white,
+              currentIndex: _currentIndex,
+              onTap: _navigateBottomBar,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: const Color(0xFFFF4361),
+              unselectedItemColor: Colors.grey,
+              items: [
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset(
+                    'assets/images/icons/feed_icon.svg',
+                    width: 25.5,
+                    height: 25.5,
+                  ),
+                  activeIcon: SvgPicture.asset(
+                    'assets/images/icons/feed_icon.svg',
+                    width: 25.5,
+                    height: 25.5,
+                    color: Color(0xFFFF4361), // ← активный цвет
+                  ),
+                  label: 'Лента',
+                ),
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset(
+                    'assets/images/icons/heart_icon.svg',
+                    width: 25.5,
+                    height: 25.5,
+                  ),
+                  activeIcon: SvgPicture.asset(
+                    'assets/images/icons/heart_icon.svg',
+                    width: 25.5,
+                    height: 25.5,
+                    color: Color(0xFFFF4361),
+                  ),
+                  label: 'Заявки',
+                ),
+                BottomNavigationBarItem(
+                  icon: SvgPicture.asset(
+                    'assets/images/icons/userProfile.svg',
+                    width: 25.5,
+                    height: 25.5,
+                  ),
+                  activeIcon: SvgPicture.asset(
+                    'assets/images/icons/userProfileРозовый.svg',
+                    width: 25.5,
+                    height: 25.5,
+                  ),
+                  label: 'Профиль',
+                ),
+              ],
+            ),
+            const SizedBox(height: 30), // ← отступ снизу
+          ],
+        ),
+      );
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: _pages[_currentIndex],
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DividerLine(), // ← полоска сверху
-          BottomNavigationBar(
-            elevation: 0,
-            backgroundColor: Colors.white,
-            currentIndex: _currentIndex,
-            onTap: _navigateBottomBar,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: const Color(0xFFFF4361),
-            unselectedItemColor: Colors.grey,
-            items: [
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset(
-                  'assets/images/icons/feed_icon.svg',
-                  width: 25.5,
-                  height: 25.5,
-                ),
-                activeIcon: SvgPicture.asset(
-                  'assets/images/icons/feed_icon.svg',
-                  width: 25.5,
-                  height: 25.5,
-                  color: Color(0xFFFF4361), // ← активный цвет
-                ),
-                label: 'Лента',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset(
-                  'assets/images/icons/heart_icon.svg',
-                  width: 25.5,
-                  height: 25.5,
-                ),
-                activeIcon: SvgPicture.asset(
-                  'assets/images/icons/heart_icon.svg',
-                  width: 25.5,
-                  height: 25.5,
-                  color: Color(0xFFFF4361),
-                ),
-                label: 'Заявки',
-              ),
-              BottomNavigationBarItem(
-                icon: SvgPicture.asset(
-                  'assets/images/icons/userProfile.svg',
-                  width: 25.5,
-                  height: 25.5,
-                ),
-                activeIcon: SvgPicture.asset(
-                  'assets/images/icons/userProfileРозовый.svg',
-                  width: 25.5,
-                  height: 25.5,
-                ),
-                label: 'Профиль',
-              ),
-            ],
-          ),
-          const SizedBox(height: 30), // ← отступ снизу
-        ],
-      ),
-    );
 
-  }
 
-}

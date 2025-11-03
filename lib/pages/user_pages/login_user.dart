@@ -32,7 +32,7 @@ class LoginPageUser extends StatelessWidget {
       final pass = _pwController.text;
 
 
-      final email = '${phone_num}@telemedicine.com';
+      final email = '${phone_num}@user.com';
 
       debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
