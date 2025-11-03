@@ -32,9 +32,12 @@ class LoginPageUser extends StatelessWidget {
       final pass = _pwController.text;
       debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
+
       // try login
       try {
         await authService.signInWithEmailPassword(_phoneController.text, _pwController.text,);
+
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
 
       // catch errors

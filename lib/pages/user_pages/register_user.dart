@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/auth/auth_service.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
 
@@ -20,6 +21,38 @@ class RegisterPageUser extends StatelessWidget {
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
     const dividerOfContinue = 10.0;
+
+    final TextEditingController _nameController = TextEditingController();
+    final TextEditingController _phoneController = TextEditingController();
+    final TextEditingController _pwController = TextEditingController();
+
+
+    void register(BuildContext context) async  {
+      final _auth =AuthService();
+
+      final email = _phoneController.text;
+      final pass = _pwController.text;
+
+      debugPrint('DEBUG: email="$email", pass length=${pass.length}');
+
+
+      try {
+        await _auth.signUpWithEmailPassword(_phoneController.text, _pwController.text);
+
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+
+      // catch errors
+      catch (e) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(e.toString()),
+          ),
+        );
+      }
+
+    }
 
 
     return Scaffold(
@@ -99,6 +132,7 @@ class RegisterPageUser extends StatelessWidget {
 
               // Поле: Имя и Фамилия
               TextFormField(
+                controller: _nameController,
                 decoration: const InputDecoration(
                   hintText: '  Имя и Фамилия пациента',
                   hintStyle: TextStyle(
@@ -155,6 +189,7 @@ class RegisterPageUser extends StatelessWidget {
 
                     Expanded(
                       child: TextFormField(
+                        controller: _phoneController,
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
                           hintText: 'Ваш номер телефона',
@@ -187,6 +222,7 @@ class RegisterPageUser extends StatelessWidget {
                   ),
                 ),
                 child: TextFormField(
+                  controller: _pwController,
                   obscureText: true,
                   decoration: const InputDecoration(
                     hintText: '  Пароль',
@@ -243,12 +279,7 @@ class RegisterPageUser extends StatelessWidget {
         child: SizedBox(
           height: 64,
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => LoginPageUser()),
-              );
-            },
+            onPressed: () {register(context);},
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.additionalAccent,
               elevation: 0,

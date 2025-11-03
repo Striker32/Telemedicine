@@ -46,11 +46,12 @@ class Myapp extends StatelessWidget {
           cursorColor: AppColors.mainColor,
         ),
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (_) => SplashScreen(), // ← сначала splash
-        '/main': (_) => const ProfilePageDoctor(), // ← потом основной экран
-      },
+      home: AuthGate(),
+      // initialRoute: '/',
+      // routes: {
+      //   '/': (_) => SplashScreen(), // ← сначала splash
+      //   '/main': (_) => const AuthGate(), // ← потом основной экран
+      // },
     );
   }
 }
