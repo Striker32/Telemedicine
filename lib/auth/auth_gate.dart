@@ -14,7 +14,6 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String userEmail = 'a@a.com';
 
     return Scaffold(
       body: StreamBuilder(

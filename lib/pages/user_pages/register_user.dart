@@ -25,6 +25,7 @@ class RegisterPageUser extends StatelessWidget {
     final TextEditingController _nameController = TextEditingController();
     final TextEditingController _phoneController = TextEditingController();
     final TextEditingController _pwController = TextEditingController();
+    final TextEditingController _emailController = TextEditingController();
 
 
     void register(BuildContext context) async  {
@@ -32,13 +33,13 @@ class RegisterPageUser extends StatelessWidget {
 
       final phone_num = _phoneController.text;
       final pass = _pwController.text;
+      final name = _nameController.text;
+      final pseudoemail = '${phone_num}@user.com';
 
-      final email = '${phone_num}@user.com';
-
-      debugPrint('DEBUG: email="$email", pass length=${pass.length}');
+      debugPrint('DEBUG: email="$pseudoemail", pass length=${pass.length}');
 
       try {
-        await _auth.signUpWithEmailPassword(email, pass);
+        await _auth.signUpWithEmailPassword(pseudoemail: pseudoemail, password: pass, phone: phone_num, name: name, surname: name);
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
