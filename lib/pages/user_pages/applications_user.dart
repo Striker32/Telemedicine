@@ -6,6 +6,9 @@ import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 
+import '../../components/Confirmation.dart';
+import '../../components/Notification.dart';
+
 class ApplicationCard extends StatelessWidget {
   final String title;
   final String user;
@@ -250,12 +253,7 @@ class ApplicationCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                           side: const BorderSide(color: Color(0x544A4B4E)),
                         ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(10),
-                          onTap: () {
-                            debugPrint('Удалить');
-                          },
-                          child: Column(
+                        child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SvgPicture.asset(
@@ -274,7 +272,6 @@ class ApplicationCard extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          ),
                         ),
                       ),
                     ),
@@ -519,8 +516,19 @@ class HistoryApplicationCard extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
                           highlightColor: Colors.transparent,
-                          onTap: () {
-                            debugPrint('Удалить');
+                          onTap: () async {
+                            final confirmed = await showConfirmationDialog(
+                              context,
+                              'Удалить заявку',
+                              'Данная заявка будет полностью\n удалена из базы данных приложения.\n Врачи больше не смогут её посмотреть.',
+                              'Удалить',
+                              'Отмена',
+                            );
+
+                            if (confirmed) {
+                              showCustomNotification(context, 'Заявка была успешно удалена');
+                              //   TODO: Логика удаления заявки
+                            }
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -869,7 +877,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                     'email': 'ivan@example.com',
                     'city': 'Москва',
                     'experience': '10 лет',
-                    'price': '5000р',
+                    'price': '5000',
                     'workplace': 'Клиника Здоровья',
                     'about':
                     'Опытный специалист в терапевтической стоматологии. Занимается лечением кариеса, пульпита и заболеваний десен с использованием современных технологий. Регулярно проходит повышение квалификации и уделяет внимание комфорту пациентов. Отличается аккуратностью, внимательностью и доброжелательным подходом.',
@@ -898,7 +906,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                     'email': 'morozov.proct@example.com',
                     'city': 'Санкт-Петербург',
                     'experience': '11 лет',
-                    'price': '5800р',
+                    'price': '5800',
                     'workplace': 'Медицинский центр «АльфаМед»',
                     'about':
                     'Врач-проктолог с большим опытом работы. Проводит диагностику и лечение геморроя, анальных трещин и воспалительных заболеваний прямой кишки. Придерживается деликатного и внимательного подхода к пациентам, использует современные малоинвазивные методы. Известен своей корректностью и профессионализмом.',
@@ -928,7 +936,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                     'email': 'lebedeva.logoped@example.com',
                     'city': 'Москва',
                     'experience': '9 лет',
-                    'price': '3500р',
+                    'price': '3500',
                     'workplace': 'Центр речи и коммуникации «Голос+»',
                     'about':
                     'Профессиональный логопед-дефектолог. Работает со взрослыми и детьми, помогает устранить дефекты речи, улучшить дикцию и развить артикуляцию. Использует современные методики коррекции речи и дыхательные упражнения. Отличается внимательностью, терпением и индивидуальным подходом к каждому клиенту.',
@@ -1040,7 +1048,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                     'email': 'ivanov.dent@example.com',
                     'city': 'Москва',
                     'experience': '12 лет',
-                    'price': '5500р',
+                    'price': '5500',
                     'workplace': 'Стоматологическая клиника «Улыбка»',
                     'about':
                     'Специализируется на терапевтическом и эстетическом лечении зубов. Владеет современными методиками реставрации и эндодонтического лечения под микроскопом. Постоянно повышает квалификацию, участвует в международных стоматологических конференциях. Работает с пациентами любого возраста, делает акцент на безболезненности процедур и сохранении естественной структуры зуба. Ведёт приём в Москве и Санкт-Петербурге.',
@@ -1056,7 +1064,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                     'email': 'kuznetsova.dent@example.com',
                     'city': 'Санкт-Петербург',
                     'experience': '8 лет',
-                    'price': '5200р',
+                    'price': '5200',
                     'workplace': 'Клиника «DentalPro»',
                     'about':
                     'Опытный врач-стоматолог с внимательным подходом к каждому пациенту. Специализируется на лечении кариеса, пульпита и заболеваний дёсен, применяет современные обезболивающие препараты и щадящие технологии. Регулярно проходит обучение по современным методам эстетической реставрации и профессиональной гигиены полости рта. Известна своей аккуратностью, вниманием к деталям и стремлением сделать лечение максимально комфортным.',
@@ -1072,7 +1080,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                     'email': 'smirnov.stom@example.com',
                     'city': 'Москва',
                     'experience': '15 лет',
-                    'price': '6000р',
+                    'price': '6000',
                     'workplace': 'Сеть клиник «Здоровье+»',
                     'about':
                     'Проводит лечение зубов с использованием микроскопа и цифровых технологий. Имеет большой опыт работы с осложнёнными клиническими случаями, включая перелечивание корневых каналов и восстановление разрушенных зубов. Постоянно внедряет новые методики для достижения идеального эстетического результата. Индивидуально подходит к каждому пациенту, подробно объясняет план лечения и варианты восстановления зубов.',
@@ -1495,7 +1503,11 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
 
                       // Кнопка создать заявку
                       ElevatedButton(
-                        onPressed: _allFilled ? () {} : null,
+                        onPressed: _allFilled ? () {
+                          Navigator.pop(context);
+                          showCustomNotification(context, 'Заявка была успешно создана!');
+                          // TODO: Логика создания заявки
+                        } : null,
                         style: ButtonStyle(
                           elevation: MaterialStateProperty.all(0), // убираем тень
                           minimumSize: MaterialStateProperty.all(const Size(double.infinity, 57)), // высота кнопки
@@ -1757,8 +1769,20 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(10),
                             highlightColor: Colors.transparent,
-                            onTap: () {
-                              debugPrint('Удалить');
+                            onTap: () async {
+                              final confirmed = await showConfirmationDialog(
+                                context,
+                                'Удалить заявку',
+                                'Данная заявка будет полностью\n удалена из базы данных приложения.\n Врачи больше не смогут её посмотреть.',
+                                'Удалить',
+                                'Отмена',
+                              );
+
+                              if (confirmed) {
+                                showCustomNotification(context, 'Заявка была успешно удалена');
+                              //   TODO: Логика удаления заявки
+                              }
+
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -1828,7 +1852,21 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                         onTap: () {
                           Navigator.push(
                             context, // 'context' здесь очень важен!
-                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers()), // Замените DoctorScreen() на ваш виджет
+                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
+                              isArchived: true,
+                              name: responder['name'],
+                              surname: responder['surname'],
+                              specialization: responder['specialization'],
+                              rating: responder['rating'],
+                              applications_quant: responder['completed'],
+                              phone_num: responder['phone'],
+                              email: responder['email'],
+                              city: responder['city'],
+                              work_exp: responder['experience'],
+                              services_cost: responder['price'],
+                              work_place: responder['workplace'],
+                              about: responder['about'],
+                            )),
                           );
                         },
                         child: Container(
@@ -2262,7 +2300,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
                       // Опционально: проверка заполненности
                       if (!_allFilled) {
-                        // TODO: Сделать уведомление
+                        showCustomNotification(context, 'Пожалуйста, заполните все поля!');
                         return;
                       }
 
@@ -2366,8 +2404,19 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                           elevation: 0,
                         ),
-                        onPressed: () {
-                          // TODO: завершить заявку
+                        onPressed: () async {
+                          final confirmed = await showConfirmationDialog(
+                            context,
+                            'Завершить заявку',
+                            'Данная заявка будет завершена\n и помещена в архив заявок профиля.\n Врачи больше не смогут её посмотреть.',
+                            'Завершить',
+                            'Отмена',
+                          );
+
+                          if (confirmed) {
+                            showCustomNotification(context, 'Заявка была успешно завершена!');
+                            //   TODO: Логика перенесения заявки в архив + отзыв
+                          }
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -2453,7 +2502,22 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                         onTap: () {
                           Navigator.push(
                             context, // 'context' здесь очень важен!
-                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers()), // Замените DoctorScreen() на ваш виджет
+                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
+                              isArchived: false,
+                              name: responder['name'],
+                              surname: responder['surname'],
+                              specialization: responder['specialization'],
+                              rating: responder['rating'],
+                              applications_quant: responder['completed'],
+                              phone_num: responder['phone'],
+                              email: responder['email'],
+                              city: responder['city'],
+                              work_exp: responder['experience'],
+                              services_cost: responder['price'],
+                              work_place: responder['workplace'],
+                              about: responder['about'],
+                              datetime: widget.datetime as String,
+                            )), // Замените DoctorScreen() на ваш виджет
                           );
                         },
                         child: Container(

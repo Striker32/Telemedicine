@@ -47,11 +47,6 @@ class Myapp extends StatelessWidget {
         ),
       ),
       home: SplashScreen(),
-      // initialRoute: '/',
-      // routes: {
-      //   '/': (_) => SplashScreen(), // ← сначала splash
-      //   '/main': (_) => const AuthGate(), // ← потом основной экран
-      // },
     );
   }
 }

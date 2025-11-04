@@ -7,10 +7,31 @@ import '../../auth/auth_service.dart';
 import '../../components/Checkbox.dart';
 import '../../components/Appbar/AppBarButton.dart' show AppBarButton;
 import '../../components/Appbar/CustomAppBar.dart';
+import '../../components/DividerLine.dart';
+import '../../components/Notification.dart';
 import '../../themes/AppColors.dart';
 
-class LoginPageDoctor extends StatelessWidget {
+class LoginPageDoctor extends StatefulWidget {
   const LoginPageDoctor({super.key});
+
+  @override
+  State<LoginPageDoctor> createState() => _LoginPageDoctorState();
+}
+
+class _LoginPageDoctorState extends State<LoginPageDoctor> {
+
+  final TextEditingController _loginController = TextEditingController();
+  final TextEditingController _pwController = TextEditingController();
+
+  bool _isPrivacyChecked = false;
+  bool _isOathChecked = false;
+
+  bool get _isFormValid {
+    return _isPrivacyChecked &&
+        _isOathChecked &&
+        _loginController.text.trim().isNotEmpty &&
+        _pwController.text.trim().isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +39,6 @@ class LoginPageDoctor extends StatelessWidget {
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
     const dividerOfContinue = 10.0;
-
-    final TextEditingController _loginController = TextEditingController();
-    final TextEditingController _pwController = TextEditingController();
 
     void login(BuildContext context) async {
       // caught auth service
@@ -107,7 +125,7 @@ class LoginPageDoctor extends StatelessWidget {
               const SizedBox(height: 80),
 
               // Divider before first field (как в макете)
-              const Divider(height: 1, thickness: 1, color: AppColors.greyDivider),
+              const DividerLine(),
 
 
 
@@ -127,22 +145,23 @@ class LoginPageDoctor extends StatelessWidget {
 
                     Expanded(
                       child: TextFormField(
+                        onChanged: (_) => setState(() {}),
                         controller: _loginController,
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
                           hintText: 'Логин',
                           hintStyle: TextStyle(
                             fontFamily: 'SF Pro Display',
-                            color: Colors.grey,
+                            color: AppColors.addLightText,
                             fontSize: 20,
                             fontWeight: FontWeight.w400,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 18),
+                          contentPadding: EdgeInsets.fromLTRB(0, 20, 0, 20),
                         ),
                         style: const TextStyle(
                           fontFamily: 'SF Pro Display',
-                          color: Colors.grey,
+                          color: AppColors.primaryText,
                           fontSize: 20,
                         ),
                       ),
@@ -160,20 +179,22 @@ class LoginPageDoctor extends StatelessWidget {
                   ),
                 ),
                 child: TextFormField(
+                  onChanged: (_) => setState(() {}),
                   controller: _pwController,
                   obscureText: true,
                   decoration: const InputDecoration(
-                    hintText: '  Пароль',
+                    hintText: 'Пароль',
                     hintStyle: TextStyle(
                       fontFamily: 'SF Pro Display',
-                      color: Colors.grey,
+                      color: AppColors.addLightText,
                       fontSize: 20,
                       fontWeight: FontWeight.w400,
                     ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 18),
+                    contentPadding: EdgeInsets.fromLTRB(10, 20, 0, 20),
                   ),
                   style: const TextStyle(
+                    color: AppColors.primaryText,
                     fontFamily: 'SF Pro Display',
                     fontSize: 20,
                   ),
@@ -192,14 +213,21 @@ class LoginPageDoctor extends StatelessWidget {
                     'Политика конфиденциальности',
                     style: TextStyle(
                       fontFamily: 'SF Pro Display',
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      color: Colors.grey,
+                      color: AppColors.addLightText,
                     ),
                   ),
                   // В макете круглый свайч справа
                   // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  Checkboxswitch(),
+                  Checkboxswitch(
+                    value: _isPrivacyChecked,
+                    onChanged: (val) {
+                      setState(() {
+                        _isPrivacyChecked = val;
+                      });
+                    },
+                  ),
                 ],
               ),
 
@@ -212,14 +240,21 @@ class LoginPageDoctor extends StatelessWidget {
                     'Клятва гиппократа',
                     style: TextStyle(
                       fontFamily: 'SF Pro Display',
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      color: Colors.grey,
+                      color: AppColors.addLightText,
                     ),
                   ),
                   // В макете круглый свайч справа
                   // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  Checkboxswitch(),
+                  Checkboxswitch(
+                    value: _isOathChecked,
+                    onChanged: (val) {
+                      setState(() {
+                        _isOathChecked = val;
+                      });
+                    },
+                  ),
                 ],
               ),
 
@@ -234,10 +269,16 @@ class LoginPageDoctor extends StatelessWidget {
           height: 64,
           child: ElevatedButton(
             onPressed: () {
-              login(context);
+              if (_isFormValid) {
+                login(context);
+              } else {
+                showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+              }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.additionalAccent,
+              backgroundColor: _isFormValid
+                  ? AppColors.additionalAccent
+                  : const Color(0xFFFDF4F7),
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
@@ -249,7 +290,9 @@ class LoginPageDoctor extends StatelessWidget {
                 fontFamily: 'SF Pro Display',
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: AppColors.mainColor,
+                color: _isFormValid
+                    ? AppColors.mainColor
+                    : const Color(0xFFFDA0AF),
               ),
             ),
           ),

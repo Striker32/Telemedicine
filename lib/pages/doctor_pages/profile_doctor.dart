@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../auth/auth_service.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/Appbar/ProfileAppBar.dart';
+import '../../components/Avatar/AvatarWithPicker.dart';
+import '../../components/Avatar/DisplayAvatar.dart';
 import '../../components/DividerLine.dart';
+import '../../components/Notification.dart';
 import '../../components/SettingsRow.dart';
 import '../../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
@@ -20,6 +27,19 @@ class ProfilePageDoctor extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePageDoctor> {
+  // Хранение данных для сброса изменений
+  late String _initialName;
+  late String _initialSurname;
+  late String _initialPhone;
+  late String _initialEmail;
+  late String _initialCity;
+  late File _initialAvatar;
+  late String _initialSpecialization;
+  late String _initialExperience;
+  late String _initialPlaceOfWork;
+  late String _initialPrice;
+  late String _initialAbout;
+
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
@@ -28,6 +48,36 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   ); // цвет значения в контактных данных
 
   bool _isEditing = false;
+
+  File? _selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDefaultAvatar();
+    _initialName = _nameController.text;
+    _initialSurname = _surnameController.text;
+    _initialPhone = _phoneController.text;
+    _initialEmail = _emailController.text;
+    _initialCity = _currentCity;
+
+    _initialSpecialization = _specializationController.text;
+    _initialExperience = _experienceController.text;
+    _initialPlaceOfWork = _placeOfWorkController.text;
+    _initialPrice = _priceController.text;
+    _initialAbout = _aboutController.text;
+  }
+
+  Future<void> _loadDefaultAvatar() async {
+    final byteData = await rootBundle.load('assets/images/app/userProfile.png');
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/userProfile.png');
+    await file.writeAsBytes(byteData.buffer.asUint8List());
+    setState(() {
+      _selectedImage = file;
+      _initialAvatar = file; // ← сохраняем оригинал
+    });
+  }
 
   final TextEditingController _phoneController = TextEditingController(
     text: '+ 7 900 502 93',
@@ -38,10 +88,12 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   );
 
   final TextEditingController _nameController = TextEditingController(
-    text: 'Георгий',
+    text: 'Мария Денисовна',
   );
 
-  final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController(
+    text: 'Речнекова',
+  );
 
   final TextEditingController _specializationController = TextEditingController(
     text: 'Стоматолог',
@@ -71,6 +123,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   String _currentCity = 'Санкт-Петербург';
 
   void logout() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
     final _auth = AuthService();
     _auth.signOut();
   }
@@ -102,13 +155,45 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
         onCancel: () {
           setState(() {
             _isEditing = false;
-            // Можно добавить логику сброса изменений
+            _nameController.text = _initialName;
+            _surnameController.text = _initialSurname;
+            _phoneController.text = _initialPhone;
+            _emailController.text = _initialEmail;
+            _currentCity = _initialCity;
+            _selectedImage = _initialAvatar;
+
+            _specializationController.text = _initialSpecialization;
+            _experienceController.text = _initialExperience;
+            _placeOfWorkController.text = _initialPlaceOfWork;
+            _priceController.text = _initialPrice;
+            _aboutController.text = _initialAbout;
+
           });
         },
         onDone: () {
+          final bool hasChanges =
+              _nameController.text != _initialName ||
+                  _surnameController.text != _initialSurname ||
+                  _phoneController.text != _initialPhone ||
+                  _emailController.text != _initialEmail ||
+                  _currentCity != _initialCity ||
+                  _selectedImage != _initialAvatar ||
+                  _specializationController.text != _initialSpecialization ||
+                  _experienceController.text != _initialExperience ||
+                  _placeOfWorkController.text != _initialPlaceOfWork ||
+                  _priceController.text != _initialPrice ||
+                  _aboutController.text != _initialAbout;
+
+
           setState(() {
             _isEditing = false;
-            // Логика сохранения
+
+            if (hasChanges) {
+              showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
+              // Логика сохранения
+            } else {
+              showCustomNotification(context, 'Вы ничего не изменили');
+            }
           });
         },
         onSettings: () {
@@ -144,46 +229,90 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 15,
+                        horizontal: 15,
+                        vertical: 10,
                       ),
                       child: Row(
                         children: [
-                          SvgPicture.asset(
-                            "assets/images/icons/userProfile.svg",
-                            width: 60,
-                            height: 60,
-                          ),
-                          const SizedBox(width: 16),
+                          _isEditing
+                              ? AvatarWithPicker(
+                            initialImage: _selectedImage,
+                            onImageSelected: (file) {
+                              setState(() {
+                                _selectedImage = file;
+                              });
+                            },
+                          )
+                              : DisplayAvatar(image: _selectedImage),
+                          const SizedBox(width: 15),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  'Речнекова Мария Д.',
-                                  style: TextStyle(
+                              children: [
+                                _isEditing
+                                    ? TextField(
+                                  controller: _nameController,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: _ProfilePageState.kPrimaryText,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                )
+                                    : Text(
+                                  _nameController.text,
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
-                                    color: kPrimaryText,
+                                    color: _ProfilePageState.kPrimaryText,
                                   ),
                                 ),
-                                Text(
-                                  '+7 900 502 9229',
-                                  style: TextStyle(
+
+                                if (_isEditing) ...[
+                                  SizedBox(height: 6),
+                                  DividerLine(),
+                                  SizedBox(height: 6),
+                                ],
+
+                                _isEditing
+                                    ? TextField(
+                                  controller: _surnameController,
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                    color: kSecondaryText,
+                                    color: _ProfilePageState.kSecondaryText,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                )
+                                    : Text(
+                                  _surnameController.text,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400,
+                                    color: _ProfilePageState.kSecondaryText,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          RatingBadge(
-                            rating: '4,8',
-                            subtitle: '23 заявки',
-                            badgeColor: AppColors.additionalAccent,
-                            badgeSize: 36,
-                          ),
+
+                          if (!_isEditing) ...{
+                            RatingBadge(
+                              rating: '4,8',
+                              subtitle: '23 заявки',
+                              badgeColor: AppColors.additionalAccent,
+                              badgeSize: 36,
+                            ),
+                          },
+
                         ],
                       ),
                     ),
@@ -193,11 +322,11 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                   // Заголовок "Контактные данные"
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
                       'Контактные данные',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF677076),
                       ),
@@ -214,7 +343,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     editTitle: 'Изменить телефон' ,
                     controller: _phoneController,
                     isEditable: _isEditing,
-                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
@@ -224,7 +352,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                       editTitle: 'Изменить почту' ,
                       controller: _emailController,
                       isEditable: _isEditing,
-                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
@@ -234,6 +361,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     editTitle: "Изменить город",
                     value: _currentCity,
                     onTap: _isEditing ? _changeCityFuncion : null,
+                    isEditable: _isEditing,
                   ),
 
                   const DividerLine(),
@@ -241,11 +369,11 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                   const SizedBox(height: 30),
 
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
                       'Работа',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF677076),
                       ),
@@ -261,7 +389,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     editTitle: 'Изменить специализацию' ,
                     controller: _specializationController,
                     isEditable: _isEditing,
-                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
@@ -271,7 +398,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                       editTitle: 'Изменить опыт' ,
                       controller: _experienceController,
                       isEditable: _isEditing,
-                      controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
@@ -281,7 +407,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     editTitle: 'Изменить место работы' ,
                     controller: _placeOfWorkController,
                     isEditable: _isEditing,
-                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
@@ -289,11 +414,11 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                   const SizedBox(height: 30),
 
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
                       'Услуги',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF677076),
                       ),
@@ -309,7 +434,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                     editTitle: 'Изменить стоимость услуг' ,
                     controller: _priceController,
                     isEditable: _isEditing,
-                    controllerColor: AppColors.addLightText,
                   ),
 
                   const DividerLine(),
@@ -317,11 +441,11 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                   const SizedBox(height: 30),
 
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 15),
                     child: Text(
                       'О себе',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF677076),
                       ),
@@ -343,8 +467,8 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                       keyboardType: TextInputType.multiline,
                       minLines: 1,
                       maxLines: 16,
-                      style: const TextStyle(
-                        color: Colors.grey,
+                      style: TextStyle(
+                        color: _isEditing ? Color(0xFF1D1D1F) : Color(0xFF9BA1A5),
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                       ),
@@ -358,36 +482,39 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                   const SizedBox(height: 30),
 
-                  // Кнопки действий
-                  Column(
-                    children: [
-                      const SizedBox(height: 10),
-
-                      const DividerLine(),
-
-                      CustomButton(label: 'Выйти', color: Colors.red, onTap: () {logout();}),
-
-                      const DividerLine(),
-                    ],
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 30),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                  if (!_isEditing) ...{
+                    // Кнопки действий
+                    Column(
                       children: [
-                        Text(
-                          'Для изменения логина'
-                          '\nили пароля - обратитесь в поддержку',
-                          style: TextStyle(
-                            color: AppColors.grey600,
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                        const SizedBox(height: 10),
+
+                        const DividerLine(),
+
+                        CustomButton(label: 'Выйти', color: AppColors.mainColor, onTap: () {logout();}),
+
+                        const DividerLine(),
                       ],
                     ),
-                  ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 30),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Для изменения логина'
+                                '\nили пароля - обратитесь в поддержку',
+                            style: TextStyle(
+                              color: AppColors.grey600,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  },
+
                 ],
               ),
             ),

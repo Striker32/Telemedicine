@@ -2,19 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:last_telemedicine/pages/user_pages/applications_user.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../Services/Bottom_Navigator.dart';
 import '../../components/Appbar/CustomAppBar.dart';
+import '../../components/Confirmation.dart';
 import '../../components/DividerLine.dart';
 import '../../components/DoctorRespondButton.dart';
 import '../../components/DoctorViewField.dart';
+import '../../components/Notification.dart';
 import '../../components/SettingsRow.dart';
 import '../../components/Appbar/AppBarButton.dart';
+import '../../components/pluralizeApplications.dart';
 import '../../themes/AppColors.dart';
 
 class ProfilePageFromUserPers extends StatefulWidget {
-  //final bool isArchived;
-  const ProfilePageFromUserPers({Key? key}) : super(key: key);
+  final bool isArchived;
+  final String name;
+  final String surname;
+  final String specialization;
+  final double rating;
+  final int applications_quant;
+  final String phone_num;
+  final String email;
+  final String city;
+  final String work_exp;
+  final String services_cost;
+  final String work_place;
+  final String about;
+  final String datetime;
+
+  const ProfilePageFromUserPers({
+    Key? key,
+    required this.isArchived,
+    required this.name,
+    this.surname = '',
+    this.specialization = 'Врач',
+    this.rating = 0,
+    this.applications_quant = 0,
+    this.phone_num = '',
+    this.email = '',
+    this.city = '',
+    this.work_exp = '',
+    this.services_cost = '',
+    this.work_place = '',
+    this.about = '',
+    this.datetime = '',
+
+  }) : super(key: key);
 
   @override
   State<ProfilePageFromUserPers> createState() => _ProfilePageState();
@@ -30,18 +64,36 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   ); // цвет значения в контактных данных
 
   @override
+  void initState() {
+    super.initState();
+    // print('Рейтинг: ${widget.rating}');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: CustomAppBar(
         titleText: 'Информация',
-        leading: AppBarButton(label: 'Назад', onTap: () {
-          Navigator.push(
-            context, // 'context' здесь очень важен!
-            MaterialPageRoute(builder: (context) => BottomNavigator(usertype: "user",)), // Замените DoctorScreen() на ваш виджет
+        leading: AppBarButton(label: 'Назад'),
+        action: AppBarButton(label: 'Выбрать', onTap: () async {
+          final confirmed = await showConfirmationDialog(
+            context,
+            'Выбрать врача',
+            'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
+            'Выбрать',
+            'Отмена',
           );
+
+          if (confirmed) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => BottomNavigator(usertype: 'user', initialIndex: 1,)),
+            );
+            showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
+            //   TODO: Логика выбора врача юзером
+          }
         }),
-        action: AppBarButton(label: 'Выбрать', onTap: () {}),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -60,36 +112,27 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border(
-                        bottom: BorderSide(color: Colors.black12, width: 1),
-                        top: BorderSide(color: Colors.black12, width: 1),
-                      ),
                     ),
 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 15,
+                        vertical: 15,
                       ),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 40,
-                            backgroundColor: const Color(0xFFE0E0E6),
-                            child: const Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.white,
-                            ),
-                            // Для реальной аватарки: backgroundImage: AssetImage(...) / NetworkImage(...)
+                          SvgPicture.asset(
+                            'assets/images/icons/userProfile.svg',
+                            width: 60,
+                            height: 60,
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 15),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
-                                  'Иванов Иван И.',
+                                  '${widget.surname} ${widget.name}',
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
@@ -97,102 +140,183 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                                   ),
                                 ),
                                 Text(
-                                  '',
+                                  'в сети 13 минут назад',
                                   style: TextStyle(
                                     fontSize: 16,
+                                    color: AppColors.addLightText,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          RatingBadge(
-                            rating: '4,8',
-                            subtitle: '',
-                            badgeColor: AppColors.additionalAccent,
-                            badgeSize: 36,
-                          ),
+                          if (widget.rating != 0) ...{
+                            RatingBadge(
+                              rating: '${widget.rating}',
+                              subtitle: '',
+                              badgeColor: AppColors.additionalAccent,
+                              badgeSize: 36,
+                            ),
+                          },
 
                         ],
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 15),
 
-                  // Заголовок "Контактные данные"
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      'Контактные данные',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF677076),
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 61,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFF0F3), // светло-розовый фон (под скрин)
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                elevation: 0,
+                              ),
+                              onPressed: () {
+                                // TODO: ннихуя
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                      'assets/images/icons/stethoscope.svg',
+                                      width: 20,
+                                      height: 20
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${widget.specialization}',
+                                    style: TextStyle(
+                                      color: Color(0xFFFF2D55),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        Expanded(
+                          child: SizedBox(
+                            height: 61,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color(0xFFF5F6F7),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                elevation: 0,
+                              ),
+                              onPressed: () {
+                                // TODO: нихуя
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                      'assets/images/icons/checkmark-black.svg',
+                                      width: 20,
+                                      height: 20
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    pluralizeApplications(widget.applications_quant),
+                                    style: TextStyle(
+                                      color: AppColors.primaryText,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        ],
                     ),
                   ),
 
-                  const SizedBox(height: 8),
-
-                  const DividerLine(),
+                  const SizedBox(height: 20),
 
                   // Поля информации — без иконок, с тонкими разделителями
                   Padding(
-                    padding: const EdgeInsets.only(left: 8, right: 0),
+                    padding: const EdgeInsets.only(left: 0, right: 0),
                     child: Column(
                       children: [
-                        const FieldDoctorView(
+                        FieldDoctorView(
                           title: 'Номер телефона',
-                          mainText: '+7 900 502 9229',
+                          mainText: widget.phone_num,
                         ),
 
-                        const DividerLine(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const DividerLine(),
+                        ),
 
-                        const FieldDoctorView(
+                        FieldDoctorView(
                           title: 'Почта',
-                          mainText: 'doctor@mail.ru',
+                          mainText: widget.email,
                         ),
 
-                        const DividerLine(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const DividerLine(),
+                        ),
 
-                        const FieldDoctorView(
+                        FieldDoctorView(
                           title: 'Город',
-                          mainText: 'Санкт-Петербург',
+                          mainText: widget.city,
                         ),
 
-                        const DividerLine(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const DividerLine(),
+                        ),
 
-                        const FieldDoctorView(
+                        FieldDoctorView(
                           title: 'Опыт работы',
-                          mainText: '13 лет опыта',
+                          mainText: widget.work_exp,
                         ),
 
-                        const DividerLine(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const DividerLine(),
+                        ),
 
-                        const FieldDoctorView(
+                        FieldDoctorView(
                           title: 'Услуги',
-                          mainText: 'Стоимость от 3000 ₽',
+                          mainText: 'Стоимость от ${widget.services_cost}₽',
                         ),
 
-                        const DividerLine(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const DividerLine(),
+                        ),
 
-                        const FieldDoctorView(
+                        FieldDoctorView(
                           title: 'Место работы',
-                          mainText: 'Городская больница №28',
+                          mainText: widget.work_place,
                         ),
 
-                        const DividerLine(),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: const DividerLine(),
+                        ),
 
-                        const FieldDoctorView(
+                        FieldDoctorView(
                           title: 'О себе',
-                          mainText:
-                              'Сертифицированный стоматолог с опытом работы более 13 лет'
-                              '  Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен,'
-                              ' а также проведении профессиональной гигиены полости рта'
-                              '  Помогаю пациентам сохранить здоровье зубов и красивую улыбку,'
-                              ' подбираю индивидуальный подход к каждому случаю  '
-                              'Провожу консультации онлайн и разрабатываю план лечения '
-                              'с учётом ваших потребностей ',
+                          mainText: widget.about,
                           aboutself: true,
                         ),
 
@@ -200,12 +324,30 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 40),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12,),
-                    child: DoctorRespondedButton(onTap: () {  }, height: 60,),
+                    padding: const EdgeInsets.symmetric(horizontal: 10,),
+                    child: DoctorRespondedButton(onTap: () async {
+                      final confirmed = await showConfirmationDialog(
+                        context,
+                        'Выбрать врача',
+                        'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
+                        'Выбрать',
+                        'Отмена',
+                      );
+
+                      if (confirmed) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => BottomNavigator(usertype: 'user', initialIndex: 1,)),
+                        );
+                        showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
+                        //   TODO: Логика выбора врача юзером
+                      }
+                    }, height: 60,),
                   ),
 
-                  const SizedBox(height: 6,)
+                  const SizedBox(height: 10,)
 
 
 

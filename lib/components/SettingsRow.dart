@@ -26,8 +26,6 @@ class SettingsRow extends StatelessWidget {
   final VoidCallback? onTap; // Для действия по нажатию (как в SettingsTileField)
   final Widget? trailing; // Для кастомных элементов в конце, например, иконки или переключателя
   final bool showArrow; // Показывать ли стрелку "вперед"
-  final Color titleColor;
-  final Color controllerColor;
   final bool isEditable;
 
   const SettingsRow({
@@ -39,8 +37,6 @@ class SettingsRow extends StatelessWidget {
     this.onTap,
     this.trailing,
     this.showArrow = false,
-    this.titleColor = AppColors.black,
-    this.controllerColor = AppColors.black,
     this.isEditable = false,
   }) : super(key: key);
 
@@ -48,6 +44,13 @@ class SettingsRow extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final String currentTitle = (isEditable && editTitle != null) ? editTitle! : viewTitle;
+
+  // Цвет заголовка
+    final Color titleColor = isEditable ? AppColors.addLightText : AppColors.primaryText;
+
+  // Цвет поля ввода
+    final Color controllerColor = isEditable ? AppColors.primaryText : AppColors.addLightText;
+
 
     // Проверка, чтобы не передать взаимоисключающие параметры
     assert(value == null ||
@@ -76,8 +79,8 @@ class SettingsRow extends StatelessWidget {
         );
       }
       if (value != null) {
-        return Text(value!, style: const TextStyle(
-            color: Colors.grey,
+        return Text(value!, style: TextStyle(
+            color: isEditable ? AppColors.primaryText : AppColors.addLightText,
             fontSize: 16,
             fontWeight: FontWeight.w400
         ));

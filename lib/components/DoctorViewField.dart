@@ -18,7 +18,7 @@ class FieldDoctorView extends StatelessWidget {
     this.onTap,
     this.titleStyle,
     this.mainStyle,
-    this.padding = const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+    this.padding = const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
     this.alignment = Alignment.centerLeft,
     this.aboutself = false,
   }) : super(key: key);
@@ -26,12 +26,14 @@ class FieldDoctorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultTitleStyle = TextStyle(
-      color: Colors.grey[600],
-      fontSize: 13,
+      height: 1.2,
+      color: AppColors.primaryText,
+      fontSize: 12,
       fontWeight: FontWeight.w400,
     );
     final defaultMainStyle = const TextStyle(
-      color: Colors.black87,
+      height: 1.3,
+      color: AppColors.primaryText,
       fontSize: 16,
       fontWeight: FontWeight.w400,
     );

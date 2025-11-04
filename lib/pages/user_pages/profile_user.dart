@@ -15,6 +15,7 @@ import '../../components/Avatar/DisplayAvatar.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/Appbar/AppBarButton.dart';
+import '../../components/Notification.dart';
 import '../../themes/AppColors.dart';
 import '../Choose_profile.dart';
 
@@ -29,6 +30,14 @@ class ProfilePageUser extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePageUser> {
+  // Хранение данных для сброса изменений
+  late String _initialName;
+  late String _initialSurname;
+  late String _initialPhone;
+  late String _initialEmail;
+  late String _initialCity;
+  late File _initialAvatar;
+
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
@@ -41,6 +50,11 @@ class _ProfilePageState extends State<ProfilePageUser> {
   void initState() {
     super.initState();
     _loadDefaultAvatar();
+    _initialName = _nameController.text;
+    _initialSurname = _surnameController.text;
+    _initialPhone = _phoneController.text;
+    _initialEmail = _emailController.text;
+    _initialCity = _currentCity;
   }
 
   Future<void> _loadDefaultAvatar() async {
@@ -50,8 +64,10 @@ class _ProfilePageState extends State<ProfilePageUser> {
     await file.writeAsBytes(byteData.buffer.asUint8List());
     setState(() {
       _selectedImage = file;
+      _initialAvatar = file; // ← сохраняем оригинал
     });
   }
+
 
   final TextEditingController _phoneController = TextEditingController(
     text: '+ 7 900 502 93',
@@ -82,6 +98,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
   }
 
   void logout() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
     final _auth = AuthService();
     _auth.signOut();
   }
@@ -101,13 +118,32 @@ class _ProfilePageState extends State<ProfilePageUser> {
         onCancel: () {
           setState(() {
             _isEditing = false;
-            // Можно добавить логику сброса изменений
+            _nameController.text = _initialName;
+            _surnameController.text = _initialSurname;
+            _phoneController.text = _initialPhone;
+            _emailController.text = _initialEmail;
+            _currentCity = _initialCity;
+            _selectedImage = _initialAvatar; // ← сброс аватара
           });
         },
         onDone: () {
+          final bool hasChanges =
+              _nameController.text != _initialName ||
+                  _surnameController.text != _initialSurname ||
+                  _phoneController.text != _initialPhone ||
+                  _emailController.text != _initialEmail ||
+                  _currentCity != _initialCity ||
+                  _selectedImage != _initialAvatar;
+
           setState(() {
             _isEditing = false;
-            // Логика сохранения
+
+            if (hasChanges) {
+              showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
+              // Логика сохранения
+            } else {
+              showCustomNotification(context, 'Вы ничего не изменили');
+            }
           });
         },
         onSettings: () {
@@ -170,19 +206,21 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                           border: InputBorder.none,
                                           contentPadding: EdgeInsets.zero,
                                           isDense: true,
+                                          visualDensity: VisualDensity.compact,
                                         ),
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          height: 1.2,
+                                          fontSize: _isEditing ? 16 : 20,
                                           fontWeight: FontWeight.w400,
                                           color: kPrimaryText,
                                         ),
                                       ),
 
-                                      SizedBox(height: 3),
-
-                                      DividerLine(),
-
-                                      SizedBox(height: 3),
+                                      if (_isEditing) ...[
+                                        SizedBox(height: 6),
+                                        DividerLine(),
+                                        SizedBox(height: 6),
+                                      ],
 
                                       TextField(
                                         controller: _surnameController,
@@ -192,15 +230,17 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                           border: InputBorder.none,
                                           contentPadding: EdgeInsets.zero,
                                           isDense: true,
+                                          visualDensity: VisualDensity.compact,
                                           hintText: 'Фамилия',
                                           hintStyle: TextStyle(
                                             color: AppColors.addLightText,
                                           ),
                                         ),
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          height: 1.2,
+                                          fontSize: _isEditing ? 16 : 20,
                                           fontWeight: FontWeight.w400,
-                                          color: kPrimaryText,
+                                          color: AppColors.addLightText,
                                         ),
                                       ),
                                     ],
@@ -254,7 +294,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
                         SettingsRow(
                           viewTitle: 'Номер телефона',
                           editTitle: 'Сменить Телефон' ,
-                          titleColor: AppColors.addLightText,
                           controller: _phoneController,
                           isEditable: _isEditing,
                         ),
@@ -264,7 +303,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
                         SettingsRow(
                           viewTitle: 'Почта',
                           editTitle: 'Сменить почту' ,
-                          titleColor: AppColors.addLightText,
                           controller: _emailController,
                           isEditable: _isEditing,
                         ),
@@ -276,6 +314,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                           editTitle: "Изменить город",
                           value: _currentCity,
                           onTap: _isEditing ? _changeCityFuncion : null,
+                          isEditable: _isEditing,
                         ),
 
                         const DividerLine(),
