@@ -82,6 +82,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
   }
 
   void logout() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
     final _auth = AuthService();
     _auth.signOut();
   }

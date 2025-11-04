@@ -1,10 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../auth/auth_service.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/Appbar/ProfileAppBar.dart';
+import '../../components/Avatar/AvatarWithPicker.dart';
+import '../../components/Avatar/DisplayAvatar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/SettingsRow.dart';
 import '../../components/Appbar/AppBarButton.dart';
@@ -28,6 +34,23 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   ); // цвет значения в контактных данных
 
   bool _isEditing = false;
+
+  File? _selectedImage;
+
+  void initState() {
+    super.initState();
+    _loadDefaultAvatar();
+  }
+
+  Future<void> _loadDefaultAvatar() async {
+    final byteData = await rootBundle.load('assets/images/app/userProfile.png');
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/userProfile.png');
+    await file.writeAsBytes(byteData.buffer.asUint8List());
+    setState(() {
+      _selectedImage = file;
+    });
+  }
 
   final TextEditingController _phoneController = TextEditingController(
     text: '+ 7 900 502 93',
@@ -71,6 +94,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   String _currentCity = 'Санкт-Петербург';
 
   void logout() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
     final _auth = AuthService();
     _auth.signOut();
   }
@@ -144,16 +168,21 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 15,
+                        horizontal: 15,
+                        vertical: 10,
                       ),
                       child: Row(
                         children: [
-                          SvgPicture.asset(
-                            "assets/images/icons/userProfile.svg",
-                            width: 60,
-                            height: 60,
-                          ),
+                          _isEditing
+                              ? AvatarWithPicker(
+                            initialImage: _selectedImage,
+                            onImageSelected: (file) {
+                              setState(() {
+                                _selectedImage = file;
+                              });
+                            },
+                          )
+                              : DisplayAvatar(image: _selectedImage),
                           const SizedBox(width: 15),
                           Expanded(
                             child: Column(
