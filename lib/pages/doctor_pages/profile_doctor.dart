@@ -12,6 +12,7 @@ import '../../components/Appbar/ProfileAppBar.dart';
 import '../../components/Avatar/AvatarWithPicker.dart';
 import '../../components/Avatar/DisplayAvatar.dart';
 import '../../components/DividerLine.dart';
+import '../../components/Notification.dart';
 import '../../components/SettingsRow.dart';
 import '../../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
@@ -26,6 +27,19 @@ class ProfilePageDoctor extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePageDoctor> {
+  // Хранение данных для сброса изменений
+  late String _initialName;
+  late String _initialSurname;
+  late String _initialPhone;
+  late String _initialEmail;
+  late String _initialCity;
+  late File _initialAvatar;
+  late String _initialSpecialization;
+  late String _initialExperience;
+  late String _initialPlaceOfWork;
+  late String _initialPrice;
+  late String _initialAbout;
+
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
   static const Color kPrimaryText = Color(0xFF111111); // цвет имени
@@ -37,9 +51,21 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
   File? _selectedImage;
 
+  @override
   void initState() {
     super.initState();
     _loadDefaultAvatar();
+    _initialName = _nameController.text;
+    _initialSurname = _surnameController.text;
+    _initialPhone = _phoneController.text;
+    _initialEmail = _emailController.text;
+    _initialCity = _currentCity;
+
+    _initialSpecialization = _specializationController.text;
+    _initialExperience = _experienceController.text;
+    _initialPlaceOfWork = _placeOfWorkController.text;
+    _initialPrice = _priceController.text;
+    _initialAbout = _aboutController.text;
   }
 
   Future<void> _loadDefaultAvatar() async {
@@ -49,6 +75,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
     await file.writeAsBytes(byteData.buffer.asUint8List());
     setState(() {
       _selectedImage = file;
+      _initialAvatar = file; // ← сохраняем оригинал
     });
   }
 
@@ -61,10 +88,12 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   );
 
   final TextEditingController _nameController = TextEditingController(
-    text: 'Георгий',
+    text: 'Мария Денисовна',
   );
 
-  final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController(
+    text: 'Речнекова',
+  );
 
   final TextEditingController _specializationController = TextEditingController(
     text: 'Стоматолог',
@@ -126,13 +155,45 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
         onCancel: () {
           setState(() {
             _isEditing = false;
-            // Можно добавить логику сброса изменений
+            _nameController.text = _initialName;
+            _surnameController.text = _initialSurname;
+            _phoneController.text = _initialPhone;
+            _emailController.text = _initialEmail;
+            _currentCity = _initialCity;
+            _selectedImage = _initialAvatar;
+
+            _specializationController.text = _initialSpecialization;
+            _experienceController.text = _initialExperience;
+            _placeOfWorkController.text = _initialPlaceOfWork;
+            _priceController.text = _initialPrice;
+            _aboutController.text = _initialAbout;
+
           });
         },
         onDone: () {
+          final bool hasChanges =
+              _nameController.text != _initialName ||
+                  _surnameController.text != _initialSurname ||
+                  _phoneController.text != _initialPhone ||
+                  _emailController.text != _initialEmail ||
+                  _currentCity != _initialCity ||
+                  _selectedImage != _initialAvatar ||
+                  _specializationController.text != _initialSpecialization ||
+                  _experienceController.text != _initialExperience ||
+                  _placeOfWorkController.text != _initialPlaceOfWork ||
+                  _priceController.text != _initialPrice ||
+                  _aboutController.text != _initialAbout;
+
+
           setState(() {
             _isEditing = false;
-            // Логика сохранения
+
+            if (hasChanges) {
+              showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
+              // Логика сохранения
+            } else {
+              showCustomNotification(context, 'Вы ничего не изменили');
+            }
           });
         },
         onSettings: () {
@@ -188,13 +249,26 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Мария Денисовна',
-                                  style: TextStyle(
-                                    height: 1.2,
-                                    fontSize: _isEditing ? 16 : 20,
+                                _isEditing
+                                    ? TextField(
+                                  controller: _nameController,
+                                  style: const TextStyle(
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    color: kPrimaryText,
+                                    color: _ProfilePageState.kPrimaryText,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                )
+                                    : Text(
+                                  _nameController.text,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: _ProfilePageState.kPrimaryText,
                                   ),
                                 ),
 
@@ -204,13 +278,26 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                                   SizedBox(height: 6),
                                 ],
 
-                                Text(
-                                  'Речнекова',
-                                  style: TextStyle(
-                                    height: 1.2,
-                                    fontSize: _isEditing ? 16 : 20,
+                                _isEditing
+                                    ? TextField(
+                                  controller: _surnameController,
+                                  style: const TextStyle(
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                    color: kSecondaryText,
+                                    color: _ProfilePageState.kSecondaryText,
+                                  ),
+                                  decoration: const InputDecoration(
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                )
+                                    : Text(
+                                  _surnameController.text,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w400,
+                                    color: _ProfilePageState.kSecondaryText,
                                   ),
                                 ),
                               ],

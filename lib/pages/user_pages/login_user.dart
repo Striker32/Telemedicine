@@ -7,10 +7,28 @@ import '../../auth/auth_service.dart';
 import '../../components/Checkbox.dart';
 import '../../components/Appbar/AppBarButton.dart' show AppBarButton;
 import '../../components/Appbar/CustomAppBar.dart';
+import '../../components/Notification.dart';
 import '../../themes/AppColors.dart';
 
-class LoginPageUser extends StatelessWidget {
+class LoginPageUser extends StatefulWidget {
   const LoginPageUser({super.key});
+
+  @override
+  State<LoginPageUser> createState() => _LoginPageUserState();
+}
+
+class _LoginPageUserState extends State<LoginPageUser> {
+
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _pwController = TextEditingController();
+
+  bool _isChecked = false;
+
+  bool get _isFormValid {
+    return _isChecked &&
+        _phoneController.text.trim().isNotEmpty &&
+        _pwController.text.trim().isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +36,6 @@ class LoginPageUser extends StatelessWidget {
 
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
-
-    final TextEditingController _phoneController = TextEditingController();
-    final TextEditingController _pwController = TextEditingController();
 
     void login(BuildContext context) async {
       // caught auth service
@@ -65,7 +80,7 @@ class LoginPageUser extends StatelessWidget {
 
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 0),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -126,7 +141,7 @@ class LoginPageUser extends StatelessWidget {
                         ),
                       ),
                       width: 72,
-                      padding: const EdgeInsets.symmetric(vertical: 18), // размер палка справа от +7
+                      padding: const EdgeInsets.symmetric(vertical: 20), // размер палка справа от +7
                       alignment: Alignment.centerLeft,
                       // граница между кодом и полем — реализована визуально через контейнер
                       child: Center(
@@ -145,22 +160,23 @@ class LoginPageUser extends StatelessWidget {
 
                     Expanded(
                       child: TextFormField(
+                        onChanged: (_) => setState(() {}),
                         keyboardType: TextInputType.phone,
                         controller: _phoneController,
                         decoration: const InputDecoration(
                           hintText: 'Ваш номер телефона',
                           hintStyle: TextStyle(
                             fontFamily: 'SF Pro Display',
-                            color: Colors.grey,
+                            color: AppColors.addLightText,
                             fontSize: 20,
                             fontWeight: FontWeight.w400,
                           ),
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 18),
+                          contentPadding: EdgeInsets.fromLTRB(20, 20, 0, 20),
                         ),
                         style: const TextStyle(
                           fontFamily: 'SF Pro Display',
-                          color: Colors.grey,
+                          color: AppColors.primaryText,
                           fontSize: 20,
                         ),
                       ),
@@ -178,10 +194,11 @@ class LoginPageUser extends StatelessWidget {
                   ),
                 ),
                 child: TextFormField(
+                  onChanged: (_) => setState(() {}),
                   obscureText: true,
                   controller: _pwController,
                   decoration: const InputDecoration(
-                    hintText: '  Пароль',
+                    hintText: 'Пароль',
                     hintStyle: TextStyle(
                       fontFamily: 'SF Pro Display',
                       color: Colors.grey,
@@ -189,7 +206,7 @@ class LoginPageUser extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                     ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 18),
+                    contentPadding: EdgeInsets.fromLTRB(10, 20, 0, 20),
                   ),
                   style: const TextStyle(
                     fontFamily: 'SF Pro Display',
@@ -210,14 +227,21 @@ class LoginPageUser extends StatelessWidget {
                     'Политика конфиденциальности',
                     style: TextStyle(
                       fontFamily: 'SF Pro Display',
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      color: Colors.grey,
+                      color: AppColors.addLightText,
                     ),
                   ),
                   // В макете круглый свайч справа
                   // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  Checkboxswitch(),
+                  Checkboxswitch(
+                    value: _isChecked,
+                    onChanged: (val) {
+                      setState(() {
+                        _isChecked = val;
+                      });
+                    },
+                  ),
                 ],
               ),
 
@@ -230,9 +254,17 @@ class LoginPageUser extends StatelessWidget {
         child: SizedBox(
           height: 64,
           child: ElevatedButton(
-            onPressed: () { login(context);},
+            onPressed: () {
+              if (_isFormValid) {
+                login(context);
+              } else {
+                showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+              }
+            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.additionalAccent,
+              backgroundColor: _isFormValid
+                  ? AppColors.additionalAccent
+                  : const Color(0xFFFDF4F7),
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
@@ -244,7 +276,9 @@ class LoginPageUser extends StatelessWidget {
                 fontFamily: 'SF Pro Display',
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
-                color: AppColors.mainColor,
+                color: _isFormValid
+                    ? AppColors.mainColor
+                    : const Color(0xFFFDA0AF),
               ),
             ),
           ),

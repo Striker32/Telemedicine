@@ -3,6 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 
+import 'Confirmation.dart';
+import 'Notification.dart';
+
 class ApplicationCard extends StatelessWidget {
   final String title;
   final String name;
@@ -753,8 +756,20 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   alignment: Alignment.center,
                 ),
-                onPressed: () {
-                  // TODO: действие при нажатии
+                onPressed: () async {
+                    final confirmed = await showConfirmationDialog(
+                      context,
+                      'Убрать отклик',
+                      'Вы собираетесь убрать и уведомить данного пациента об отзыве отклика по заявке ${widget.datetime}',
+                      'Да',
+                      'Отмена',
+                    );
+
+                    if (confirmed) {
+                      Navigator.pop(context);
+                      showCustomNotification(context, 'Вы успешно уведомили пациента об отзыве отклика по заявке!');
+                      // TODO: убрать отклик на заявку
+                    }
                 },
                 child: const Text(
                   'Убрать отклик',
@@ -1034,8 +1049,19 @@ class HistoryApplicationCard extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
                           highlightColor: Colors.transparent,
-                          onTap: () {
-                            debugPrint('Удалить');
+                          onTap: () async {
+                            final confirmed = await showConfirmationDialog(
+                              context,
+                              'Удалить заявку',
+                              'Данная заявка будет полностью удалена из базы данных приложения. Пациент больше не сможет её посмотреть.',
+                              'Удалить',
+                              'Отмена',
+                            );
+
+                            if (confirmed) {
+                              showCustomNotification(context, 'Заявка была успешно удалена');
+                              //   TODO: Логика удаления заявки
+                            }
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -1367,8 +1393,20 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(10),
                             highlightColor: Colors.transparent,
-                            onTap: () {
-                              debugPrint('Удалить');
+                            onTap: () async {
+                              final confirmed = await showConfirmationDialog(
+                                context,
+                                'Удалить заявку',
+                                'Данная заявка будет полностью удалена из базы данных приложения. Пациент больше не сможет её посмотреть.',
+                                'Удалить',
+                                'Отмена',
+                              );
+
+                              if (confirmed) {
+                                Navigator.pop(context);
+                                showCustomNotification(context, 'Заявка была успешно удалена');
+                                //   TODO: Логика удаления заявки
+                              }
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

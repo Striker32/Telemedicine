@@ -3,6 +3,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 
+import 'Confirmation.dart';
+import 'Notification.dart';
+
 class ApplicationCard extends StatelessWidget {
   final String title;
   final String name;
@@ -172,8 +175,24 @@ class ApplicationCard extends StatelessWidget {
                             : const Color(0xFFFFECF1), // светло-розовый
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
-                          onTap: () {
-                            // TODO: откликнуться на заявку
+                          onTap: () async {
+                            if (hasResponded) {
+                              showCustomNotification(context, 'Вы уведомили пациента о готовности работы с ним! Ожидайте его ответа.');
+                            } else {
+                              final confirmed = await showConfirmationDialog(
+                                context,
+                                'Откликнуться',
+                                'Вы собираетесь выбрать и уведомить данного пациента о готовности взяться за работу по заявке ${datetime}',
+                                'Да',
+                                'Отмена',
+                              );
+
+                              if (confirmed) {
+                                showCustomNotification(context, 'Вы успешно уведомили пациента о готовности работы с ним!');
+                                // TODO: откликнуться на заявку
+                              }
+                            }
+
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -485,9 +504,26 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                           elevation: 0,
                         ),
-                        onPressed: () {
-                          // TODO: завершить заявку
+                        onPressed: () async {
+                          if (widget.hasResponded) {
+                            showCustomNotification(context, 'Вы уведомили пациента о готовности работы с ним! Ожидайте его ответа.');
+                          } else {
+                            final confirmed = await showConfirmationDialog(
+                              context,
+                              'Откликнуться',
+                              'Вы собираетесь выбрать и уведомить данного пациента о готовности взяться за работу по заявке ${widget.datetime}',
+                              'Да',
+                              'Отмена',
+                            );
+
+                            if (confirmed) {
+                              Navigator.pop(context);
+                              showCustomNotification(context, 'Вы успешно уведомили пациента о готовности работы с ним!');
+                              // TODO: откликнуться на заявку
+                            }
+                          }
                         },
+
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
