@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:last_telemedicine/components/Avatar/AvatarWithPicker.dart';
@@ -9,6 +10,7 @@ import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 
+import '../../auth/Fb_user_model.dart';
 import '../../auth/auth_service.dart';
 import '../../components/Appbar/ProfileAppBar.dart';
 import '../../components/Avatar/DisplayAvatar.dart';
@@ -22,6 +24,8 @@ import '../Choose_profile.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
+// импорт репозитория и модели (путь поправь под проект)
+
 class ProfilePageUser extends StatefulWidget {
   const ProfilePageUser({Key? key}) : super(key: key);
 
@@ -30,13 +34,15 @@ class ProfilePageUser extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePageUser> {
-  // Хранение данных для сброса изменений
-  late String _initialName;
-  late String _initialSurname;
-  late String _initialPhone;
-  late String _initialEmail;
-  late String _initialCity;
-  late File _initialAvatar;
+  final repo = UserRepository();
+
+  // Хранение данных для сброса изменений (инициализируются при первой загрузке из Firestore)
+  String? _initialName;
+  String? _initialSurname;
+  String? _initialPhone;
+  String? _initialEmail;
+  String? _initialCity;
+  File? _initialAvatar;
 
   // Дизайн-токены (подгоняются под макет)
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
@@ -46,54 +52,45 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   File? _selectedImage;
 
+  // контроллеры
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController();
+
+  String _currentCity = 'Не указан';
+
+  // флаг, чтобы контроллеры инициализировались один раз из snapshot, пока не включено редактирование
+  bool _initializedFromSnapshot = false;
+
   @override
   void initState() {
     super.initState();
     _loadDefaultAvatar();
-    _initialName = _nameController.text;
-    _initialSurname = _surnameController.text;
-    _initialPhone = _phoneController.text;
-    _initialEmail = _emailController.text;
-    _initialCity = _currentCity;
   }
 
   Future<void> _loadDefaultAvatar() async {
-    final byteData = await rootBundle.load('assets/images/app/userProfile.png');
-    final tempDir = await getTemporaryDirectory();
-    final file = File('${tempDir.path}/userProfile.png');
-    await file.writeAsBytes(byteData.buffer.asUint8List());
-    setState(() {
-      _selectedImage = file;
-      _initialAvatar = file; // ← сохраняем оригинал
-    });
+    try {
+      final byteData = await rootBundle.load('assets/images/app/userProfile.png');
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/userProfile.png');
+      await file.writeAsBytes(byteData.buffer.asUint8List());
+      setState(() {
+        _selectedImage = file;
+        _initialAvatar = file;
+      });
+    } catch (e) {
+      // ignore if asset not found
+    }
   }
 
-
-  final TextEditingController _phoneController = TextEditingController(
-    text: '+ 7 900 502 93',
-  );
-
-  final TextEditingController _emailController = TextEditingController(
-    text: 'example@mail.ru',
-  );
-
-  final TextEditingController _nameController = TextEditingController(
-    text: 'Георгий',
-  );
-
-  final TextEditingController _surnameController = TextEditingController();
-
-  String _currentCity = 'Санкт-Петербург';
-
   void _changeCityFuncion() async {
-    // Пример: открыть страницу выбора языка и ждать результата
     final result = await Navigator.push<String>(
       context,
       MaterialPageRoute(builder: (_) => ChangeCityPage(selected: _currentCity)),
     );
     if (result != null && result != _currentCity) {
       setState(() => _currentCity = result);
-      // Здесь можно вызвать сохранение в настройки/сервер
     }
   }
 
@@ -103,265 +100,328 @@ class _ProfilePageState extends State<ProfilePageUser> {
     _auth.signOut();
   }
 
+  Future<void> _saveToFirestore(String uid) async {
+    final patch = <String, dynamic>{
+      'name': _nameController.text.trim(),
+      'surname': _surnameController.text.trim(),
+      // если в документе у тебя поле называется 'realEmail', сохраняем туда
+      'realEmail': _emailController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'city': _currentCity,
+    };
+
+    try {
+      await repo.updateUser(uid, patch);
+      // обновим "initial" на сохранённые значения
+      _initialName = _nameController.text;
+      _initialSurname = _surnameController.text;
+      _initialPhone = _phoneController.text;
+      _initialEmail = _emailController.text;
+      _initialCity = _currentCity;
+      _initialAvatar = _selectedImage;
+      showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
+    } catch (e) {
+      showCustomNotification(context, 'Ошибка при сохранении: $e');
+    }
+  }
+
+  void _onCancelEdit() {
+    setState(() {
+      _isEditing = false;
+      // сброс контроллеров к сохранённым initial (если они есть)
+      if (_initialName != null) _nameController.text = _initialName!;
+      if (_initialSurname != null) _surnameController.text = _initialSurname!;
+      if (_initialPhone != null) _phoneController.text = _initialPhone!;
+      if (_initialEmail != null) _emailController.text = _initialEmail!;
+      if (_initialCity != null) _currentCity = _initialCity!;
+      _selectedImage = _initialAvatar;
+      _initializedFromSnapshot = true; // чтобы при следующем snapshot контроллеры не перезаписались
+    });
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _emailController.dispose();
+    _nameController.dispose();
+    _surnameController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kBackground,
-      appBar: ProfileAppBar( // <-- 3. Используйте новый виджет
-        title: 'Профиль',
-        isEditing: _isEditing,
-        onEdit: () {
-          setState(() {
-            _isEditing = true;
-          });
-        },
-        onCancel: () {
-          setState(() {
-            _isEditing = false;
-            _nameController.text = _initialName;
-            _surnameController.text = _initialSurname;
-            _phoneController.text = _initialPhone;
-            _emailController.text = _initialEmail;
-            _currentCity = _initialCity;
-            _selectedImage = _initialAvatar; // ← сброс аватара
-          });
-        },
-        onDone: () {
-          final bool hasChanges =
-              _nameController.text != _initialName ||
-                  _surnameController.text != _initialSurname ||
-                  _phoneController.text != _initialPhone ||
-                  _emailController.text != _initialEmail ||
-                  _currentCity != _initialCity ||
-                  _selectedImage != _initialAvatar;
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) {
+      return const Scaffold(body: Center(child: Text('Пользователь не авторизован')));
+    }
+    final uid = firebaseUser.uid;
 
-          setState(() {
-            _isEditing = false;
+    return StreamBuilder<UserModel?>(
+      stream: repo.watchUser(uid),
+      builder: (context, snap) {
+        // показываем индикатор ожидания при загрузке
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
 
-            if (hasChanges) {
-              showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
-              // Логика сохранения
-            } else {
-              showCustomNotification(context, 'Вы ничего не изменили');
-            }
-          });
-        },
-        onSettings: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProfileSettingsPageUser(),
+        // если документ отсутствует — можно показать плейсхолдер или пустой профиль
+        if (!snap.hasData || snap.data == null) {
+          return Scaffold(
+            backgroundColor: kBackground,
+            appBar: ProfileAppBar(
+              title: 'Профиль',
+              isEditing: _isEditing,
+              onEdit: () => setState(() => _isEditing = true),
+              onCancel: _onCancelEdit,
+              onDone: () async {
+                // если профиля нет — создаём через upsert (инициализация)
+                await _saveToFirestore(uid);
+                setState(() => _isEditing = false);
+              },
+              onSettings: () {
+                Navigator.push(context, MaterialPageRoute(builder: (c) => ProfileSettingsPageUser()));
+              },
             ),
+            body: const Center(child: Text('Профиль не найден')),
           );
-        },
-      ),
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Блок аватара, имени и телефона
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border(
-                              bottom: BorderSide(color: AppColors.dividerLine, width: 1),
+        }
+
+        final model = snap.data!;
+
+        // Инициализация контроллеров единожды при загрузке из Firestore, если не в режиме редактирования
+        if (!_isEditing && (!_initializedFromSnapshot)) {
+          _nameController.text = model.name;
+          _surnameController.text = model.surname;
+          _emailController.text = (model.email.isNotEmpty ? model.email : model.email);
+          _phoneController.text = model.phone;
+          _currentCity = model.city.isEmpty ? 'Не указан' : model.city;
+
+          _initialName = _nameController.text;
+          _initialSurname = _surnameController.text;
+          _initialPhone = _phoneController.text;
+          _initialEmail = _emailController.text;
+          _initialCity = _currentCity;
+          // avatar остаётся default или выбранный локально
+          _initializedFromSnapshot = true;
+        }
+
+        return Scaffold(
+          backgroundColor: kBackground,
+          appBar: ProfileAppBar(
+            title: 'Профиль',
+            isEditing: _isEditing,
+            onEdit: () {
+              setState(() {
+                _isEditing = true;
+              });
+            },
+            onCancel: _onCancelEdit,
+            onDone: () async {
+              final bool hasChanges =
+                  _nameController.text != (_initialName ?? '') ||
+                      _surnameController.text != (_initialSurname ?? '') ||
+                      _phoneController.text != (_initialPhone ?? '') ||
+                      _emailController.text != (_initialEmail ?? '') ||
+                      _currentCity != (_initialCity ?? '') ||
+                      _selectedImage?.path != _initialAvatar?.path;
+
+              setState(() {
+                _isEditing = false;
+              });
+
+              if (hasChanges) {
+                await _saveToFirestore(uid);
+              } else {
+                showCustomNotification(context, 'Вы ничего не изменили');
+              }
+            },
+            onSettings: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileSettingsPageUser()));
+            },
+          ),
+          body: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Блок аватара, имени и телефона
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border(
+                                bottom: BorderSide(color: AppColors.dividerLine, width: 1),
+                              ),
                             ),
-                          ),
-
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15,
-                              vertical: 10,
-                            ),
-                            child: Row(
-                              children: [
-                                _isEditing
-                                    ? AvatarWithPicker(
-                                  initialImage: _selectedImage,
-                                  onImageSelected: (file) {
-                                    setState(() {
-                                      _selectedImage = file;
-                                    });
-                                  },
-                                )
-                                    : DisplayAvatar(image: _selectedImage),
-
-                            const SizedBox(width: 15),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      TextField(
-                                        controller: _nameController,
-                                        readOnly: !_isEditing,
-                                        textAlign: TextAlign.start,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          contentPadding: EdgeInsets.zero,
-                                          isDense: true,
-                                          visualDensity: VisualDensity.compact,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 10,
+                              ),
+                              child: Row(
+                                children: [
+                                  _isEditing
+                                      ? AvatarWithPicker(
+                                    initialImage: _selectedImage,
+                                    onImageSelected: (file) {
+                                      setState(() {
+                                        _selectedImage = file;
+                                      });
+                                    },
+                                  )
+                                      : DisplayAvatar(image: _selectedImage),
+                                  const SizedBox(width: 15),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        TextField(
+                                          controller: _nameController,
+                                          readOnly: !_isEditing,
+                                          textAlign: TextAlign.start,
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            contentPadding: EdgeInsets.zero,
+                                            isDense: true,
+                                            visualDensity: VisualDensity.compact,
+                                          ),
+                                          style: TextStyle(
+                                            height: 1.2,
+                                            fontSize: _isEditing ? 16 : 20,
+                                            fontWeight: FontWeight.w400,
+                                            color: kPrimaryText,
+                                          ),
                                         ),
-                                        style: TextStyle(
-                                          height: 1.2,
-                                          fontSize: _isEditing ? 16 : 20,
-                                          fontWeight: FontWeight.w400,
-                                          color: kPrimaryText,
-                                        ),
-                                      ),
-
-                                      if (_isEditing) ...[
-                                        SizedBox(height: 6),
-                                        DividerLine(),
-                                        SizedBox(height: 6),
-                                      ],
-
-                                      TextField(
-                                        controller: _surnameController,
-                                        readOnly: !_isEditing,
-                                        textAlign: TextAlign.start,
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          contentPadding: EdgeInsets.zero,
-                                          isDense: true,
-                                          visualDensity: VisualDensity.compact,
-                                          hintText: 'Фамилия',
-                                          hintStyle: TextStyle(
+                                        if (_isEditing) ...[
+                                          SizedBox(height: 6),
+                                          DividerLine(),
+                                          SizedBox(height: 6),
+                                        ],
+                                        TextField(
+                                          controller: _surnameController,
+                                          readOnly: !_isEditing,
+                                          textAlign: TextAlign.start,
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            contentPadding: EdgeInsets.zero,
+                                            isDense: true,
+                                            visualDensity: VisualDensity.compact,
+                                            hintText: 'Фамилия',
+                                            hintStyle: TextStyle(
+                                              color: AppColors.addLightText,
+                                            ),
+                                          ),
+                                          style: TextStyle(
+                                            height: 1.2,
+                                            fontSize: _isEditing ? 16 : 20,
+                                            fontWeight: FontWeight.w400,
                                             color: AppColors.addLightText,
                                           ),
                                         ),
-                                        style: TextStyle(
-                                          height: 1.2,
-                                          fontSize: _isEditing ? 16 : 20,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.addLightText,
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          if (_isEditing)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(
+                                    'Введите свое имя и добавьте по желанию\nфотографию профиля',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: Color(0xFF677076),
+                                    ),
                                   ),
                                 ),
+                                const SizedBox(height: 30),
                               ],
                             ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        if (_isEditing)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Text(
-                                  'Введите свое имя и добавьте по желанию\nфотографию профиля',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: Color(0xFF677076),
-                                  ),
-                                ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'Контактные данные',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF677076),
                               ),
-                              const SizedBox(height: 30),
-                            ],
-                          ),
-
-                        // Заголовок "Контактные данные"
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'Контактные данные',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF677076),
                             ),
                           ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        const DividerLine(),
-
-                        DividerLine(),
-
-                        SettingsRow(
-                          viewTitle: 'Номер телефона',
-                          editTitle: 'Сменить Телефон' ,
-                          controller: _phoneController,
-                          isEditable: _isEditing,
-                        ),
-
-                        DividerLine(),
-
-                        SettingsRow(
-                          viewTitle: 'Почта',
-                          editTitle: 'Сменить почту' ,
-                          controller: _emailController,
-                          isEditable: _isEditing,
-                        ),
-
-                        DividerLine(),
-
-                        SettingsRow(
-                          viewTitle: "Город",
-                          editTitle: "Изменить город",
-                          value: _currentCity,
-                          onTap: _isEditing ? _changeCityFuncion : null,
-                          isEditable: _isEditing,
-                        ),
-
-                        const DividerLine(),
-
-                        const SizedBox(height: 30),
-
-                        // Кнопки действий
-                        Column(
-                          children: [
-                            const DividerLine(),
-
-                            CustomButton(
-                              label: 'Изменить пароль',
-                              color: Colors.red.shade200,
-                            ),
-
-                            const DividerLine(),
-
-                          ],
-                        ),
-
-                        if (!_isEditing)
+                          const SizedBox(height: 10),
+                          const DividerLine(),
+                          DividerLine(),
+                          SettingsRow(
+                            viewTitle: 'Номер телефона',
+                            editTitle: 'Сменить Телефон',
+                            controller: _phoneController,
+                            isEditable: _isEditing,
+                          ),
+                          DividerLine(),
+                          SettingsRow(
+                            viewTitle: 'Почта',
+                            editTitle: 'Сменить почту',
+                            controller: _emailController,
+                            isEditable: _isEditing,
+                          ),
+                          DividerLine(),
+                          SettingsRow(
+                            viewTitle: "Город",
+                            editTitle: "Изменить город",
+                            value: _currentCity,
+                            onTap: _isEditing ? _changeCityFuncion : null,
+                            isEditable: _isEditing,
+                          ),
+                          const DividerLine(),
+                          const SizedBox(height: 30),
                           Column(
                             children: [
-                              const SizedBox(height: 30),
-
                               const DividerLine(),
-
                               CustomButton(
-                                onTap: () { logout();},
-                                label: 'Выйти',
-                                color: AppColors.mainColor,
+                                label: 'Изменить пароль',
+                                color: Colors.red.shade200,
                               ),
-
                               const DividerLine(),
                             ],
                           ),
-
-                        const Spacer(),
-                      ],
+                          if (!_isEditing)
+                            Column(
+                              children: [
+                                const SizedBox(height: 30),
+                                const DividerLine(),
+                                CustomButton(
+                                  onTap: () {
+                                    logout();
+                                  },
+                                  label: 'Выйти',
+                                  color: AppColors.mainColor,
+                                ),
+                                const DividerLine(),
+                              ],
+                            ),
+                          const Spacer(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
+        );
+      },
     );
   }
 }

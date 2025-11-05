@@ -16,7 +16,17 @@ class UserRepository {
           (doc) => UserModel.fromMap(doc.data()!),
     );
   }
+
+  // ← добавлен метод обновления
+  Future<void> updateUser(String uid, Map<String, dynamic> patch) async {
+    final data = {
+      ...patch,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    await _db.collection('users').doc(uid).set(data, SetOptions(merge: true));
+  }
 }
+
 
 class UserModel {
   final String name;
@@ -43,4 +53,13 @@ class UserModel {
     );
   }
 }
+
+Future<void> updateUser(String uid, Map<String, dynamic> patch) async {
+  final data = {
+    ...patch,
+    'updatedAt': FieldValue.serverTimestamp(),
+  };
+  await FirebaseFirestore.instance.collection('users').doc(uid).set(data, SetOptions(merge: true));
+}
+
 

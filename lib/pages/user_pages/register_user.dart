@@ -34,8 +34,7 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
   Widget build(BuildContext context) {
     // цветовая палитра
 
-    final Color pinkBg = const Color(0xFFFFF0F3); // пример светло-розового фона кнопки
-    final Color pinkText = const Color(0xFFFF6B86); // пример розового текста кнопки
+
 
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
@@ -46,13 +45,15 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
 
       final phone_num = _phoneController.text;
       final pass = _pwController.text;
+      final name = _nameController.text;
+      final surname = _nameController.text;
 
       final email = '${phone_num}@user.com';
 
       debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
       try {
-        await _auth.signUpWithEmailPassword(email, pass);
+        await _auth.signUpWithEmailPassword(pseudoemail: email , password: pass, phone: phone_num, name: name, surname: surname);
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
