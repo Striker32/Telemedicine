@@ -1,0 +1,120 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+/// Модель данных доктора
+class DoctorModel {
+  final String uid;
+  final String name;
+  final String surname;
+  final String phone;
+  final String realEmail; // поле, которое хранит "псевдо‑email" для Auth
+  final String city;
+  final String specialization;
+  final String experience;
+  final String placeOfWork;
+  final String price;
+  final String about;
+  final Timestamp? createdAt;
+  final Timestamp? updatedAt;
+
+  const DoctorModel({
+    required this.uid,
+    required this.name,
+    required this.surname,
+    required this.phone,
+    required this.realEmail,
+    required this.city,
+    required this.specialization,
+    required this.experience,
+    required this.placeOfWork,
+    required this.price,
+    required this.about,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory DoctorModel.fromMap(String uid, Map<String, dynamic> map) {
+    return DoctorModel(
+      uid: uid,
+      name: map['name'] ?? '',
+      surname: map['surname'] ?? '',
+      phone: map['phone'] ?? '',
+      realEmail: map['realEmail'] ?? map['email'] ?? '',
+      city: map['city'] ?? 'Не указан',
+      specialization: map['specialization'] ?? 'Не указана',
+      experience: map['experience'] ?? 'Не указано',
+      placeOfWork: map['placeOfWork'] ?? 'Не указано',
+      price: map['price'] ?? 'Не указано',
+      about: map['about'] ?? '',
+      createdAt: map['createdAt'] as Timestamp?,
+      updatedAt: map['updatedAt'] as Timestamp?,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'surname': surname,
+      'phone': phone,
+      'realEmail': realEmail,
+      'city': city,
+      'specialization': specialization,
+      'experience': experience,
+      'placeOfWork': placeOfWork,
+      'price': price,
+      'about': about,
+      // createdAt/updatedAt устанавливаются в репозитории через FieldValue.serverTimestamp()
+    };
+  }
+}
+
+/// Репозиторий для коллекции doctors
+class DoctorRepository {
+  final FirebaseFirestore _db;
+
+  DoctorRepository({FirebaseFirestore? db}) : _db = db ?? FirebaseFirestore.instance;
+
+  CollectionReference get _col => _db.collection('doctors');
+
+  /// Получить доктора однократно
+  Future<DoctorModel?> getDoctor(String uid) async {
+    final doc = await _col.doc(uid).get();
+    if (!doc.exists || doc.data() == null) return null;
+    return DoctorModel.fromMap(doc.id, doc.data()! as Map<String, dynamic>);
+  }
+
+  /// Подписка на изменения документа доктора
+  Stream<DoctorModel?> watchDoctor(String uid) {
+    return _col.doc(uid).snapshots().map((doc) {
+      if (!doc.exists || doc.data() == null) return null;
+      return DoctorModel.fromMap(doc.id, doc.data()! as Map<String, dynamic>);
+    });
+  }
+
+  /// Частичное обновление полей доктора (update)
+  Future<void> updateDoctor(String uid, Map<String, dynamic> patch) async {
+    final data = {
+      ...patch,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    await _col.doc(uid).set(data, SetOptions(merge: true));
+  }
+
+  /// Создать документ доктора (инициализация) — использует merge, чтобы не перезаписывать
+  Future<void> createDoctor(String uid, DoctorModel model) async {
+    final data = {
+      ...model.toMap(),
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    await _col.doc(uid).set(data, SetOptions(merge: true));
+  }
+
+  /// Upsert: создать если нет, иначе обновить
+  Future<void> upsertDoctor(String uid, Map<String, dynamic> patch) async {
+    final data = {
+      ...patch,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    await _col.doc(uid).set(data, SetOptions(merge: true));
+  }
+}

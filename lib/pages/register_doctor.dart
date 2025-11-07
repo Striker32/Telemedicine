@@ -4,27 +4,24 @@ import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
 
 import '../../components/Checkbox.dart';
-import '../../components/Appbar/AppBarButton.dart' show AppBarButton;
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/Notification.dart';
-import 'login_user.dart';
 
-class RegisterPageUser extends StatefulWidget {
-  const RegisterPageUser({super.key});
+class CoveredRegisterDoctor extends StatefulWidget {
+  const CoveredRegisterDoctor({super.key});
 
   @override
-  State<RegisterPageUser> createState() => _RegisterPageUserState();
+  State<CoveredRegisterDoctor> createState() => _CoveredRegisterDoctorState();
 
 }
-class _RegisterPageUserState extends State<RegisterPageUser> {
-  bool _isChecked = false;
+class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
   bool get _isFormValid {
-    return _isChecked &&
+    return
         _nameController.text.trim().isNotEmpty &&
         _phoneController.text.trim().isNotEmpty &&
         _pwController.text.trim().isNotEmpty;
@@ -54,12 +51,12 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
       }
 
 
-      final email = '${phone_num}@user.com';
+      final email = '${phone_num}@doctor.com';
 
       debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
       try {
-        await _auth.signUpUserWithEmailPassword(pseudoemail: email , password: pass, phone: phone_num, name: name, surname: surname);
+        await _auth.signUpDoctorWithEmailPassword(pseudoemail: email , password: pass, phone: phone_num, name: name, surname: surname);
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
@@ -80,7 +77,7 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        leading: AppBarButton(label: 'Назад'),
+        titleText: 'Этой страницы не существует',
         backgroundColor: Colors.white,
       ),
 
@@ -96,7 +93,7 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
 
               // Заголовок
               const Text(
-                'Регистрация',
+                'Регистрация ВРАЧА',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'SF Pro Display',
@@ -110,42 +107,7 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
 
 
 
-              // Подзаголовок
-              Text(
-                'Пожалуйста, зарегистрируйтесь для\nдальнейшего пользования приложением.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'SF Pro Display',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
 
-              const SizedBox(height: 22),
-
-              // Ссылка "У меня уже есть профиль"
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context, // 'context' здесь очень важен!
-                    MaterialPageRoute(builder: (context) => LoginPageUser()), // Замените DoctorScreen() на ваш виджет
-                  );
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'У меня уже есть профиль',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'SF Pro Display',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.addLightText,
-                  ),
-                ),
-              ),
 
               const SizedBox(height: 80),
 
@@ -157,7 +119,7 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
                 onChanged: (_) => setState(() {}),
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  hintText: 'Имя и Фамилия пациента',
+                  hintText: 'Имя и Фамилия врача',
                   hintStyle: TextStyle(
                     fontFamily: 'SF Pro Display',
                     color: AppColors.addLightText,
@@ -271,31 +233,6 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
 
 
 
-              // Политика конфиденциальности + переключатель
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Политика конфиденциальности',
-                    style: TextStyle(
-                      fontFamily: 'SF Pro Display',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.addLightText,
-                    ),
-                  ),
-                  // В макете круглый свайч справа
-                  // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  Checkboxswitch(
-                    value: _isChecked,
-                    onChanged: (val) {
-                      setState(() {
-                        _isChecked = val;
-                      });
-                    },
-                  ),
-                ],
-              ),
 
             ],
           ),

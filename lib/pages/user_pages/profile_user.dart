@@ -192,7 +192,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
         if (!_isEditing && (!_initializedFromSnapshot)) {
           _nameController.text = model.name;
           _surnameController.text = model.surname;
-          _emailController.text = (model.email.isNotEmpty ? model.email : model.email);
+          _emailController.text = (model.realEmail.isNotEmpty ? model.realEmail : model.realEmail);
           _phoneController.text = model.phone;
           _currentCity = model.city.isEmpty ? 'Не указан' : model.city;
 

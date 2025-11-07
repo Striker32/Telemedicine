@@ -31,14 +31,14 @@ class UserRepository {
 class UserModel {
   final String name;
   final String surname;
-  final String email;
+  final String realEmail;
   final String phone;
   final String city;
 
   UserModel({
     required this.name,
     required this.surname,
-    required this.email,
+    required this.realEmail,
     required this.phone,
     required this.city,
   });
@@ -47,7 +47,7 @@ class UserModel {
     return UserModel(
       name: map['name'] ?? '',
       surname: map['surname'] ?? '',
-      email: map['email'] ?? '',
+      realEmail: map['realEmail'] ?? '',
       phone: map['phone'] ?? '',
       city: map['city'] ?? '',
     );

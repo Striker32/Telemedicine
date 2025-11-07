@@ -30,7 +30,7 @@ class AuthService {
     }
   }
   // sign up
-  Future<UserCredential> signUpWithEmailPassword({
+  Future<UserCredential> signUpUserWithEmailPassword({
     required String pseudoemail,
     required String password,
     required String phone,
@@ -47,10 +47,46 @@ class AuthService {
       // создаём документ в Firestore
       await _db.collection('users').doc(userCredential.user!.uid).set({
         'phone': phone,
-        'realEmail': 'Не указан',
+        'realEmail': 'Не указана',
         'name' : name,
         'surname' : surname,
         'city': 'Не указан',
+        'createdAt': FieldValue.serverTimestamp(),
+        // 'role': role,
+      });
+
+      return userCredential;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.code);
+    }
+  }
+
+  Future<UserCredential> signUpDoctorWithEmailPassword({
+    required String pseudoemail,
+    required String password,
+    required String phone,
+    required String name,
+    required String surname,
+    // required String role,
+  }) async {
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: pseudoemail,
+        password: password,
+      );
+
+      // создаём документ в Firestore
+      await _db.collection('doctors').doc(userCredential.user!.uid).set({
+        'phone': phone,
+        'realEmail': 'Не указана',
+        'name' : name,
+        'surname' : surname,
+        'city': 'Не указан',
+        'specialization': 'Не указана',
+        'experience': 'Не указан',
+        'placeOfWork': 'Не указано',
+        'price': 'Не указано',
+        'about': 'Не указано',
         'createdAt': FieldValue.serverTimestamp(),
         // 'role': role,
       });
