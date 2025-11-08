@@ -615,6 +615,8 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 10),
                 ),
+                minLines: 1,
+                maxLines: 2,
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 12),

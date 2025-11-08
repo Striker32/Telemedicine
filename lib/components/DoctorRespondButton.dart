@@ -13,10 +13,12 @@ class DoctorRespondedButton extends StatelessWidget {
   final double? height; // если задано — фиксированная высота кнопки
   final double minWidth; // минимальная ширина кнопки
   final double subtitleheight;
+  final bool isActive;
 
   const DoctorRespondedButton({
     Key? key,
     required this.onTap,
+    required this.isActive,
     this.enabled = true,
     this.title = 'Выбрать',
     this.subtitle = 'Врач откликнулся на Вашу заявку!',
@@ -37,7 +39,7 @@ class DoctorRespondedButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: '$title. $subtitle',
+      label: '${isActive ? 'Снять врача с заявки' : title}. ${subtitle}',
       child: Material(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -60,7 +62,7 @@ class DoctorRespondedButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    title,
+                    isActive ? 'Снять врача с заявки' : title,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: AppColors.mainColor,
@@ -69,7 +71,8 @@ class DoctorRespondedButton extends StatelessWidget {
                     ),
                   ),
 
-                  Row(
+                  if (!isActive) ...[
+                    Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -90,6 +93,7 @@ class DoctorRespondedButton extends StatelessWidget {
                       ),
                     ],
                   ),
+                  ],
                 ],
               ),
             ),

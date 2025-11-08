@@ -34,6 +34,7 @@ class ApplicationCard extends StatelessWidget {
 
 // поле: список откликнувшихся врачей
   final List<Map<String, dynamic>> responders;
+  final Map<String, dynamic> physician; // Типо лечащий врач
 
 // флаг, есть ли отклики (по умолчанию false)
   final bool hasResponse;
@@ -49,6 +50,7 @@ class ApplicationCard extends StatelessWidget {
     required this.cost,
     this.urgent = false,
     this.responders = const [],
+    this.physician = const {},
     this.hasResponse = false,
   }) : super(key: key);
 
@@ -67,7 +69,7 @@ class ApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasResponse = responders.isNotEmpty;
+    final bool hasResponse = responders.isNotEmpty || physician.isNotEmpty;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
@@ -215,6 +217,7 @@ class ApplicationCard extends StatelessWidget {
                               urgent: urgent,
                               datetime: datetime,
                               responders: responders,
+                              physician: physician,
                             );
 
                             if (result != null) {
@@ -329,6 +332,7 @@ class ChangeApplicationPopup extends StatefulWidget {
   final bool urgent;
   final String? datetime;
   final List<Map<String, dynamic>> responders;
+  final Map<String, dynamic> physician;
 
   const ChangeApplicationPopup({
     super.key,
@@ -336,6 +340,7 @@ class ChangeApplicationPopup extends StatefulWidget {
     this.urgent = false,
     this.datetime,
     this.responders = const [],
+    this.physician = const {},
   });
 
   @override
@@ -600,7 +605,97 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
               const SizedBox(height: 20),
 
               // Блок: Откликнувшиеся врачи с серым фоном всей области и радиусами у крайних элементов
-              if (widget.responders.isNotEmpty) ...[
+              if (widget.physician.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: const Text("Лечащий врач",
+                        style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF9BA1A5),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
+                          isArchived: false,
+                          isActive: true,
+                          name: widget.physician['name'],
+                          surname: widget.physician['surname'],
+                          specialization: widget.physician['specialization'],
+                          rating: widget.physician['rating'],
+                          applications_quant: widget.physician['completed'],
+                          phone_num: widget.physician['phone'],
+                          email: widget.physician['email'],
+                          city: widget.physician['city'],
+                          work_exp: widget.physician['experience'],
+                          services_cost: widget.physician['price'],
+                          work_place: widget.physician['workplace'],
+                          about: widget.physician['about'],
+                          datetime: widget.datetime as String,
+                        )),
+                      );
+                    },
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF5F6F7),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/icons/userProfile.svg',
+                            width: 60,
+                            height: 60,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.physician['surname'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF1D1D1F),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.physician['name'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFF9BA1A5),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          SvgPicture.asset(
+                            'assets/images/icons/arrow_right.svg',
+                            width: 7,
+                            height: 12,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ] else if (widget.responders.isNotEmpty) ...[
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.only(left: 15),
@@ -658,6 +753,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             context, // 'context' здесь очень важен!
                             MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
                               isArchived: false,
+                              isActive: false,
                               name: responder['name'],
                               surname: responder['surname'],
                               specialization: responder['specialization'],
@@ -982,6 +1078,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       bool urgent = false,
       String? datetime,
       List<Map<String, dynamic>> responders = const [],
+      Map<String, dynamic> physician = const {},
     }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -992,6 +1089,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       urgent: urgent,
       datetime: datetime,
       responders: responders,
+      physician: physician,
     ),
   );
 }

@@ -589,6 +589,7 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                             context, // 'context' здесь очень важен!
                             MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
                               isArchived: true,
+                              isActive: false,
                               name: responder['name'],
                               surname: responder['surname'],
                               specialization: responder['specialization'],
@@ -761,6 +762,8 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 10),
                 ),
+                minLines: 1,
+                maxLines: 2,
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 12),

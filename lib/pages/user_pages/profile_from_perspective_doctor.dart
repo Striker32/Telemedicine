@@ -17,6 +17,7 @@ import '../../themes/AppColors.dart';
 
 class ProfilePageFromUserPers extends StatefulWidget {
   final bool isArchived;
+  final bool isActive;
   final String name;
   final String surname;
   final String specialization;
@@ -34,6 +35,7 @@ class ProfilePageFromUserPers extends StatefulWidget {
   const ProfilePageFromUserPers({
     Key? key,
     required this.isArchived,
+    required this.isActive,
     required this.name,
     this.surname = '',
     this.specialization = 'Врач',
@@ -76,7 +78,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
       appBar: CustomAppBar(
         titleText: 'Информация',
         leading: AppBarButton(label: 'Назад'),
-        action: AppBarButton(label: 'Выбрать', onTap: () async {
+        action: AppBarButton(label: (widget.isActive || widget.isArchived) ? '' : 'Выбрать', onTap: () async {
           final confirmed = await showConfirmationDialog(
             context,
             'Выбрать врача',
@@ -324,28 +326,31 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 40),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10,),
-                    child: DoctorRespondedButton(onTap: () async {
-                      final confirmed = await showConfirmationDialog(
-                        context,
-                        'Выбрать врача',
-                        'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
-                        'Выбрать',
-                        'Отмена',
-                      );
 
-                      if (confirmed) {
-                        Navigator.push(
+                  if (!widget.isArchived) ...{
+                    const SizedBox(height: 40),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10,),
+                      child: DoctorRespondedButton(isActive: widget.isActive, onTap: () async {
+                        final confirmed = await showConfirmationDialog(
                           context,
-                          MaterialPageRoute(builder: (_) => BottomNavigator(usertype: 'user', initialIndex: 1,)),
+                          'Выбрать врача',
+                          'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
+                          'Выбрать',
+                          'Отмена',
                         );
-                        showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
-                        //   TODO: Логика выбора врача юзером
-                      }
-                    }, height: 60,),
-                  ),
+
+                        if (confirmed) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => BottomNavigator(usertype: 'user', initialIndex: 1,)),
+                          );
+                          showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
+                          //   TODO: Логика выбора врача юзером
+                        }
+                      }, height: 60,),
+                    ),
+                  },
 
                   const SizedBox(height: 10,)
 
