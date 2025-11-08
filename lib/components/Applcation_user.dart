@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:last_telemedicine/themes/AppColors.dart';
+import 'package:last_telemedicine/components/DividerLine.dart';
+import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
+import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
+
+import '../../components/Confirmation.dart';
+import '../../components/Notification.dart';
 
 
 class _ThinDivider extends StatelessWidget {
@@ -10,36 +15,41 @@ class _ThinDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 1, color: AppColors.dividerLine);
+    return Container(height: 1, color: ApplicationCard._divider);
   }
 }
+
 
 // ЗАЯВКИ
 
 class ApplicationCard extends StatelessWidget {
   final String title;
-  final String name;
-  final String surname;
+  final String user;
   final String datetime;
   final String doctor;
   final String description;
   final String city;
   final int cost;
   final bool urgent;
-  final bool hasResponded;
+
+// поле: список откликнувшихся врачей
+  final List<Map<String, dynamic>> responders;
+
+// флаг, есть ли отклики (по умолчанию false)
+  final bool hasResponse;
 
   const ApplicationCard({
     Key? key,
     required this.title,
-    required this.name,
-    required this.surname,
+    required this.user,
     required this.datetime,
     required this.doctor,
     required this.description,
     required this.city,
     required this.cost,
-    this.hasResponded = false,
     this.urgent = false,
+    this.responders = const [],
+    this.hasResponse = false,
   }) : super(key: key);
 
 
@@ -57,10 +67,11 @@ class ApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasResponse = responders.isNotEmpty;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: _cardBg,
+        color: hasResponse ? const Color(0xFFFFFAFB) : _cardBg,
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
           BoxShadow(color: _shadow, blurRadius: 4, offset: Offset(0, 2)),
@@ -73,53 +84,57 @@ class ApplicationCard extends StatelessWidget {
           children: [
             // Верхняя строка: заголовок, справа молния
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Иконка юзера
-                SvgPicture.asset(
-                  'assets/images/icons/userProfile.svg',
-                  width: 60,
-                  height: 60,
-                ),
-
-                const SizedBox(width: 15),
-
-                // Имя + фамилия в колонке
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: _text,
-                        ),
-                      ),
-                      const SizedBox(height: 1),
-                      Text(
-                        surname,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF9BA1A5),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Молния справа
-                if (urgent)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: SvgPicture.asset(
-                      'assets/images/icons/lightning.svg',
-                      width: 30,
-                      height: 25,
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
+                      color: _text,
                     ),
                   ),
+                ),
+                SizedBox(width: 30),
+                if (urgent)
+                  SvgPicture.asset(
+                      'assets/images/icons/lightning.svg',
+                      width: 30,
+                      height: 25
+                  ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Аватар + имя + дата (в одной строке)
+            Row(
+              children: [
+                SvgPicture.asset(
+                    'assets/images/icons/userProfile.svg',
+                    width: 29,
+                    height: 29
+                ),
+                const SizedBox(width: 10),
+                // Имя
+                Text(
+                  user,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text),
+                ),
+                const SizedBox(width: 20),
+                SvgPicture.asset(
+                    'assets/images/icons/calendar.svg',
+                    width: 28,
+                    height: 28
+                ),
+                const SizedBox(width: 10),
+                // Дата
+                Text(
+                  datetime,
+                  style: const TextStyle(fontSize: 16, color: _gray, fontWeight: FontWeight.w400),
+                ),
               ],
             ),
 
@@ -127,18 +142,28 @@ class ApplicationCard extends StatelessWidget {
 
             // Врач
             const SizedBox(height: 12),
-            const Text("Ищу врача", style: TextStyle(fontSize: 12, color: _label)),
+            const Text("Врач", style: TextStyle(fontSize: 12, color: _label)),
             const SizedBox(height: 4),
             Text(doctor, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
 
             const SizedBox(height: 12),
             const _ThinDivider(),
 
-            // Причина
+            // Описание с фейдом без троеточия (только если переполнение)
             const SizedBox(height: 12),
-            const Text("Причина", style: TextStyle(fontSize: 12, color: _label)),
+            const Text("Описание", style: TextStyle(fontSize: 12, color: _label)),
             const SizedBox(height: 4),
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text), overflow: TextOverflow.ellipsis,),
+            Text(
+              description,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
+            ),
+
             const SizedBox(height: 12),
             const _ThinDivider(),
 
@@ -160,15 +185,6 @@ class ApplicationCard extends StatelessWidget {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text),
             ),
 
-            const SizedBox(height: 12),
-            const _ThinDivider(),
-
-            // Дата публикации
-            const SizedBox(height: 12),
-            const Text("Дата публикации", style: TextStyle(fontSize: 12, color: _label)),
-            const SizedBox(height: 6),
-            Text(datetime, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
-
             const SizedBox(height: 30),
 
             Row(
@@ -179,7 +195,8 @@ class ApplicationCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Material(
-                        color: const Color(0xFFFFECF1),
+                        // если есть отклики — кнопка ярко-красная, иначе светло-розовая
+                        color: hasResponse ? const Color(0xFFFF4361) : const Color(0xFFFFECF1),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
                           onTap: () async {
@@ -197,7 +214,7 @@ class ApplicationCard extends StatelessWidget {
                               initialValues: initialValues,
                               urgent: urgent,
                               datetime: datetime,
-                              name: name,
+                              responders: responders,
                             );
 
                             if (result != null) {
@@ -209,17 +226,25 @@ class ApplicationCard extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SvgPicture.asset(
-                                'assets/images/icons/applications.svg',
-                                width: 20,
-                                height: 20,
-                              ),
-                              const SizedBox(height: 4),
+                              // иконка: белая версия при отклике, обычная при отсутствии
+                              if (hasResponse)
+                                SvgPicture.asset(
+                                  'assets/images/icons/applications-white.svg',
+                                  width: 20,
+                                  height: 20,
+                                )
+                              else
+                                SvgPicture.asset(
+                                  'assets/images/icons/applications.svg',
+                                  width: 20,
+                                  height: 20,
+                                ),
+                              const SizedBox(height: 6),
                               Text(
                                 "Открыть заявку",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: const Color(0xFFFF4361),
+                                  color: hasResponse ? const Color(0xFFF5F5F7) : const Color(0xFFFF4361),
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -237,31 +262,28 @@ class ApplicationCard extends StatelessWidget {
                 Expanded(
                   child: SizedBox(
                     height: 61,
-                    child: Opacity(
-                      opacity: 0.5,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFF5F6F7),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                          elevation: 0,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Material(
+                        color: hasResponse ? const Color(0xFFFFFAFB) : Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: Color(0x544A4B4E)),
                         ),
-                        onPressed: () {
-                          // TODO: открыть чат
-                        },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SvgPicture.asset(
-                              'assets/images/icons/chat.svg',
-                              width: 18,
+                              'assets/images/icons/trash.svg',
+                              width: 20,
                               height: 20,
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             const Text(
-                              'Открыть чат',
+                              "Удалить",
+                              textAlign: TextAlign.center,
                               style: TextStyle(
-                                color: ApplicationCard._label,
+                                color: Color(0x544A4B4E),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -271,7 +293,7 @@ class ApplicationCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
+                )
 
               ],
             ),
@@ -299,22 +321,21 @@ class ApplicationCard extends StatelessWidget {
 }
 
 
-// POPUP ДЛЯ ЗАЯВКИ
+
+// POPUP ЗАЯВОК
 
 class ChangeApplicationPopup extends StatefulWidget {
   final List<String>? initialValues;
   final bool urgent;
   final String? datetime;
-  final String? name;
-  final bool hasResponded;
+  final List<Map<String, dynamic>> responders;
 
   const ChangeApplicationPopup({
     super.key,
     this.initialValues,
     this.urgent = false,
     this.datetime,
-    this.name,
-    this.hasResponded = false,
+    this.responders = const [],
   });
 
   @override
@@ -325,6 +346,29 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
   late final List<TextEditingController> _controllers;
   late bool _urgent;
   bool _isEditing = false;
+
+  Future<void> _openChangeCity() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChangeCityPage(
+          selected: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
+        ),
+      ),
+    );
+
+    if (result != null && result.isNotEmpty) {
+      setState(() {
+        _controllers[3].text = result;
+      });
+    }
+  }
+
+  bool get _allFilled =>
+      _controllers.every((c) =>
+      c.text
+          .trim()
+          .isNotEmpty);
 
   @override
   void initState() {
@@ -389,24 +433,38 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () async {
-                      const url = 'https://t.me/suehsush';
-                      if (await canLaunchUrl(Uri.parse(url))) {
-                        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                      } else {
-                        // Можно показать Snackbar или Alert
-                        debugPrint('Не удалось открыть ссылку');
+                    onTap: () {
+                      if (!_isEditing) {
+                        // Входим в режим редактирования
+                        setState(() => _isEditing = true);
+                        return;
                       }
+
+                      // Сейчас _isEditing == true — пользователь нажал "Готово"
+                      // Собираем данные из контроллеров и передаём результат наружу
+                      final result = {
+                        'doctor': _controllers[0].text,
+                        'reason': _controllers[1].text,
+                        'description': _controllers[2].text,
+                        'city': _controllers[3].text,
+                        'cost': _controllers[4].text,
+                        'urgent': _urgent,
+                        'datetime': widget.datetime,
+                      };
+
+                      // Опционально: проверка заполненности
+                      if (!_allFilled) {
+                        showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+                        return;
+                      }
+
+                      Navigator.pop(context, result);
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(right: 16),
                       child: Text(
-                        "Поддержка",
-                        style: TextStyle(
-                          color: Colors.red.shade400, // тот же красный, что был
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        _isEditing ? "Готово" : "Изменить",
+                        style: const TextStyle(color: Colors.red, fontSize: 16),
                       ),
                     ),
                   ),
@@ -425,35 +483,22 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 ),
               ),
 
-              const SizedBox(height: 20),
-
               // Дата и время из widget.datetime
-              Column(
-                children: [
-                  SvgPicture.asset(
-                    'assets/images/icons/userProfile.svg',
-                    width: 38,
-                    height: 38,
+              if (widget.datetime != null)
+                Text(
+                  widget.datetime!,
+                  style: const TextStyle(
+                    fontSize: 32,
+                    color: ApplicationCard._gray,
+                    fontWeight: FontWeight.w200,
                   ),
-
-                  const SizedBox(height: 6),
-
-                  Text(
-                    widget.name ?? "Гость",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF000000),
-                    ),
-                  ),
-                ],
-              ),
+                ),
 
               const SizedBox(height: 20),
 
               // Подзаголовок/описание
               const Text(
-                "Здесь Вы можете посмотреть содержимое заявки, а также откликнуться на неё.",
+                "Здесь Вы можете посмотреть и изменить содержимое, а также завершить заявку.",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: ApplicationCard._label),
               ),
@@ -463,32 +508,33 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
               Row(
                 children: [
+                  // Левая кнопка
                   Expanded(
                     child: SizedBox(
                       height: 61,
                       child: TextButton(
                         style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF4361),
+                          backgroundColor: const Color(0xFFF5F6F7),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                           elevation: 0,
                         ),
                         onPressed: () {
-                          // TODO: завершить заявку
+                          // TODO: открыть чат
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SvgPicture.asset(
-                              'assets/images/icons/checkmark-white.svg',
-                              width: 20,
-                              height: 20,
+                                'assets/images/icons/chat.svg',
+                                width: 18,
+                                height: 20
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              'Пациент выбрал Вас',
+                            const Text(
+                              'Открыть чат',
                               style: TextStyle(
-                                color: const Color(0xFFF5F5F7),
+                                color: ApplicationCard._label,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -505,46 +551,193 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   Expanded(
                     child: SizedBox(
                       height: 61,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: const Color(0xFFF5F6F7),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                            elevation: 0,
-                          ),
-                          onPressed: () {
-                            // TODO: открыть чат
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SvgPicture.asset(
-                                'assets/images/icons/chat.svg',
-                                width: 18,
-                                height: 20,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFF0F3), // светло-розовый фон (под скрин)
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          elevation: 0,
+                        ),
+                        onPressed: () async {
+                          final confirmed = await showConfirmationDialog(
+                            context,
+                            'Завершить заявку',
+                            'Данная заявка будет завершена\n и помещена в архив заявок профиля.\n Врачи больше не смогут её посмотреть.',
+                            'Завершить',
+                            'Отмена',
+                          );
+
+                          if (confirmed) {
+                            showCustomNotification(context, 'Заявка была успешно завершена!');
+                            //   TODO: Логика перенесения заявки в архив + отзыв
+                          }
+                        },
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                                'assets/images/icons/checkmark.svg',
+                                width: 20,
+                                height: 20
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Завершить',
+                              style: TextStyle(
+                                color: Color(0xFFFF2D55),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
                               ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Открыть чат',
-                                style: TextStyle(
-                                  color: ApplicationCard._label,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Блок: Откликнувшиеся врачи с серым фоном всей области и радиусами у крайних элементов
+              if (widget.responders.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: const Text("Откликнувшиеся врачи",
+                        style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Фоновая панель для списка (цвет 0xFF9BA1A5)
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF9BA1A5),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: ListView.separated(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: widget.responders.length,
+                    // separator ставим строго между элементами; если элементов <=1 будет пусто
+                    separatorBuilder: (context, index) {
+                      return widget.responders.length > 1 ? const _ThinDivider() : const SizedBox.shrink();
+                    },
+                    itemBuilder: (context, index) {
+                      final responder = widget.responders[index];
+                      final String name = (responder['name'] ?? '') as String;
+                      final String surname = (responder['surname'] ?? '') as String;
+
+                      // Рассчитываем радиусы в зависимости от позиции
+                      final bool isFirst = index == 0;
+                      final bool isLast = index == widget.responders.length - 1;
+                      final BorderRadius itemRadius;
+                      if (widget.responders.length == 1) {
+                        itemRadius = BorderRadius.circular(10);
+                      } else if (isFirst) {
+                        itemRadius = const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        );
+                      } else if (isLast) {
+                        itemRadius = const BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        );
+                      } else {
+                        itemRadius = BorderRadius.zero;
+                      }
+
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context, // 'context' здесь очень важен!
+                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
+                              isArchived: false,
+                              name: responder['name'],
+                              surname: responder['surname'],
+                              specialization: responder['specialization'],
+                              rating: responder['rating'],
+                              applications_quant: responder['completed'],
+                              phone_num: responder['phone'],
+                              email: responder['email'],
+                              city: responder['city'],
+                              work_exp: responder['experience'],
+                              services_cost: responder['price'],
+                              work_place: responder['workplace'],
+                              about: responder['about'],
+                              datetime: widget.datetime as String,
+                            )), // Замените DoctorScreen() на ваш виджет
+                          );
+                        },
+                        child: Container(
+                          // Отдельный белый прямоугольник внутри серой панели,
+                          // чтобы визуально совпадало со скрином; радиусы применяются к этому контейнеру
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F6F7),
+                            borderRadius: itemRadius,
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          child: Row(
+                            children: [
+                              // Серый кружок вместо фото
+                              SvgPicture.asset(
+                                  'assets/images/icons/userProfile.svg',
+                                  width: 60,
+                                  height: 60
+                              ),
+
+                              const SizedBox(width: 12),
+
+                              // Фамилия сверху (bold), имя снизу (обычный)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      surname,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF1D1D1F),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      name,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF9BA1A5),
+                                      ),
+                                    ),
+                                  ],
                                 ),
+                              ),
+
+                              const SizedBox(width: 8),
+
+                              // Серый кружок вместо стрелки
+                              SvgPicture.asset(
+                                  'assets/images/icons/arrow_right.svg',
+                                  width: 7,
+                                  height: 12
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
+                  ),
+                ),
 
+                const SizedBox(height: 20),
+              ],
 
-                ],
-              ),
-
-
-
-              const SizedBox(height: 20),
 
               // Поля ввода
               // Поле 1: Врач
@@ -668,18 +861,11 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 ),
               ),
               const SizedBox(height: 4),
-              DropdownButtonFormField<String>(
-                value: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
-                items: [
-                  DropdownMenuItem<String>(
-                    value: _controllers[3].text,
-                    child: Text(
-                      _controllers[3].text,
-                      style: const TextStyle(color: Color(0xFF1D1D1F)),
-                    ),
-                  ),
-                ],
-                onChanged: null, // ← полностью отключает выбор
+              _isEditing
+                  ? TextFormField(
+                controller: _controllers[3],
+                readOnly: true,
+                onTap: _openChangeCity,
                 decoration: InputDecoration(
                   hintText: "Выберите город",
                   filled: true,
@@ -692,6 +878,25 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  suffixIcon: const Icon(Icons.chevron_right, color: Color(0xFF9BA1A5)),
+                ),
+                style: const TextStyle(color: Color(0xFF1D1D1F)),
+              )
+                  : TextFormField(
+                controller: _controllers[3],
+                readOnly: true,
+                enabled: false,
+                decoration: InputDecoration(
+                  hintText: "Выберите город",
+                  filled: true,
+                  fillColor: const Color(0xFFF5F5F5),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
@@ -699,10 +904,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
                 style: const TextStyle(color: Color(0xFF1D1D1F)),
-                dropdownColor: const Color(0xFFF5F5F5),
-                menuMaxHeight: 200,
               ),
-
               const SizedBox(height: 12),
 
               // Поле 5: Предлагаемая стоимость
@@ -739,29 +941,32 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 ),
                 onChanged: (_) => setState(() {}),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 60),
 
-              TextButton(
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  alignment: Alignment.center,
-                ),
-                onPressed: () {
-                  // TODO: действие при нажатии
-                },
-                child: const Text(
-                  'Убрать отклик',
-                  style: TextStyle(
-                    color: Color(0xFFFF4361),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
+              // Переключатель Срочно
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Срочно",
+                      style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 16)),
+                  SizedBox(
+                    width: 51,
+                    height: 31,
+                    child: Switch(
+                      value: _urgent,
+                      onChanged: _isEditing ? (val) =>
+                          setState(() => _urgent = val) : null,
+                      activeTrackColor: const Color(0xFF77D572),
+                      inactiveTrackColor: const Color(0xFFE9E9EA),
+                      activeColor: Colors.white,
+                      inactiveThumbColor: Colors.white,
+                      trackOutlineColor: MaterialStateProperty.all(
+                          Colors.transparent),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              )
-
+                ],
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -776,8 +981,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       List<String>? initialValues,
       bool urgent = false,
       String? datetime,
-      String? name,
-      bool hasResponded = false,
+      List<Map<String, dynamic>> responders = const [],
     }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -787,8 +991,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       initialValues: initialValues,
       urgent: urgent,
       datetime: datetime,
-      name: name,
-      hasResponded: hasResponded,
+      responders: responders,
     ),
   );
 }
