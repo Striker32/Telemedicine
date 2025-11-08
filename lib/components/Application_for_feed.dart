@@ -353,7 +353,6 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
   late final List<TextEditingController> _controllers;
   late bool _urgent;
   bool _isEditing = false;
-  final List<String> cities = ['Москва', 'Санкт-Петербург', 'Казань'];
 
   @override
   void initState() {
@@ -670,6 +669,8 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 10),
                 ),
+                minLines: 1,
+                maxLines: 2,
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 12),
@@ -724,36 +725,34 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
               ),
               const SizedBox(height: 4),
               DropdownButtonFormField<String>(
-                value: _controllers[3].text.isNotEmpty
-                    ? _controllers[3].text
-                    : null,
-                items: cities.map((city) => DropdownMenuItem<String>(
-                  value: city,
-                  child: Text(city, style: const TextStyle(color: Color(0xFF1D1D1F))),
-                )).toList(),
-                onChanged: _isEditing
-                    ? (val) {
-                  setState(() {
-                    _controllers[3].text = val ?? '';
-                  });
-                }
-                    : null,
+                value: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
+                items: [
+                  DropdownMenuItem<String>(
+                    value: _controllers[3].text,
+                    child: Text(
+                      _controllers[3].text,
+                      style: const TextStyle(color: Color(0xFF1D1D1F)),
+                    ),
+                  ),
+                ],
+                onChanged: null, // ← полностью отключает выбор
                 decoration: InputDecoration(
                   hintText: "Выберите город",
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 ),
                 style: const TextStyle(color: Color(0xFF1D1D1F)),
                 dropdownColor: const Color(0xFFF5F5F5),
