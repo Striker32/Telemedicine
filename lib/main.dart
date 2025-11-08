@@ -4,6 +4,7 @@ import 'package:last_telemedicine/pages/Main_screen.dart';
 import 'package:last_telemedicine/pages/News_feed.dart';
 import 'package:last_telemedicine/pages/doctor_pages/applications_doctor.dart';
 import 'package:last_telemedicine/pages/doctor_pages/profile_doctor.dart';
+import 'package:last_telemedicine/pages/register_doctor.dart';
 import 'package:last_telemedicine/pages/user_pages/Welcome_screen_user.dart';
 import 'package:last_telemedicine/pages/user_pages/login_user.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_settings_user.dart';
@@ -46,7 +47,7 @@ class Myapp extends StatelessWidget {
           cursorColor: AppColors.mainColor,
         ),
       ),
-      home: SplashScreen(),
+      home: CoveredRegisterDoctor(),
     );
   }
 }

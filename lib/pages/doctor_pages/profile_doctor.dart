@@ -7,7 +7,7 @@ import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
-import '../../auth/Fb_bid_model.dart';
+import '../../auth/Fb_doctor_model.dart';
 import '../../auth/auth_service.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/Appbar/ProfileAppBar.dart';
