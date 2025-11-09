@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:last_telemedicine/pages/Chat.dart';
 import 'package:last_telemedicine/pages/Choose_profile.dart';
 import 'package:last_telemedicine/pages/Main_screen.dart';
 import 'package:last_telemedicine/pages/News_feed.dart';
@@ -48,6 +49,7 @@ class Myapp extends StatelessWidget {
         ),
       ),
       home: SplashScreen(),
+      // home: ChatScreen(),
     );
   }
 }

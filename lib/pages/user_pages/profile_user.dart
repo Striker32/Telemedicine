@@ -367,7 +367,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                             viewTitle: 'Номер телефона',
                             editTitle: 'Сменить Телефон',
                             controller: _phoneController,
-                            isEditable: _isEditing,
+                            isEditable: false,
                           ),
                           DividerLine(),
                           SettingsRow(

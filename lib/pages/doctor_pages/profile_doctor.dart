@@ -460,7 +460,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                         viewTitle: 'Номер телефона',
                         editTitle: 'Изменить телефон',
                         controller: _phoneController,
-                        isEditable: _isEditing,
+                        isEditable: false,
                       ),
 
                       const DividerLine(),
@@ -598,19 +598,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                         ),
                       ),
 
-                      const SizedBox(height: 30),
-
-                      Column(
-                        children: [
-                          const DividerLine(),
-                          CustomButton(
-                            label: 'Изменить пароль',
-                            color: Colors.red.shade200,
-                          ),
-                          const DividerLine(),
-                        ],
-                      ),
-
                       if (!_isEditing)
                         Column(
                           children: [
@@ -627,7 +614,20 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                           ],
                         ),
 
-                      const Spacer(),
+                      const Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 30,
+                        ),
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          'Для изменения логина\nили пароля - обратитесь в поддержку',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.addLightText,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

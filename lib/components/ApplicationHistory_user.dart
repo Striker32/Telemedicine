@@ -390,7 +390,7 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      const url = 'https://t.me/suehsush';
+                      const url = 'https://ru.wiktionary.org/wiki/%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0';
                       if (await canLaunchUrl(Uri.parse(url))) {
                         await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                       } else {
