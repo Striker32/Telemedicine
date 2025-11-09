@@ -8,6 +8,7 @@ import 'dart:ui' as ui;
 
 import '../../components/Confirmation.dart';
 import '../../components/Notification.dart';
+import '../auth/Fb_request_model.dart';
 
 
 class _ThinDivider extends StatelessWidget {
@@ -29,7 +30,8 @@ class ApplicationCard extends StatelessWidget {
   final String doctor;
   final String description;
   final String city;
-  final int cost;
+  final String cost;
+  final String requestID;
   final bool urgent;
 
 // поле: список откликнувшихся врачей
@@ -48,6 +50,7 @@ class ApplicationCard extends StatelessWidget {
     required this.description,
     required this.city,
     required this.cost,
+    required this.requestID,
     this.urgent = false,
     this.responders = const [],
     this.physician = const {},
@@ -218,6 +221,7 @@ class ApplicationCard extends StatelessWidget {
                               datetime: datetime,
                               responders: responders,
                               physician: physician,
+                              requestID: requestID,
                             );
 
                             if (result != null) {
@@ -311,8 +315,8 @@ class ApplicationCard extends StatelessWidget {
     );
   }
 
-  static String _formatCost(int value) {
-    final s = value.toString();
+  static String _formatCost(String value) {
+    final s = value;
     final buf = StringBuffer();
     for (int i = 0; i < s.length; i++) {
       buf.write(s[i]);
@@ -333,9 +337,11 @@ class ChangeApplicationPopup extends StatefulWidget {
   final String? datetime;
   final List<Map<String, dynamic>> responders;
   final Map<String, dynamic> physician;
+  final requestID;
 
   const ChangeApplicationPopup({
     super.key,
+    required this.requestID,
     this.initialValues,
     this.urgent = false,
     this.datetime,
@@ -378,6 +384,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
   @override
   void initState() {
     super.initState();
+    var  d = widget.requestID;
     _urgent = widget.urgent;
     final init = widget.initialValues ?? List<String>.filled(5, '');
     _controllers = List.generate(
@@ -391,6 +398,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
     }
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -438,32 +446,36 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       if (!_isEditing) {
-                        // Входим в режим редактирования
                         setState(() => _isEditing = true);
                         return;
                       }
 
-                      // Сейчас _isEditing == true — пользователь нажал "Готово"
-                      // Собираем данные из контроллеров и передаём результат наружу
-                      final result = {
-                        'doctor': _controllers[0].text,
-                        'reason': _controllers[1].text,
-                        'description': _controllers[2].text,
-                        'city': _controllers[3].text,
-                        'cost': _controllers[4].text,
-                        'urgent': _urgent,
-                        'datetime': widget.datetime,
-                      };
-
-                      // Опционально: проверка заполненности
                       if (!_allFilled) {
                         showCustomNotification(context, 'Пожалуйста, заполните все поля!');
                         return;
                       }
 
-                      Navigator.pop(context, result);
+                      final patch = {
+                        'specializationRequested': _controllers[0].text,
+                        'reason': _controllers[1].text,
+                        'description': _controllers[2].text,
+                        'city': _controllers[3].text,
+                        'price': _controllers[4].text,
+                        'urgent': _urgent,
+                      };
+                      var c4 = widget.requestID;
+
+                      try {
+                        final repo = RequestRepository();
+                        await repo.updateRequest(widget.requestID, patch); // ← обновление в БД
+                        Navigator.pop(context, patch);
+                        showCustomNotification(context, 'Заявка обновлена');
+                      } catch (e) {
+                        showCustomNotification(context, 'Ошибка обновления: $e');
+                        debugPrint('DEBUG: ct="$c4"');
+                      }
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(right: 16),
@@ -473,6 +485,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       ),
                     ),
                   ),
+
                 ],
               ),
 
@@ -572,9 +585,16 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             'Отмена',
                           );
 
+                          final patch = {
+                            'status': '2',
+                          };
+
                           if (confirmed) {
+
+                            final repo = RequestRepository();
+                            await repo.updateRequest(widget.requestID, patch);
+                            Navigator.pop(context, patch);
                             showCustomNotification(context, 'Заявка была успешно завершена!');
-                            //   TODO: Логика перенесения заявки в архив + отзыв
                           }
                         },
                         child: Column(
@@ -642,6 +662,8 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           work_place: widget.physician['workplace'],
                           about: widget.physician['about'],
                           datetime: widget.datetime as String,
+                          requestID: widget.requestID,
+                          id : widget.physician['id'],
                         )),
                       );
                     },
@@ -754,6 +776,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
                               isArchived: false,
                               isActive: false,
+                              id: responder['id'],
                               name: responder['name'],
                               surname: responder['surname'],
                               specialization: responder['specialization'],
@@ -767,6 +790,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                               work_place: responder['workplace'],
                               about: responder['about'],
                               datetime: widget.datetime as String,
+                              requestID: widget.requestID,
                             )), // Замените DoctorScreen() на ваш виджет
                           );
                         },
@@ -1079,6 +1103,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       String? datetime,
       List<Map<String, dynamic>> responders = const [],
       Map<String, dynamic> physician = const {},
+      required String requestID,
     }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -1090,6 +1115,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       datetime: datetime,
       responders: responders,
       physician: physician,
+      requestID: requestID,
     ),
   );
 }

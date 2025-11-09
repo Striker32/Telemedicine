@@ -70,10 +70,20 @@ class DoctorModel {
 /// Репозиторий для коллекции doctors
 class DoctorRepository {
   final FirebaseFirestore _db;
+  CollectionReference get _col => _db.collection('users'); // коллекция врачей
 
-  DoctorRepository({FirebaseFirestore? db}) : _db = db ?? FirebaseFirestore.instance;
+  DoctorRepository({FirebaseFirestore? firestore})
+      : _db = firestore ?? FirebaseFirestore.instance;
 
-  CollectionReference get _col => _db.collection('doctors');
+
+  Future<List<DoctorModel>> getDoctorsByUids(List<String> uids) async {
+    if (uids.isEmpty) return [];
+    final snap = await _col.where(FieldPath.documentId, whereIn: uids).get();
+    return snap.docs
+        .map((d) => DoctorModel.fromMap(d.id, d.data()! as Map<String, dynamic>))
+        .toList();
+  }
+
 
   /// Получить доктора однократно
   Future<DoctorModel?> getDoctor(String uid) async {

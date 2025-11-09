@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:last_telemedicine/components/DividerLine.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../components/DividerLine.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/Appbar/AppBarButton.dart';
 import '../../components/ApplicationHistory_doctor.dart';
 import '../../components/Application_doctor.dart';
-import '../user_pages/subpages/Change_city.dart';
+import '../../auth/Fb_request_model.dart';
+import '../../auth/Fb_user_model.dart';
 
 class ApplicationsPageDoctor extends StatelessWidget {
   const ApplicationsPageDoctor({super.key});
@@ -14,251 +18,228 @@ class ApplicationsPageDoctor extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-
         backgroundColor: const Color(0xFFEFEFF4),
         body: SafeArea(
-          child: DefaultTabController(
-            length: 2,
-            child: Column(
-              children: [
-                // Верхняя область (белый фон) с заголовком и кнопкой Создать
-                Container(
-                  width: double.infinity,
-                  color: const Color(0xFFFBFCFD),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 16),
-
-                      // Заголовок центрирован, кнопка справа
-                      SizedBox(
-                        height: 36,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Центрированный заголовок
-                            const Center(
-                              child: Text(
-                                "Заявки",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
+          child: Column(
+            children: [
+              // Верхняя панель
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFFBFCFD),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 36,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: const [
+                          Center(
+                            child: Text(
+                              "Заявки",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-
-                            ],
-                        ),
+                          ),
+                        ],
                       ),
-
-                      const SizedBox(height: 12),
-
-                      // Переключатель (TabBar)
-                      SizedBox(
-                        width: 214,
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(9),
-                              ),
-                              child: SizedBox(
-                                height: 37,
-                                child: TabBar(
-                                  isScrollable: false,
-                                  indicator: BoxDecoration(
-                                    color: const Color(0xFFF7F7F7),
-                                    borderRadius: BorderRadius.circular(7),
-                                  ),
-                                  indicatorColor: Colors.transparent,
-                                  dividerColor: Colors.transparent,
-                                  indicatorSize: TabBarIndicatorSize.tab,
-                                  labelColor: Colors.black,
-                                  unselectedLabelColor: Colors.black54,
-                                  tabs: const [
-                                    SizedBox(
-                                      width: 105,
-                                      child: Tab(text: "Активные"),
-                                    ),
-                                    SizedBox(
-                                      width: 105,
-                                      child: Tab(text: "Архив"),
-                                    ),
-                                  ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: 214,
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(9),
+                            ),
+                            child: SizedBox(
+                              height: 37,
+                              child: TabBar(
+                                indicator: BoxDecoration(
+                                  color: const Color(0xFFF7F7F7),
+                                  borderRadius: BorderRadius.circular(7),
                                 ),
+                                indicatorColor: Colors.transparent,
+                                dividerColor: Colors.transparent,
+                                indicatorSize: TabBarIndicatorSize.tab,
+                                labelColor: Colors.black,
+                                unselectedLabelColor: Colors.black54,
+                                tabs: const [
+                                  SizedBox(width: 105, child: Tab(text: "Активные")),
+                                  SizedBox(width: 105, child: Tab(text: "Архив")),
+                                ],
                               ),
                             ),
-                            Container(height: 9, color: Colors.white),
-                          ],
-                        ),
+                          ),
+                          Container(height: 9, color: Colors.white),
+                        ],
                       ),
-                      DividerLine(),
-                    ],
-                  ),
+                    ),
+                    DividerLine(),
+                  ],
                 ),
+              ),
 
-
-
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      _ApplicationsEmptyView(),
-                      _HistoryApplicationsEmptyView(),
-                    ],
-                  ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _ActiveApplicationsView(),
+                    _ArchivedApplicationsView(),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
+    );
+  }
+}
 
+// ==================== Активные заявки =====================
+class _ActiveApplicationsView extends StatelessWidget {
+  const _ActiveApplicationsView();
+
+  String _fmt(DateTime dt) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final doctor = FirebaseAuth.instance.currentUser;
+    if (doctor == null) {
+      return const Center(child: Text('Войдите, чтобы увидеть заявки'));
+    }
+
+    final repo = RequestRepository();
+
+    return StreamBuilder<List<RequestModel>>(
+      stream: repo.watchRequestsByStatus('1'), // открытые
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final items = snap.data ?? [];
+        final active = items.where((r) => r.hasResponded(doctor.uid) && !r.isArchived).toList();
+
+        if (active.isEmpty) {
+          return const Center(child: Text("0 активных заявок"));
+        }
+
+        return ListView.builder(
+          itemCount: active.length,
+          itemBuilder: (context, i) {
+            final r = active[i];
+            final ts = r.updatedAt ?? r.createdAt;
+            final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+
+            return FutureBuilder<UserModel>(
+              future: UserRepository().getUser(r.userUid),
+              builder: (context, userSnap) {
+                if (userSnap.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(
+                      child: CircularProgressIndicator()); // или индикатор
+                }
+                final fullName = userSnap.data!;
+
+                final currentDoctorUid = FirebaseAuth.instance.currentUser!.uid;
+                final responded = r.hasResponded(currentDoctorUid);
+
+                return ApplicationCard(
+                  title: r.reason,
+                  name: fullName.name,
+                  surname: fullName.surname,
+                  datetime: dtStr,
+                  doctor: r.specializationRequested,
+                  description: r.description,
+                  city: r.city,
+                  cost: r.price,
+                  urgent: r.urgent,
+                  hasResponded: responded,
+                  requestID: r.id,
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
 
 // ================= История заявок =================
+class _ArchivedApplicationsView extends StatelessWidget {
+  const _ArchivedApplicationsView();
 
-class _HistoryApplicationsEmptyView extends StatelessWidget {
-  const _HistoryApplicationsEmptyView();
+  String _fmt(DateTime dt) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-          const Text(
-            "3 архивных заявки",
-            style: TextStyle(fontSize: 12, color: Colors.black54),
-          ),
-          const SizedBox(height: 0),
+    final doctor = FirebaseAuth.instance.currentUser;
+    if (doctor == null) {
+      return const Center(child: Text('Войдите, чтобы увидеть архив'));
+    }
 
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 100),
-          //   child: Text(
-          //     "В данном разделе хранятся Ваши архивные заявки, по которым Вы уже оказали помощь.",
-          //     textAlign: TextAlign.center,
-          //     style: const TextStyle(fontSize: 13, color: Colors.black54),
-          //   ),
-          // ),
+    final repo = RequestRepository();
 
-          ListView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(top: 2),
-            children: const [
+    return StreamBuilder<List<RequestModel>>(
+      stream: repo.watchRequestsByStatus('2'), // архивные
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final items = snap.data ?? [];
+        final archived = items.where((r) => r.hasResponded(doctor.uid)).toList();
 
-              HistoryApplicationCard(
-                title: "Острая боль в нижней челюсти при жевании",
-                name: "Максим",
-                surname: "Орлов",
-                datetime: "12.04.2025 14:30",
-                doctor: "Стоматолог",
-                description:
-                "Появилась резкая боль в нижнем зубе с левой стороны, особенно при жевании и попадании холодного воздуха. Сначала было лёгкое покалывание, теперь боль стала постоянной. Обезболивающие помогают ненадолго. Ранее подобных проблем не было. Требуется консультация стоматолога, желательно с рентгеном, чтобы определить причину — возможно, воспаление нерва или трещина корня.",
-                city: "Каргополь",
-                cost: 7200,
-                rating: '5',
-              ),
+        if (archived.isEmpty) {
+          return const Center(child: Text("0 архивных заявок"));
+        }
 
-              HistoryApplicationCard(
-                title: "Жжение и дискомфорт после долгого сидения",
-                name: "Владимир",
-                surname: "Селиванов",
-                datetime: "05.02.2025 09:20",
-                doctor: "Проктолог",
-                description:
-                "После долгого сидения за компьютером начал ощущать зуд и лёгкое жжение в области заднего прохода. Симптомы усиливаются вечером, особенно после рабочего дня. Никаких выделений или крови нет, но ощущается неприятное давление. Хотел бы пройти обследование у проктолога, чтобы исключить воспаление или начальную стадию геморроя. Проблема вызывает дискомфорт и мешает нормально работать.",
-                city: "Сибирь",
-                cost: 6500,
-              ),
-
-              HistoryApplicationCard(
-                title: "Нечёткая дикция и трудности с произношением",
-                name: "Илья",
-                surname: "Трофимов",
-                datetime: "08.03.2025 17:05",
-                doctor: "Логопед",
-                description:
-                "После публичных выступлений заметил, что некоторые звуки произношу нечетко, особенно при быстрой речи. Есть ощущение напряжения в челюсти и языке. Ранее таких проблем не было. Хотелось бы пройти диагностику у логопеда, чтобы определить причину — возможно, это связано с неправильной артикуляцией или дыханием. Планирую заняться корректировкой речи и улучшить дикцию для уверенного общения.",
-                city: "Владивосток",
-                cost: 4800,
-                rating: '3',
-              ),
+        return ListView.builder(
+          itemCount: archived.length,
+          itemBuilder: (context, i) {
+            final r = archived[i];
+            final ts = r.updatedAt ?? r.createdAt;
+            final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
 
-            ],
-          ),
-        ],
-      ),
+            return FutureBuilder<UserModel>(
+              future: UserRepository().getUser(r.userUid),
+              builder: (context, userSnap) {
+                if (userSnap.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(
+                      child: CircularProgressIndicator()); // или индикатор
+                }
+                final fullName = userSnap.data!;
+
+
+                return HistoryApplicationCard(
+                  title: r.reason,
+                  name: fullName.name,
+                  surname: fullName.surname,
+                  datetime: dtStr,
+                  doctor: r.specializationRequested,
+                  description: r.description,
+                  city: r.city,
+                  cost: r.price,
+                  rating: '—',
+                );
+              },
+            );
+          }
+        );
+      },
     );
   }
 }
-
-// ==================== Заявки =====================
-class _ApplicationsEmptyView extends StatelessWidget {
-  const _ApplicationsEmptyView();
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-          const Text(
-            "2 активных заявки",
-            style: TextStyle(fontSize: 12, color: Colors.black54),
-          ),
-          const SizedBox(height: 0),
-
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 100),
-          //   child: Text(
-          //     "В данном разделе Вы можете отслеживать заявки на которые Вы откликнулись, а также просматривать их содержание и актуальный статус..",
-          //     textAlign: TextAlign.center,
-          //     style: const TextStyle(fontSize: 13, color: Colors.black54),
-          //   ),
-          // ),
-
-          ListView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(top: 2),
-            children: const [
-              ApplicationCard(
-                title: "Острая боль в нижнем клыке",
-                name: "Дмитрий",
-                surname: "Петров",
-                datetime: "15.04.2025 13:20",
-                doctor: "Стоматолог",
-                description:
-                "Появилась сильная боль в нижнем клыке с правой стороны, особенно при накусывании и при попадании холодной пищи. Сначала была лёгкая чувствительность, теперь боль постоянная, иногда пульсирующая. Обезболивающие помогают ненадолго. Хотелось бы пройти осмотр и при необходимости лечение каналов зуба.",
-                city: "Каргополь",
-                cost: 7500,
-                urgent: true,
-              ),
-
-              ApplicationCard(
-                title: "Консультация по установке прозрачных элайнеров",
-                name: "Екатерина",
-                surname: "Иванова",
-                datetime: "16.04.2025 09:45",
-                doctor: "Ортодонт",
-                description:
-                "Хотела бы узнать про варианты лечения с помощью прозрачных элайнеров, сроки ношения и стоимость. Интересует, можно ли их комбинировать с профессиональной чисткой и отбеливанием. Также хочу понять, насколько комфортно носить элайнеры и какие есть ограничения по питанию и уходу за зубами. Жду подробной консультации и плана лечения.",
-                city: "Санкт-Петербург",
-                cost: 0,
-                urgent: false,
-                hasResponded: true,
-              ),
-
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-

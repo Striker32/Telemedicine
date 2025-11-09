@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,6 +36,7 @@ class ProfilePageUser extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePageUser> {
   final repo = UserRepository();
+
 
   // Хранение данных для сброса изменений (инициализируются при первой загрузке из Firestore)
   String? _initialName;
@@ -150,11 +152,14 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   @override
   Widget build(BuildContext context) {
+
     final firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser == null) {
       return const Scaffold(body: Center(child: Text('Пользователь не авторизован')));
     }
     final uid = firebaseUser.uid;
+
+
 
     return StreamBuilder<UserModel?>(
       stream: repo.watchUser(uid),

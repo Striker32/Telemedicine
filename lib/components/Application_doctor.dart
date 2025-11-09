@@ -1,8 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
+
+import '../auth/Fb_request_model.dart';
+import 'Confirmation.dart';
+import 'Notification.dart';
 
 
 class _ThinDivider extends StatelessWidget {
@@ -24,7 +29,8 @@ class ApplicationCard extends StatelessWidget {
   final String doctor;
   final String description;
   final String city;
-  final int cost;
+  final String cost;
+  final String requestID;
   final bool urgent;
   final bool hasResponded;
 
@@ -38,6 +44,7 @@ class ApplicationCard extends StatelessWidget {
     required this.description,
     required this.city,
     required this.cost,
+    required this.requestID,
     this.hasResponded = false,
     this.urgent = false,
   }) : super(key: key);
@@ -198,6 +205,7 @@ class ApplicationCard extends StatelessWidget {
                               urgent: urgent,
                               datetime: datetime,
                               name: name,
+                              requestID: requestID,
                             );
 
                             if (result != null) {
@@ -286,8 +294,8 @@ class ApplicationCard extends StatelessWidget {
     );
   }
 
-  static String _formatCost(int value) {
-    final s = value.toString();
+  static String _formatCost(String value) {
+    final s = value;
     final buf = StringBuffer();
     for (int i = 0; i < s.length; i++) {
       buf.write(s[i]);
@@ -307,6 +315,7 @@ class ChangeApplicationPopup extends StatefulWidget {
   final String? datetime;
   final String? name;
   final bool hasResponded;
+  final String requestID;
 
   const ChangeApplicationPopup({
     super.key,
@@ -315,6 +324,7 @@ class ChangeApplicationPopup extends StatefulWidget {
     this.datetime,
     this.name,
     this.hasResponded = false,
+    required this.requestID,
   });
 
   @override
@@ -750,8 +760,26 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   alignment: Alignment.center,
                 ),
-                onPressed: () {
-                  // TODO: действие при нажатии
+                onPressed: () async{
+                    final confirmed = await showConfirmationDialog(
+                    context,
+                    'Убрать отклик',
+                    'Вы собираетесь убрать и уведомить данного пациента об отзыве отклика по заявке ${widget.datetime}',
+                    'Да',
+                    'Отмена',
+                  );
+
+                  if (confirmed) {
+                    final repo = RequestRepository();
+                    await repo.assignDoctorAtomically(
+                      requestId: widget.requestID,
+                      doctorData: {'uid': FirebaseAuth.instance.currentUser!.uid},
+                      remove: true,
+                    );
+                    Navigator.pop(context);
+                    showCustomNotification(context, 'Вы успешно уведомили пациента об отзыве отклика по заявке!');
+
+                  }
                 },
                 child: const Text(
                   'Убрать отклик',
@@ -780,6 +808,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       String? datetime,
       String? name,
       bool hasResponded = false,
+      required String requestID,
     }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -791,6 +820,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       datetime: datetime,
       name: name,
       hasResponded: hasResponded,
+      requestID: requestID,
     ),
   );
 }
