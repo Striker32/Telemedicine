@@ -18,6 +18,7 @@ import '../../components/Avatar/DisplayAvatar.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
 import '../../components/Appbar/AppBarButton.dart';
+import '../../components/Loading.dart';
 import '../../components/Notification.dart';
 import '../../themes/AppColors.dart';
 import '../Choose_profile.dart';
@@ -166,7 +167,10 @@ class _ProfilePageState extends State<ProfilePageUser> {
       builder: (context, snap) {
         // показываем индикатор ожидания при загрузке
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return Scaffold(
+            backgroundColor: AppColors.background2,
+            body: const PulseLoadingWidget(),
+          );
         }
 
         // если документ отсутствует — можно показать плейсхолдер или пустой профиль

@@ -14,6 +14,7 @@ import '../../components/Appbar/ProfileAppBar.dart';
 import '../../components/Avatar/AvatarWithPicker.dart';
 import '../../components/Avatar/DisplayAvatar.dart';
 import '../../components/DividerLine.dart';
+import '../../components/Loading.dart';
 import '../../components/Notification.dart';
 import '../../components/SettingsRow.dart';
 import '../../components/Appbar/AppBarButton.dart';
@@ -237,7 +238,10 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
       stream: repo.watchDoctor(uid),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return Scaffold(
+            backgroundColor: AppColors.background2,
+            body: const PulseLoadingWidget(),
+          );
         }
 
         if (!snap.hasData || snap.data == null) {

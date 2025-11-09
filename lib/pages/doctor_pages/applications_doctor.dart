@@ -9,6 +9,9 @@ import '../../components/ApplicationHistory_doctor.dart';
 import '../../components/Application_doctor.dart';
 import '../../auth/Fb_request_model.dart';
 import '../../auth/Fb_user_model.dart';
+import '../../components/Loading.dart';
+import '../../components/pluralizeApplications.dart';
+import '../../themes/AppColors.dart';
 
 class ApplicationsPageDoctor extends StatelessWidget {
   const ApplicationsPageDoctor({super.key});
@@ -110,6 +113,17 @@ class _ActiveApplicationsView extends StatelessWidget {
     return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
   }
 
+  // Widget build(BuildContext context) {
+  //   return SingleChildScrollView(
+  //       child: Column(
+  //           children: [
+  //           const SizedBox(height: 10),
+  //       const Text(
+  //         "2 активных заявки",
+  //         style: TextStyle(fontSize: 12, color: Colors.black54),
+  //       ),
+  //       const SizedBox(height: 0),
+
   @override
   Widget build(BuildContext context) {
     final doctor = FirebaseAuth.instance.currentUser;
@@ -123,51 +137,115 @@ class _ActiveApplicationsView extends StatelessWidget {
       stream: repo.watchRequestsByStatus('1'), // открытые
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Scaffold(
+            backgroundColor: AppColors.background2,
+            body: const PulseLoadingWidget(),
+          );
         }
         final items = snap.data ?? [];
         final active = items.where((r) => r.hasResponded(doctor.uid) && !r.isArchived).toList();
 
-        if (active.isEmpty) {
-          return const Center(child: Text("0 активных заявок"));
+        String _activeLabel(int count) {
+          if (count == 0) return 'Нет заявок';
+          return pluralizeApplications(count);
         }
 
-        return ListView.builder(
-          itemCount: active.length,
-          itemBuilder: (context, i) {
-            final r = active[i];
-            final ts = r.updatedAt ?? r.createdAt;
-            final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
-            return FutureBuilder<UserModel>(
-              future: UserRepository().getUser(r.userUid),
-              builder: (context, userSnap) {
-                if (userSnap.connectionState ==
-                    ConnectionState.waiting) {
-                  return const Center(
-                      child: CircularProgressIndicator()); // или индикатор
-                }
-                final fullName = userSnap.data!;
 
-                final currentDoctorUid = FirebaseAuth.instance.currentUser!.uid;
-                final responded = r.hasResponded(currentDoctorUid);
+        // Верхний блок: отступ + текст с количеством заявок
+        // Если нет активных заявок — покажем центр с сообщением "тут будут заявки"
+        if (active.isEmpty) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    _activeLabel(active.length),
+                    style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Center(
+                      child: const Text(
+                        'В данном разделе Вы можете отслеживать заявки на которые Вы откликнулись, а также просматривать их содержание и актуальный статус.',
+                        style: TextStyle(fontSize: 14, color: AppColors.primaryText),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
 
-                return ApplicationCard(
-                  title: r.reason,
-                  name: fullName.name,
-                  surname: fullName.surname,
-                  datetime: dtStr,
-                  doctor: r.specializationRequested,
-                  description: r.description,
-                  city: r.city,
-                  cost: r.price,
-                  urgent: r.urgent,
-                  hasResponded: responded,
-                  requestID: r.id,
-                );
-              },
-            );
-          },
+        // Есть активные заявки — рендерим список с заголовком сверху
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 5),
+              Center(
+                child: Text(
+                  _activeLabel(active.length),
+                  style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              // const SizedBox(height: 5)
+              // Сам список — ListView.builder внутри Column: shrinkWrap и не скроллить отдельно
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: active.length,
+                itemBuilder: (context, i) {
+                  final r = active[i];
+                  final ts = r.updatedAt ?? r.createdAt;
+                  final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+
+                  return FutureBuilder<UserModel>(
+                    future: UserRepository().getUser(r.userUid),
+                    builder: (context, userSnap) {
+                      if (userSnap.connectionState == ConnectionState.waiting) {
+                        // Небольшой placeholder вместо Scaffold (сохраняет структуру списка)
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: SizedBox(
+                            height: 80,
+                            child: Center(child: SizedBox(width: 48, height: 48, child: PulseLoadingWidget())),
+                          ),
+                        );
+                      }
+                      final fullName = userSnap.data!;
+                      final currentDoctorUid = FirebaseAuth.instance.currentUser!.uid;
+                      final responded = r.hasResponded(currentDoctorUid);
+
+                      return ApplicationCard(
+                        title: r.reason,
+                        name: fullName.name,
+                        surname: fullName.surname,
+                        datetime: dtStr,
+                        doctor: r.specializationRequested,
+                        description: r.description,
+                        city: r.city,
+                        cost: r.price,
+                        urgent: r.urgent,
+                        hasResponded: responded,
+                        requestID: r.id,
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
         );
       },
     );
@@ -184,6 +262,7 @@ class _ArchivedApplicationsView extends StatelessWidget {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final doctor = FirebaseAuth.instance.currentUser;
     if (doctor == null) {
@@ -196,50 +275,111 @@ class _ArchivedApplicationsView extends StatelessWidget {
       stream: repo.watchRequestsByStatus('2'), // архивные
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Scaffold(
+            backgroundColor: AppColors.background2,
+            body: const PulseLoadingWidget(),
+          );
         }
+
         final items = snap.data ?? [];
         final archived = items.where((r) => r.hasResponded(doctor.uid)).toList();
 
-        if (archived.isEmpty) {
-          return const Center(child: Text("0 архивных заявок"));
+        String _archiveLabel(int count) {
+          if (count == 0) return 'Нет заявок';
+          return pluralizeApplications(count);
         }
 
-        return ListView.builder(
-          itemCount: archived.length,
-          itemBuilder: (context, i) {
-            final r = archived[i];
-            final ts = r.updatedAt ?? r.createdAt;
-            final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+        // Пустое состояние: показываем заголовок и центральное сообщение
+        if (archived.isEmpty) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    _archiveLabel(archived.length),
+                    style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Center(
+                      child: const Text(
+                        'В данном разделе хранятся Ваши архивные заявки, по которым Вы уже оказали помощь.',
+                        style: TextStyle(fontSize: 14, color: AppColors.primaryText),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
 
+        // Есть архивные заявки — рендерим заголовок и список
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 5),
+              Center(
+                child: Text(
+                  _archiveLabel(archived.length),
+                  style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                  textAlign: TextAlign.center,
+                ),
+              ),
 
-            return FutureBuilder<UserModel>(
-              future: UserRepository().getUser(r.userUid),
-              builder: (context, userSnap) {
-                if (userSnap.connectionState ==
-                    ConnectionState.waiting) {
-                  return const Center(
-                      child: CircularProgressIndicator()); // или индикатор
-                }
-                final fullName = userSnap.data!;
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: archived.length,
+                itemBuilder: (context, i) {
+                  final r = archived[i];
+                  final ts = r.updatedAt ?? r.createdAt;
+                  final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
+                  return FutureBuilder<UserModel>(
+                    future: UserRepository().getUser(r.userUid),
+                    builder: (context, userSnap) {
+                      if (userSnap.connectionState == ConnectionState.waiting) {
+                        // placeholder вместо Scaffold — чтобы не ломать список
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: SizedBox(
+                            height: 80,
+                            child: Center(child: SizedBox(width: 48, height: 48, child: PulseLoadingWidget())),
+                          ),
+                        );
+                      }
 
-                return HistoryApplicationCard(
-                  title: r.reason,
-                  name: fullName.name,
-                  surname: fullName.surname,
-                  datetime: dtStr,
-                  doctor: r.specializationRequested,
-                  description: r.description,
-                  city: r.city,
-                  cost: r.price,
-                  rating: '—',
-                );
-              },
-            );
-          }
+                      final fullName = userSnap.data!;
+                      return HistoryApplicationCard(
+                        title: r.reason,
+                        name: fullName.name,
+                        surname: fullName.surname,
+                        datetime: dtStr,
+                        doctor: r.specializationRequested,
+                        description: r.description,
+                        city: r.city,
+                        cost: r.price,
+                        rating: '—',
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
         );
       },
     );
   }
+
 }

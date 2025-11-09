@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/Appbar/AppBarButton.dart';
 import '../../components/Application_for_feed.dart';
+import '../../components/Loading.dart';
+import '../../themes/AppColors.dart';
 import '../user_pages/subpages/Change_city.dart';
 import '../../auth/Fb_request_model.dart';
 import '../../auth/Fb_user_model.dart';
@@ -49,29 +51,63 @@ class MainDoctor extends StatelessWidget {
                     stream: repo.watchRequestsByStatus('0'),
                     builder: (context, snap) {
                       if (snap.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: PulseLoadingWidget());
                       }
+
                       final items = snap.data ?? [];
+
+                      // Пустое состояние — только центрированный текст
                       if (items.isEmpty) {
-                        return const Center(child: Text("Нет активных заявок"));
+                        return const Center(child: Text("Нет объявлений"));
                       }
+
+                      // Есть элементы — показываем заголовок как элемент списка и далее сами карточки
                       return ListView.builder(
-                        itemCount: items.length,
-                        itemBuilder: (context, i) {
-                          final r = items[i];
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        itemCount: items.length + 1, // +1 для заголовка "Все объявления"
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            // Заголовок и отступ — это первый элемент списка, поэтому он прокручивается вместе с остальным
+                            return Column(
+                              children: const [
+                                // SizedBox(height: 10),
+                                Center(
+                                  child: Text(
+                                    'Все объявления',
+                                    style: TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                              ],
+                            );
+                          }
+
+                          final r = items[index - 1];
                           final ts = r.updatedAt ?? r.createdAt;
                           final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
                           return FutureBuilder<UserModel>(
                             future: UserRepository().getUser(r.userUid),
                             builder: (context, userSnap) {
-                              if (userSnap.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator()); // или индикатор
+                              if (userSnap.connectionState == ConnectionState.waiting) {
+                                // Небольшой placeholder вместо PulseLoadingWidget
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                                  child: SizedBox(
+                                    height: 80,
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                    ),
+                                  ),
+                                );
                               }
-                              final fullName = userSnap.data!;
 
+                              final fullName = userSnap.data!;
                               final currentDoctorUid = FirebaseAuth.instance.currentUser!.uid;
                               final responded = r.hasResponded(currentDoctorUid);
 
@@ -90,55 +126,10 @@ class MainDoctor extends StatelessWidget {
                               );
                             },
                           );
-                        }
+                        },
                       );
                     },
                   ),
-
-                  // Архивные заявки (status == '3')
-                  // StreamBuilder<List<RequestModel>>(
-                  //   stream: repo.watchRequestsByStatus('3'),
-                  //   builder: (context, snap) {
-                  //     if (snap.connectionState == ConnectionState.waiting) {
-                  //       return const Center(child: CircularProgressIndicator());
-                  //     }
-                  //     final items = snap.data ?? [];
-                  //     if (items.isEmpty) {
-                  //       return const Center(child: Text("Нет архивных заявок"));
-                  //     }
-                  //     return ListView.builder(
-                  //       itemCount: items.length,
-                  //       itemBuilder: (context, i) {
-                  //         final r = items[i];
-                  //         final ts = r.updatedAt ?? r.createdAt;
-                  //         final dtStr = ts != null ? _fmt(ts.toDate()) : '';
-                  //
-                  //         return FutureBuilder<UserModel>(
-                  //           future: UserRepository().getUser(r.userUid),
-                  //           builder: (context, userSnap) {
-                  //             if (userSnap.connectionState ==
-                  //                 ConnectionState.waiting) {
-                  //               return const Center(child: CircularProgressIndicator()); // или индикатор
-                  //             }
-                  //             final fullName = userSnap.data!;
-                  //             return ApplicationCard(
-                  //               title: r.reason,
-                  //               name: fullName.name,
-                  //               surname: fullName.surname,
-                  //               datetime: dtStr,
-                  //               doctor: r.specializationRequested,
-                  //               description: r.description,
-                  //               city: r.city,
-                  //               cost: r.price,
-                  //               urgent: r.urgent,
-                  //               hasResponded: true, // если врач откликнулся
-                  //             );
-                  //           }
-                  //         );
-                  //       },
-                  //     );
-                  //   },
-                  // ),
 
                 ],
               ),
