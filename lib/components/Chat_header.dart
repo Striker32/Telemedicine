@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
@@ -8,7 +9,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
   final String firstName;
   final String lastName;
   final bool online;
-  final Duration? lastSeenAgo;
+  final Timestamp? lastSeenAgo;
   final String? avatarUrl;
   final VoidCallback? onBack;
 
@@ -22,12 +23,28 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
   }) : super(key: key);
 
-  String _statusText() {
+  String _statusText({
+    required bool online,
+    Object? lastSeenAgo, // Timestamp | DateTime | null
+  }) {
     if (online) return 'онлайн';
     if (lastSeenAgo == null) return 'был(-а) давно';
-    final m = lastSeenAgo!.inMinutes;
-    if (m < 1) return 'только что';
-    return 'был(-а) в сети $m минут назад';
+
+    if (lastSeenAgo is Timestamp) {
+      final seen = lastSeenAgo.toDate().toUtc();
+      final diff = DateTime.now().toUtc().difference(seen);
+      if (diff.inMinutes < 1) return 'только что';
+      return 'был(-а) в сети ${diff.inMinutes} минут назад';
+    }
+
+    if (lastSeenAgo is DateTime) {
+      final seen = lastSeenAgo.toUtc();
+      final diff = DateTime.now().toUtc().difference(seen);
+      if (diff.inMinutes < 1) return 'только что';
+      return 'был(-а) в сети ${diff.inMinutes} минут назад';
+    }
+
+    return 'был(-а) давно';
   }
 
   @override
@@ -36,7 +53,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final title = '${firstName.trim()} ${lastName.trim()}'.trim();
-    final status = _statusText();
+    final status = _statusText(online: false, lastSeenAgo: lastSeenAgo);
 
     return AppBar(
       backgroundColor: Colors.white,
@@ -86,20 +103,22 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
             height: 38,
             child: avatarUrl != null && avatarUrl!.isNotEmpty
                 ? ClipRRect(
-              borderRadius: BorderRadius.circular(4), // или 0 если нужен прямоугольный
-              child: Image.network(
-                avatarUrl!,
-                width: 38,
-                height: 38,
-                fit: BoxFit.cover,
-              ),
-            )
+                    borderRadius: BorderRadius.circular(
+                      4,
+                    ), // или 0 если нужен прямоугольный
+                    child: Image.network(
+                      avatarUrl!,
+                      width: 38,
+                      height: 38,
+                      fit: BoxFit.cover,
+                    ),
+                  )
                 : SvgPicture.asset(
-              'assets/images/icons/userProfile.svg',
-              width: 38,
-              height: 38,
-              fit: BoxFit.contain,
-            ),
+                    'assets/images/icons/userProfile.svg',
+                    width: 38,
+                    height: 38,
+                    fit: BoxFit.contain,
+                  ),
           ),
         ),
       ],

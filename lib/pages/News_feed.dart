@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:last_telemedicine/components/Avatar/AvatarWithPicker.dart';
+import 'package:last_telemedicine/components/Create_application.dart';
 import 'package:last_telemedicine/components/SettingsRow.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
@@ -77,12 +78,15 @@ class _ProfilePageState extends State<NewsFeedPage> {
                           ),
                           alignment: Alignment.center,
                           child: CreateRequestButton(
-                            onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => BottomNavigator(usertype: 'user', initialIndex: 1,)),
-                            );
-                          },),
+                            onTap: () async {
+                              // await showModalBottomSheet(
+                              // context: context,
+                              // isScrollControlled: true,
+                              // backgroundColor: Colors.transparent,
+                              // builder: (_) => const CreateApplicationPopup(),
+                              // );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -99,7 +103,6 @@ class _ProfilePageState extends State<NewsFeedPage> {
                     //   title: 'Дистанционные\nконсультации у терапевта',
                     //   image:
                     // ),
-
                     const SizedBox(height: 12),
 
                     Image(

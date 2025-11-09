@@ -5,8 +5,6 @@
 ///     body: const PulseLoadingWidget(),
 ///   );
 
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -17,7 +15,8 @@ class PulseLoadingWidget extends StatefulWidget {
   State<PulseLoadingWidget> createState() => _PulseLoadingWidgetState();
 }
 
-class _PulseLoadingWidgetState extends State<PulseLoadingWidget> with TickerProviderStateMixin {
+class _PulseLoadingWidgetState extends State<PulseLoadingWidget>
+    with TickerProviderStateMixin {
   // asset + размеры + параметры
   static const String _assetPath = 'assets/images/icons/heart.svg';
   static const double _baseWidth = 68.0;
@@ -27,7 +26,7 @@ class _PulseLoadingWidgetState extends State<PulseLoadingWidget> with TickerProv
   // длительности
   static const Duration _pulseDuration = Duration(milliseconds: 1200);
   static const Duration _fadeDuration = Duration(milliseconds: 200);
-  static const Duration _minVisibleDuration = Duration(milliseconds: 2000);
+  static const Duration _minVisibleDuration = Duration(milliseconds: 500);
 
   late final AnimationController _pulseCtrl;
   late final Animation<double> _scaleAnim;
@@ -111,13 +110,18 @@ class _PulseLoadingWidgetState extends State<PulseLoadingWidget> with TickerProv
         animation: Listenable.merge([_pulseCtrl, _fadeCtrl]),
         builder: (context, child) {
           // комбинируем общий opacity: fade * pulseOpacity
-          final double overallOpacity = _fadeAnim.value * (_opacityPulseAnim.value);
+          final double overallOpacity =
+              _fadeAnim.value * (_opacityPulseAnim.value);
           final double scale = _scaleAnim.value;
           return Opacity(
             opacity: overallOpacity.clamp(0.0, 1.0),
             child: Transform.scale(
               scale: scale,
-              child: SizedBox(width: _baseWidth, height: _baseHeight, child: child),
+              child: SizedBox(
+                width: _baseWidth,
+                height: _baseHeight,
+                child: child,
+              ),
             ),
           );
         },

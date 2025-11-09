@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../auth/auth_gate.dart';
 
 class SplashScreen extends StatefulWidget {
-  SplashScreen({Key? key}) : super(key: key); // убрал const если нужен
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -12,12 +12,11 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _radius;
+  double _maxRadius = 0;
 
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 4000),
@@ -25,57 +24,45 @@ class _SplashScreenState extends State<SplashScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final size = MediaQuery.of(context).size;
-      final maxRadius = size.longestSide * 1.2;
+      _maxRadius = size.longestSide * 1.2;
 
-      setState(() {
-        _radius = Tween<double>(begin: 0, end: maxRadius).animate(
-          CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-        );
-      });
-
-      // ⏱ Задержка перед запуском анимации
+      // Запуск анимации с небольшой задержкой
       Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          _controller.forward();
-        }
+        if (mounted) _controller.forward();
       });
 
       _controller.addStatusListener((status) {
-        _controller.addStatusListener((status) {
-          if (status == AnimationStatus.completed && mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const AuthGate()),
-            );
-          }
-        });
-
+        if (status == AnimationStatus.completed && mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const AuthGate()),
+          );
+        }
       });
+      // Нужно вызвать setState, чтобы AnimatedBuilder увидел обновлённый _maxRadius
+      setState(() {});
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF), // тот же цвет, что и в launch_background
+      backgroundColor: const Color(0xFFFFFFFF),
       body: Stack(
         children: [
-          // анимированная заливка розовым через ClipOval
           AnimatedBuilder(
-            animation: _radius,
+            animation: _controller,
             builder: (_, __) {
+              final radius = _controller.value * _maxRadius;
               return ClipOval(
-                clipper: _CircleClipper(_radius.value),
+                clipper: _CircleClipper(radius),
                 child: Container(color: const Color(0xFFFFECF1)),
               );
             },
           ),
-
-          // Центрированный первый кадр: тот же image что и в launch_background
           Center(
             child: Image.asset(
-              'assets/images/app/heartStart.png', // убедись что путь совпадает с pubspec
+              'assets/images/app/heartStart.png',
               width: 120,
               height: 120,
               fit: BoxFit.contain,
