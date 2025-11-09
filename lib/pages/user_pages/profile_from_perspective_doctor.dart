@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/auth/Fb_request_model.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:last_telemedicine/pages/user_pages/applications_user.dart';
@@ -21,7 +22,7 @@ class ProfilePageFromUserPers extends StatefulWidget {
   final String name;
   final String surname;
   final String specialization;
-  final double rating;
+  final String rating;
   final int applications_quant;
   final String phone_num;
   final String email;
@@ -31,15 +32,19 @@ class ProfilePageFromUserPers extends StatefulWidget {
   final String work_place;
   final String about;
   final String datetime;
+  final String requestID;
+  final String id;
 
   const ProfilePageFromUserPers({
     Key? key,
     required this.isArchived,
     required this.isActive,
     required this.name,
+    required this.requestID,
+    required this.id,
     this.surname = '',
     this.specialization = 'Врач',
-    this.rating = 0,
+    this.rating = "-",
     this.applications_quant = 0,
     this.phone_num = '',
     this.email = '',
@@ -65,6 +70,8 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
     0xFF9BA1A5,
   ); // цвет значения в контактных данных
 
+  final repo = RequestRepository();
+
   @override
   void initState() {
     super.initState();
@@ -88,12 +95,16 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
           );
 
           if (confirmed) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => BottomNavigator(usertype: 'user', initialIndex: 1,)),
-            );
-            showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
-            //   TODO: Логика выбора врача юзером
+            if (confirmed) {
+              await repo.assignDoctorAtomically(
+                requestId: widget.requestID,
+                doctorData: {'uid': widget.id},
+                select: true,
+                newStatus: '1', // назначен
+              );
+              Navigator.pop(context,);
+              showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
+            }
           }
         }),
       ),
@@ -341,12 +352,21 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                         );
 
                         if (confirmed) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => BottomNavigator(usertype: 'user', initialIndex: 1,)),
+                          widget.isActive ?
+
+                          await repo.assignDoctorAtomically(
+                            requestId: widget.requestID,
+                            doctorData: {'uid': widget.id},
+                            remove: true, // назначен
+                          )
+                              : await repo.assignDoctorAtomically(
+                            requestId: widget.requestID,
+                            doctorData: {'uid': widget.id},
+                            select: true,
+                            newStatus: '1', // назначен
                           );
+                          Navigator.pop(context,);
                           showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
-                          //   TODO: Логика выбора врача юзером
                         }
                       }, height: 60,),
                     ),

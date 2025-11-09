@@ -24,7 +24,7 @@ class HistoryApplicationCard extends StatelessWidget {
   final String description;
   final String city;
   final String rating;
-  final int cost;
+  final String cost;
 
   const HistoryApplicationCard({
     Key? key,
@@ -177,7 +177,7 @@ class HistoryApplicationCard extends StatelessWidget {
                               title,
                               description,
                               city,
-                              cost.toString(),
+                              cost,
                             ];
 
                             // Передаём responders (поле класса ApplicationCard)

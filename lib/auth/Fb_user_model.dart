@@ -11,6 +11,7 @@ class UserRepository {
     return UserModel.fromMap(doc.data()!);
   }
 
+
   Stream<UserModel> watchUser(String uid) {
     return _db.collection('users').doc(uid).snapshots().map(
           (doc) => UserModel.fromMap(doc.data()!),

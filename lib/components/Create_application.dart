@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../components/Notification.dart';
-
-
+import '../auth/Fb_request_model.dart'; // <- модель заявки + репозиторий (RequestModel, RequestRepository)
 
 
 // ================= POPUP СОЗДАНИЯ ЗАЯВКИ =================
@@ -18,6 +18,8 @@ class CreateApplicationPopup extends StatefulWidget {
 class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
   final _controllers = List.generate(5, (_) => TextEditingController());
   bool _urgent = false;
+
+  // Репозиторий для сохранения заявки
 
   Future<void> _openChangeCity() async {
     final result = await Navigator.push<String>(
@@ -36,9 +38,62 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
     }
   }
 
-
-
   bool get _allFilled => _controllers.every((c) => c.text.trim().isNotEmpty);
+
+  @override
+  void dispose() {
+    for (final c in _controllers) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _createRequest() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      showCustomNotification(context, 'Сначала войдите в аккаунт');
+      return;
+    }
+
+
+    // Собираем данные из полей
+    final reason = _controllers[1].text.trim();
+    final description = _controllers[2].text.trim();
+    final city = _controllers[3].text.trim();
+    final price = _controllers[4].text.trim();
+    final specializationRequested = _controllers[0].text.trim();
+
+    // Формируем модель заявки.
+    // id будет сгенерирован в репозитории (createRequest возвращает id).
+    final model = RequestModel(
+      id: '', // временно пустой — createRequest сгенерирует id в репозитории
+      userUid: user.uid,
+      status: '0', // 0 = открыта
+      doctors: [], // пока никого не назначено
+      reason: reason ,
+      specializationRequested: specializationRequested,
+      description: description,
+      city: city,
+      price: price,
+      urgent: _urgent,
+      createdAt: null,
+      updatedAt: null,
+      selectedDoctorUid: null,
+    );
+
+    final _repo = RequestRepository();
+
+    try {
+      final createdId = await _repo.createRequest(model);
+      // успешно создана заявка
+      Navigator.pop(context); // возвращаем id созданной заявки (опционально)
+      showCustomNotification(context, 'Заявка успешно создана');
+
+    } catch (e) {
+      debugPrint('create request error: $e');
+      showCustomNotification(context, 'Ошибка при создании заявки: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +178,7 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
               SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Поле 1
+                    // Поле 1: врач / специализация
                     Padding(
                       padding: const EdgeInsets.only(left: 15, bottom: 5), // сдвиг надписи вправо
                       child: Align(
@@ -164,7 +219,7 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Поле 2
+                    // Поле 2: причина
                     Padding(
                       padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5), // сдвиг надписи вправо
                       child: Align(
@@ -205,7 +260,7 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Поле 3
+                    // Поле 3: подробное описание
                     Padding(
                       padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                       child: Align(
@@ -249,7 +304,7 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Поле 4
+                    // Поле 4: город (выбор)
                     Padding(
                       padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                       child: Align(
@@ -294,7 +349,7 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
                     const SizedBox(height: 12),
 
 
-                    // Поле 5
+                    // Поле 5: предлагаемая стоимость
                     Padding(
                       padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                       child: Align(
@@ -368,10 +423,8 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
 
                     // Кнопка создать заявку
                     ElevatedButton(
-                      onPressed: _allFilled ? () {
-                        Navigator.pop(context);
-                        showCustomNotification(context, 'Заявка была успешно создана!');
-                        // TODO: Логика создания заявки
+                      onPressed: _allFilled ? () async {
+                        await _createRequest();
                       } : null,
                       style: ButtonStyle(
                         elevation: MaterialStateProperty.all(0), // убираем тень
@@ -422,4 +475,3 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
     );
   }
 }
-

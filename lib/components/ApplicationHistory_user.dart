@@ -9,6 +9,7 @@ import 'dart:ui' as ui;
 
 import '../../components/Confirmation.dart';
 import '../../components/Notification.dart';
+import '../auth/Fb_request_model.dart';
 
 class _ThinDivider extends StatelessWidget {
   const _ThinDivider();
@@ -30,7 +31,9 @@ class HistoryApplicationCard extends StatelessWidget {
   final String description;
   final String city;
   final String rating;
-  final int cost;
+  final String cost;
+  final String requestID;
+
 
   final List<dynamic> responder;
 
@@ -44,6 +47,7 @@ class HistoryApplicationCard extends StatelessWidget {
     required this.city,
     required this.cost,
     required this.responder,
+    required this.requestID,
     this.rating = '',
   }) : super(key: key);
 
@@ -59,6 +63,9 @@ class HistoryApplicationCard extends StatelessWidget {
   static const _btnGreyBg = Color(0xFFF2F2F7);
   static const _btnGreyText = Color(0xFF8E8E93);
   static const _gray = Color(0xFF9BA1A5);
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +181,7 @@ class HistoryApplicationCard extends StatelessWidget {
                               title,
                               description,
                               city,
-                              cost.toString(),
+                              cost,
                             ];
 
                             // Передаём responders (поле класса ApplicationCard)
@@ -185,6 +192,7 @@ class HistoryApplicationCard extends StatelessWidget {
                               responder: responder,
                               hasRating: rating != '',
                               rating: rating,
+                              requestID: requestID,
                             );
 
                             if (result != null) {
@@ -245,8 +253,9 @@ class HistoryApplicationCard extends StatelessWidget {
                             );
 
                             if (confirmed) {
+                              final repo = RequestRepository();
+                              await repo.deleteRequest(requestID);
                               showCustomNotification(context, 'Заявка была успешно удалена');
-                              //   TODO: Логика удаления заявки
                             }
                           },
                           child: Column(
@@ -309,9 +318,11 @@ class HistoryApplicationPopup extends StatefulWidget {
   final List<dynamic> responder;
   final bool? hasRating;
   final String? rating;
+  final String requestID;
 
   const HistoryApplicationPopup({
     super.key,
+    required this.requestID,
     this.initialValues,
     this.datetime,
     this.hasRating,
@@ -514,8 +525,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                               );
 
                               if (confirmed) {
+                                final repo = RequestRepository();
+                                await repo.deleteRequest(widget.requestID);
+                                Navigator.pop(context);
                                 showCustomNotification(context, 'Заявка была успешно удалена');
-                                //   TODO: Логика удаления заявки
                               }
 
                             },
@@ -602,6 +615,8 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                               services_cost: responder['price'],
                               work_place: responder['workplace'],
                               about: responder['about'],
+                              requestID: widget.requestID,
+                              id : responder['id'],
                             )),
                           );
                         },
@@ -890,6 +905,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
       List<dynamic> responder = const [],
       bool? hasRating,
       String? rating,
+      required String requestID,
     }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -901,6 +917,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
       responder: responder,
       hasRating: hasRating,
       rating: rating,
+      requestID: requestID,
     ),
   );
 }

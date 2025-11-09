@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 
+import '../auth/Fb_request_model.dart';
 import 'Confirmation.dart';
 import 'Notification.dart';
 
@@ -14,9 +16,12 @@ class ApplicationCard extends StatelessWidget {
   final String doctor;
   final String description;
   final String city;
-  final int cost;
+  final String cost;
+  final String requestID;
   final bool urgent;
   final bool hasResponded;
+
+  final List<Map<String, dynamic>> responders;
 
   const ApplicationCard({
     Key? key,
@@ -28,6 +33,8 @@ class ApplicationCard extends StatelessWidget {
     required this.description,
     required this.city,
     required this.cost,
+    required this.requestID,
+    this.responders = const [],
     this.hasResponded = false,
     this.urgent = false,
   }) : super(key: key);
@@ -177,7 +184,24 @@ class ApplicationCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(10),
                           onTap: () async {
                             if (hasResponded) {
-                              showCustomNotification(context, 'Вы уведомили пациента о готовности работы с ним! Ожидайте его ответа.');
+                              final confirmed = await showConfirmationDialog(
+                                context,
+                                'Убрать отклик',
+                                'Вы собираетесь убрать и уведомить данного пациента об отзыве отклика по заявке ${datetime}',
+                                'Да',
+                                'Отмена',
+                              );
+
+                              if (confirmed) {
+                                showCustomNotification(context, 'Вы успешно уведомили пациента об отзыве отклика по заявке!');
+                                final repo = RequestRepository();
+                                await repo.assignDoctorAtomically(
+                                  requestId: requestID,
+                                  doctorData: {'uid': FirebaseAuth.instance.currentUser!.uid},
+                                  remove: true,
+                                );
+
+                              }
                             } else {
                               final confirmed = await showConfirmationDialog(
                                 context,
@@ -189,7 +213,15 @@ class ApplicationCard extends StatelessWidget {
 
                               if (confirmed) {
                                 showCustomNotification(context, 'Вы успешно уведомили пациента о готовности работы с ним!');
-                                // TODO: откликнуться на заявку
+                                final repo = RequestRepository();
+                                await repo.assignDoctorAtomically(
+                                  requestId: requestID,
+                                  doctorData: {
+                                    'uid': FirebaseAuth.instance.currentUser!.uid,
+                                  },
+                                  keepMultiple: true,
+                                );
+
                               }
                             }
 
@@ -252,6 +284,7 @@ class ApplicationCard extends StatelessWidget {
                               datetime: datetime,
                               name: name,
                               hasResponded: hasResponded,
+                                requestID: requestID,
                             );
 
                             if (result != null) {
@@ -299,8 +332,8 @@ class ApplicationCard extends StatelessWidget {
     );
   }
 
-  static String _formatCost(int value) {
-    final s = value.toString();
+  static String _formatCost(String value) {
+    final s = value;
     final buf = StringBuffer();
     for (int i = 0; i < s.length; i++) {
       buf.write(s[i]);
@@ -335,6 +368,7 @@ class ChangeApplicationPopup extends StatefulWidget {
   final String? datetime;
   final String? name;
   final bool hasResponded;
+  final String requestID;
 
   const ChangeApplicationPopup({
     super.key,
@@ -343,6 +377,7 @@ class ChangeApplicationPopup extends StatefulWidget {
     this.datetime,
     this.name,
     this.hasResponded = false,
+    required this.requestID,
   });
 
   @override
@@ -505,7 +540,24 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                         ),
                         onPressed: () async {
                           if (widget.hasResponded) {
-                            showCustomNotification(context, 'Вы уведомили пациента о готовности работы с ним! Ожидайте его ответа.');
+                            final confirmed = await showConfirmationDialog(
+                              context,
+                              'Убрать отклик',
+                              'Вы собираетесь убрать и уведомить данного пациента об отзыве отклика по заявке ${widget.datetime}',
+                              'Да',
+                              'Отмена',
+                            );
+
+                            if (confirmed) {
+                              final repo = RequestRepository();
+                              await repo.assignDoctorAtomically(
+                                requestId: widget.requestID,
+                                doctorData: {'uid': FirebaseAuth.instance.currentUser!.uid},
+                                remove: true,
+                              );
+                              Navigator.pop(context);
+                              showCustomNotification(context, 'Вы успешно уведомили пациента об отзыве отклика по заявке!');
+                            }
                           } else {
                             final confirmed = await showConfirmationDialog(
                               context,
@@ -516,12 +568,19 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             );
 
                             if (confirmed) {
+                              final repo = RequestRepository();
+                              await repo.assignDoctorAtomically(
+                                requestId: widget.requestID,
+                                doctorData: {'uid': FirebaseAuth.instance.currentUser!.uid},
+                                keepMultiple: true,
+                              );
                               Navigator.pop(context);
                               showCustomNotification(context, 'Вы успешно уведомили пациента о готовности работы с ним!');
-                              // TODO: откликнуться на заявку
                             }
                           }
                         },
+
+
 
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -811,6 +870,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       String? datetime,
       String? name,
       bool hasResponded = false,
+                        required String requestID,
     }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -822,6 +882,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       datetime: datetime,
       name: name,
       hasResponded: hasResponded,
+              requestID: requestID,
     ),
   );
 }
