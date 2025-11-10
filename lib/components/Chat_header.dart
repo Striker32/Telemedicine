@@ -28,23 +28,31 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
     Object? lastSeenAgo, // Timestamp | DateTime | null
   }) {
     if (online) return 'онлайн';
-    if (lastSeenAgo == null) return 'был(-а) давно';
+    if (lastSeenAgo == null) return 'был(-а) в сети давно';
 
-    if (lastSeenAgo is Timestamp) {
-      final seen = lastSeenAgo.toDate().toUtc();
-      final diff = DateTime.now().toUtc().difference(seen);
-      if (diff.inMinutes < 1) return 'только что';
-      return 'был(-а) в сети ${diff.inMinutes} минут назад';
+    final seen = lastSeenAgo is Timestamp
+        ? lastSeenAgo.toDate().toUtc()
+        : lastSeenAgo is DateTime
+        ? lastSeenAgo.toUtc()
+        : null;
+
+    if (seen == null) return 'был(-а) в сети давно';
+
+    final diff = DateTime.now().toUtc().difference(seen);
+    final minutes = diff.inMinutes;
+    final hours = diff.inHours;
+    final days = diff.inDays;
+
+    if (minutes <= 60) return 'был(-а) в сети $minutes минут назад';
+    if (hours < 24) return 'был(-а) в сети $hours часов назад';
+    if (days == 1) return 'был(-а) в сети вчера';
+    if (days == 2) return 'был(-а) в сети позавчера';
+    if (days < 7) {
+      final suffix = (days >= 2 && days <= 4) ? 'дня' : 'дней';
+      return 'был(-а) в сети $days $suffix назад';
     }
 
-    if (lastSeenAgo is DateTime) {
-      final seen = lastSeenAgo.toUtc();
-      final diff = DateTime.now().toUtc().difference(seen);
-      if (diff.inMinutes < 1) return 'только что';
-      return 'был(-а) в сети ${diff.inMinutes} минут назад';
-    }
-
-    return 'был(-а) давно';
+    return 'был(-а) в сети давно';
   }
 
   @override

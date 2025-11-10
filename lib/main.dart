@@ -49,7 +49,13 @@ class Myapp extends StatelessWidget {
         ),
       ),
       // home: SplashScreen(),
-      home: ChatScreen(recieverID: '', requestID: ''),
+      home: ChatScreen(
+        recieverID: 'o3Qk0eZM9GdGNfsQqC1WmPoG0Mr1',
+        requestID: 'tQvccYS59frDi5kXDFl6',
+        senderID: 'iP4WOlOacfYt0elrBMt5LUIeJuI3',
+      ),
+      // доктор o3Qk0eZM9GdGNfsQqC1WmPoG0Mr1
+      // юзер iP4WOlOacfYt0elrBMt5LUIeJuI3
     );
   }
 }
