@@ -166,6 +166,28 @@ class RequestRepository {
     await _col.doc(id).delete();
   }
 
+
+  Future<List<RequestModel>> getRequestsPage({
+    required String status,
+    DocumentSnapshot? startAfter,
+    int limit = 10,
+  }) async {
+    Query q = _db.collection('requests')
+        .where('status', isEqualTo: status)
+        .orderBy('updatedAt', descending: true)
+        .limit(limit);
+
+    if (startAfter != null) {
+      q = q.startAfterDocument(startAfter);
+    }
+
+    final snap = await q.get();
+    return snap.docs
+        .map((d) => RequestModel.fromMap(d.id, d.data()! as Map<String, dynamic>))
+        .toList();
+  }
+
+
   /// Добавление или удаление врача
   Future<void> assignDoctorAtomically({
     required String requestId,

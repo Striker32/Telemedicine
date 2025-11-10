@@ -571,12 +571,14 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       height: 61,
                       child: TextButton(
                         style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFF0F3), // светло-розовый фон (под скрин)
+                          backgroundColor: const Color(0xFFFFF0F3),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                           elevation: 0,
                         ),
-                        onPressed: () async {
+                        // Кнопка активна только если есть выбранный врач
+                        onPressed: (widget.physician.isNotEmpty)
+                            ? () async {
                           final confirmed = await showConfirmationDialog(
                             context,
                             'Завершить заявку',
@@ -585,36 +587,33 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             'Отмена',
                           );
 
-                          final patch = {
-                            'status': '2',
-                          };
-
                           if (confirmed) {
-
+                            final patch = { 'status': '2' };
                             final repo = RequestRepository();
                             await repo.updateRequest(widget.requestID, patch);
                             Navigator.pop(context, patch);
                             showCustomNotification(context, 'Заявка была успешно завершена!');
                           }
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                                'assets/images/icons/checkmark.svg',
-                                width: 20,
-                                height: 20
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Завершить',
-                              style: TextStyle(
-                                color: Color(0xFFFF2D55),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
+                        }
+                            : null, // ← отключаем кнопку
+                        child: Opacity(
+                          // Визуально приглушаем, если disabled
+                          opacity: widget.physician.isNotEmpty ? 1.0 : 0.5,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset('assets/images/icons/checkmark.svg', width: 20, height: 20),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Завершить',
+                                style: TextStyle(
+                                  color: Color(0xFFFF2D55),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -13,8 +13,11 @@ class DoctorModel {
   final String placeOfWork;
   final String price;
   final String about;
+  final String rating;
+  final String completed;
   final Timestamp? createdAt;
   final Timestamp? updatedAt;
+  final Blob? avatar;
 
   const DoctorModel({
     required this.uid,
@@ -28,8 +31,11 @@ class DoctorModel {
     required this.placeOfWork,
     required this.price,
     required this.about,
+    required this.rating,
+    required this.completed,
     this.createdAt,
     this.updatedAt,
+    this.avatar,
   });
 
   factory DoctorModel.fromMap(String uid, Map<String, dynamic> map) {
@@ -47,6 +53,9 @@ class DoctorModel {
       about: map['about'] ?? '',
       createdAt: map['createdAt'] as Timestamp?,
       updatedAt: map['updatedAt'] as Timestamp?,
+      avatar: map['avatar'] as Blob?,
+      rating: map ['rating'] ?? '5',
+      completed: map['rating'] ?? '0',
     );
   }
 
@@ -62,6 +71,9 @@ class DoctorModel {
       'placeOfWork': placeOfWork,
       'price': price,
       'about': about,
+      'avatar' : avatar,
+      "rating" : rating,
+      "completed" : completed,
       // createdAt/updatedAt устанавливаются в репозитории через FieldValue.serverTimestamp()
     };
   }
@@ -70,7 +82,7 @@ class DoctorModel {
 /// Репозиторий для коллекции doctors
 class DoctorRepository {
   final FirebaseFirestore _db;
-  CollectionReference get _col => _db.collection('users'); // коллекция врачей
+  CollectionReference get _col => _db.collection('doctors'); // коллекция врачей
 
   DoctorRepository({FirebaseFirestore? firestore})
       : _db = firestore ?? FirebaseFirestore.instance;

@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:last_telemedicine/auth/auth_service.dart';
 import 'package:last_telemedicine/pages/Chat.dart';
 import 'package:last_telemedicine/pages/Choose_profile.dart';
 import 'package:last_telemedicine/pages/Main_screen.dart';
@@ -48,8 +49,8 @@ class Myapp extends StatelessWidget {
           cursorColor: AppColors.mainColor,
         ),
       ),
-      // home: SplashScreen(),
-      home: ChatScreen(recieverID: '', requestID: ''),
+       home: SplashScreen(),
+      //home: ChatScreen(recieverID: '', requestID: ''),
     );
   }
 }

@@ -291,7 +291,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                             'id': d.uid,
                             'name': d.name,
                             'surname': d.surname,
-                            'rating': "4",
+                            'rating': d.rating,
                             'specialization': d.specialization,
                             'phone': d.phone,
                             'email': d.realEmail,
@@ -300,7 +300,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                             'price': d.price,
                             'workplace': d.placeOfWork,
                             'about': d.about,
-                            'completed': 123,
+                            'completed': d.completed,
                           }
                         ];
 
@@ -313,7 +313,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                           city: r.city,
                           cost: r.price,
                           requestID: r.id,
-                          rating: "4",
+                          rating: d.rating,
                           responder: responders, // ← теперь список с одним врачом
                         );
                       },
@@ -527,7 +527,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               'id': d.uid,
                               'name': d.name,
                               'surname': d.surname,
-                              'rating': 4.0,
+                              'rating': d.rating,
                               'specialization': d.specialization,
                               'phone': d.phone,
                               'email': d.realEmail,
@@ -536,7 +536,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               'price': d.price,
                               'workplace': d.placeOfWork,
                               'about': d.about,
-                              'completed': 123,
+                              'completed': int.parse(d.completed),
                             };
                             return ApplicationCard(
                               title: r.reason,
@@ -570,7 +570,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                             'id': d.uid,
                             'name': d.name,
                             'surname': d.surname,
-                            'rating': 4.0,
+                            'rating': d.rating,
                             'specialization': d.specialization,
                             'phone': d.phone,
                             'email': d.realEmail,
@@ -579,7 +579,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                             'price': d.price,
                             'workplace': d.placeOfWork,
                             'about': d.about,
-                            'completed': 123,
+                            'completed': int.parse(d.completed),
                           }).toList();
 
                           return ApplicationCard(

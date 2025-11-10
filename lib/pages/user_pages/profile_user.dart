@@ -1,9 +1,13 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+
 import 'package:last_telemedicine/components/Avatar/AvatarWithPicker.dart';
 import 'package:last_telemedicine/components/SettingsRow.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
@@ -23,9 +27,6 @@ import '../../components/Notification.dart';
 import '../../themes/AppColors.dart';
 import '../Choose_profile.dart';
 
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:path_provider/path_provider.dart';
-
 // импорт репозитория и модели (путь поправь под проект)
 
 class ProfilePageUser extends StatefulWidget {
@@ -38,7 +39,6 @@ class ProfilePageUser extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePageUser> {
   final repo = UserRepository();
 
-
   // Хранение данных для сброса изменений (инициализируются при первой загрузке из Firestore)
   String? _initialName;
   String? _initialSurname;
@@ -47,13 +47,14 @@ class _ProfilePageState extends State<ProfilePageUser> {
   String? _initialCity;
   File? _initialAvatar;
 
-  // Дизайн-токены (подгоняются под макет)
-  static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
-  static const Color kPrimaryText = Color(0xFF111111); // цвет имени
+  // Дизайн-токены
+  static const Color kBackground = Color(0xFFEFEFF4);
+  static const Color kPrimaryText = Color(0xFF111111);
 
   bool _isEditing = false;
 
   File? _selectedImage;
+  Uint8List? _avatarBytes; // байты из Firestore (Blob)
 
   // контроллеры
   final TextEditingController _phoneController = TextEditingController();
@@ -63,7 +64,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   String _currentCity = 'Не указан';
 
-  // флаг, чтобы контроллеры инициализировались один раз из snapshot, пока не включено редактирование
+  // флаг одноразовой инициализации контроллеров из snapshot
   bool _initializedFromSnapshot = false;
 
   @override
@@ -73,18 +74,14 @@ class _ProfilePageState extends State<ProfilePageUser> {
   }
 
   Future<void> _loadDefaultAvatar() async {
+    // убираем присвоение _selectedImage = file;
     try {
       final byteData = await rootBundle.load('assets/images/app/userProfile.png');
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/userProfile.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
-      setState(() {
-        _selectedImage = file;
-        _initialAvatar = file;
-      });
-    } catch (e) {
-      // ignore if asset not found
-    }
+      _initialAvatar = file; // только для сброса, но не в _selectedImage
+    } catch (_) {}
   }
 
   void _changeCityFuncion() async {
@@ -103,42 +100,58 @@ class _ProfilePageState extends State<ProfilePageUser> {
     _auth.signOut();
   }
 
+  // Сохранение профиля + аватар как Blob (60x60)
   Future<void> _saveToFirestore(String uid) async {
     final patch = <String, dynamic>{
       'name': _nameController.text.trim(),
       'surname': _surnameController.text.trim(),
-      // если в документе у тебя поле называется 'realEmail', сохраняем туда
       'realEmail': _emailController.text.trim(),
       'phone': _phoneController.text.trim(),
       'city': _currentCity,
     };
 
-    try {
-      await repo.updateUser(uid, patch);
-      // обновим "initial" на сохранённые значения
-      _initialName = _nameController.text;
-      _initialSurname = _surnameController.text;
-      _initialPhone = _phoneController.text;
-      _initialEmail = _emailController.text;
-      _initialCity = _currentCity;
-      _initialAvatar = _selectedImage;
-      showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
-    } catch (e) {
-      showCustomNotification(context, 'Ошибка при сохранении: $e');
+    // сохраняем аватар только если юзер выбрал новый файл
+    if (_selectedImage != null && _selectedImage != _initialAvatar) {
+      final bytes = await _selectedImage!.readAsBytes();
+      final decoded = img.decodeImage(bytes);
+      if (decoded != null) {
+        final resized = img.copyResize(decoded, width: 60, height: 60);
+        final resizedBytes = Uint8List.fromList(img.encodePng(resized));
+        patch['avatar'] = Blob(resizedBytes);
+        _avatarBytes = resizedBytes;
+      }
     }
+
+    await repo.updateUser(uid, patch);
+    // обновляем initial
+    _initialAvatar = _selectedImage;
+
+    // try {
+    //   await repo.updateUser(uid, patch);
+    //   // обновим "initial" на сохранённые значения
+    //   _initialName = _nameController.text;
+    //   _initialSurname = _surnameController.text;
+    //   _initialPhone = _phoneController.text;
+    //   _initialEmail = _emailController.text;
+    //   _initialCity = _currentCity;
+    //   _initialAvatar = _selectedImage;
+    //   showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
+    // } catch (e) {
+    //   showCustomNotification(context, 'Ошибка при сохранении: $e');
+    // }
   }
 
   void _onCancelEdit() {
     setState(() {
       _isEditing = false;
-      // сброс контроллеров к сохранённым initial (если они есть)
+      // сброс контроллеров к сохранённым initial
       if (_initialName != null) _nameController.text = _initialName!;
       if (_initialSurname != null) _surnameController.text = _initialSurname!;
       if (_initialPhone != null) _phoneController.text = _initialPhone!;
       if (_initialEmail != null) _emailController.text = _initialEmail!;
       if (_initialCity != null) _currentCity = _initialCity!;
       _selectedImage = _initialAvatar;
-      _initializedFromSnapshot = true; // чтобы при следующем snapshot контроллеры не перезаписались
+      _initializedFromSnapshot = true;
     });
   }
 
@@ -153,19 +166,15 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
   @override
   Widget build(BuildContext context) {
-
     final firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser == null) {
       return const Scaffold(body: Center(child: Text('Пользователь не авторизован')));
     }
     final uid = firebaseUser.uid;
 
-
-
     return StreamBuilder<UserModel?>(
       stream: repo.watchUser(uid),
       builder: (context, snap) {
-        // показываем индикатор ожидания при загрузке
         if (snap.connectionState == ConnectionState.waiting) {
           return Scaffold(
             backgroundColor: AppColors.background2,
@@ -173,7 +182,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
           );
         }
 
-        // если документ отсутствует — можно показать плейсхолдер или пустой профиль
         if (!snap.hasData || snap.data == null) {
           return Scaffold(
             backgroundColor: kBackground,
@@ -183,7 +191,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
               onEdit: () => setState(() => _isEditing = true),
               onCancel: _onCancelEdit,
               onDone: () async {
-                // если профиля нет — создаём через upsert (инициализация)
                 await _saveToFirestore(uid);
                 setState(() => _isEditing = false);
               },
@@ -197,7 +204,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
 
         final model = snap.data!;
 
-        // Инициализация контроллеров единожды при загрузке из Firestore, если не в режиме редактирования
+        // одноразовая инициализация контроллеров
         if (!_isEditing && (!_initializedFromSnapshot)) {
           _nameController.text = model.name;
           _surnameController.text = model.surname;
@@ -210,7 +217,13 @@ class _ProfilePageState extends State<ProfilePageUser> {
           _initialPhone = _phoneController.text;
           _initialEmail = _emailController.text;
           _initialCity = _currentCity;
-          // avatar остаётся default или выбранный локально
+
+          // подтянем аватар из Firestore, если есть
+          if (model.avatar != null) {
+            _avatarBytes = model.avatar!.bytes;
+          }
+
+
           _initializedFromSnapshot = true;
         }
 
@@ -276,14 +289,16 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                 children: [
                                   _isEditing
                                       ? AvatarWithPicker(
-                                    initialImage: _selectedImage,
+                                    initialImage: _selectedImage,        // ← сюда приходит новый файл
+                                    firestoreBytes: _avatarBytes,        // ← старый Blob, если файла нет
                                     onImageSelected: (file) {
                                       setState(() {
-                                        _selectedImage = file;
+                                        _selectedImage = file;           // ← обновляем состояние страницы
                                       });
                                     },
                                   )
-                                      : DisplayAvatar(image: _selectedImage),
+                                      : DisplayAvatar(image: _selectedImage, firestoreBytes: _avatarBytes),
+
                                   const SizedBox(width: 15),
                                   Expanded(
                                     child: Column(
@@ -293,7 +308,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                           controller: _nameController,
                                           readOnly: !_isEditing,
                                           textAlign: TextAlign.start,
-                                          decoration: InputDecoration(
+                                          decoration: const InputDecoration(
                                             border: InputBorder.none,
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
@@ -307,15 +322,15 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                           ),
                                         ),
                                         if (_isEditing) ...[
-                                          SizedBox(height: 6),
-                                          DividerLine(),
-                                          SizedBox(height: 6),
+                                          const SizedBox(height: 6),
+                                          const DividerLine(),
+                                          const SizedBox(height: 6),
                                         ],
                                         TextField(
                                           controller: _surnameController,
                                           readOnly: !_isEditing,
                                           textAlign: TextAlign.start,
-                                          decoration: InputDecoration(
+                                          decoration: const InputDecoration(
                                             border: InputBorder.none,
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
@@ -343,9 +358,9 @@ class _ProfilePageState extends State<ProfilePageUser> {
                           if (_isEditing)
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
+                              children: const [
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
                                     'Введите свое имя и добавьте по желанию\nфотографию профиля',
                                     style: TextStyle(
@@ -355,7 +370,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 30),
+                                SizedBox(height: 30),
                               ],
                             ),
                           const Padding(
@@ -371,21 +386,21 @@ class _ProfilePageState extends State<ProfilePageUser> {
                           ),
                           const SizedBox(height: 10),
                           const DividerLine(),
-                          DividerLine(),
+                          const DividerLine(),
                           SettingsRow(
                             viewTitle: 'Номер телефона',
                             editTitle: 'Сменить Телефон',
                             controller: _phoneController,
                             isEditable: false,
                           ),
-                          DividerLine(),
+                          const DividerLine(),
                           SettingsRow(
                             viewTitle: 'Почта',
                             editTitle: 'Сменить почту',
                             controller: _emailController,
                             isEditable: _isEditing,
                           ),
-                          DividerLine(),
+                          const DividerLine(),
                           SettingsRow(
                             viewTitle: "Город",
                             editTitle: "Изменить город",
