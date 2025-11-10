@@ -27,8 +27,6 @@ class ChatService {
     requestID,
     message,
   ) async {
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-
     // создание нового сообщения
     ChatMessage newMessage = ChatMessage(
       senderID: senderID,
