@@ -140,3 +140,16 @@ class MainDoctor extends StatelessWidget {
     );
   }
 }
+
+// appBar: CustomAppBar(
+// titleText: 'Лента',
+// leading: AppBarButton(label: '', onTap: () {}),
+// action: AppBarButton(label: 'Локация', onTap: () async {
+// final selectedCity = await Navigator.push<String>(
+// context,
+// MaterialPageRoute(
+// builder: (_) => ChangeCityPage(selected: ''),
+// ),
+// );
+// }),
+// ),

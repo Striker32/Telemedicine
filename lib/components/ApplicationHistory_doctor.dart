@@ -4,6 +4,10 @@ import 'package:last_telemedicine/themes/AppColors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
 
+import '../auth/Fb_request_model.dart';
+import 'Confirmation.dart';
+import 'Notification.dart';
+
 class _ThinDivider extends StatelessWidget {
   const _ThinDivider();
 
@@ -25,6 +29,7 @@ class HistoryApplicationCard extends StatelessWidget {
   final String city;
   final String rating;
   final String cost;
+  final String requestID;
 
   const HistoryApplicationCard({
     Key? key,
@@ -36,6 +41,7 @@ class HistoryApplicationCard extends StatelessWidget {
     required this.description,
     required this.city,
     required this.cost,
+    required this.requestID,
     this.rating = '',
   }) : super(key: key);
 
@@ -189,6 +195,7 @@ class HistoryApplicationCard extends StatelessWidget {
                               rating: rating,
                               name: name,
                               surname: surname,
+                              requestID: requestID,
                             );
 
                             if (result != null) {
@@ -239,8 +246,20 @@ class HistoryApplicationCard extends StatelessWidget {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
                           highlightColor: Colors.transparent,
-                          onTap: () {
-                            debugPrint('Удалить');
+                          onTap: () async {
+                            final confirmed = await showConfirmationDialog(
+                              context,
+                              'Удалить заявку',
+                              'Данная заявка будет полностью\n удалена из базы данных приложения.\n Вы больше не сможете её посмотреть.',
+                              'Удалить',
+                              'Отмена',
+                            );
+
+                            if (confirmed) {
+                              final repo = RequestRepository();
+                              await repo.deleteRequest(requestID);
+                              showCustomNotification(context, 'Заявка была успешно удалена');
+                            }
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -303,6 +322,7 @@ class HistoryApplicationPopup extends StatefulWidget {
   final String? rating;
   final String? name;
   final String? surname;
+  final String requestID;
 
   const HistoryApplicationPopup({
     super.key,
@@ -313,6 +333,7 @@ class HistoryApplicationPopup extends StatefulWidget {
     this.name = "Гость",
     this.surname = "",
     this.responder = const [],
+    required this.requestID,
   });
 
   @override
@@ -562,8 +583,20 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(10),
                             highlightColor: Colors.transparent,
-                            onTap: () {
-                              debugPrint('Удалить');
+                            onTap: () async {
+                              final confirmed = await showConfirmationDialog(
+                                context,
+                                'Удалить заявку',
+                                'Данная заявка будет полностью\n удалена из базы данных приложения.\n Вы больше не сможете её посмотреть.',
+                                'Удалить',
+                                'Отмена',
+                              );
+
+                              if (confirmed) {
+                                final repo = RequestRepository();
+                                await repo.deleteRequest(widget.requestID);
+                                showCustomNotification(context, 'Заявка была успешно удалена');
+                              }
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -808,6 +841,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
       String? rating,
       String? name,
       String? surname,
+      required String requestID,
     }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -821,6 +855,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
       rating: rating,
       name: name,
       surname: surname,
+      requestID: requestID,
     ),
   );
 }

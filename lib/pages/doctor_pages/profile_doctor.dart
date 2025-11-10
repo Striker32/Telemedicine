@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +22,10 @@ import '../../components/Appbar/AppBarButton.dart';
 import '../../themes/AppColors.dart';
 import '../user_pages/profile_settings_user.dart';
 import '../user_pages/subpages/Change_city.dart';
+
+import 'dart:typed_data';
+import 'package:image/image.dart' as img;
+
 
 // добавленные импорты
 
@@ -58,6 +63,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   bool _isEditing = false;
 
   File? _selectedImage;
+  Uint8List? _avatarBytes;
 
   // контроллеры
   final TextEditingController _phoneController = TextEditingController(
@@ -129,13 +135,13 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
       final file = File('${tempDir.path}/userProfile.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
       setState(() {
-        _selectedImage = file;
-        _initialAvatar = file; // ← сохраняем оригинал
+        // keep as fallback only
+        _initialAvatar = file;
+        // DO NOT set _selectedImage = file; to avoid overwriting Firestore avatar
       });
-    } catch (e) {
-      // ignore if asset not found
-    }
+    } catch (_) {}
   }
+
 
   void logout() {
     Navigator.of(context).popUntil((route) => route.isFirst);
@@ -169,10 +175,23 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
       'about': _aboutController.text.trim(),
     };
 
+    // Save avatar only if user picked a new image
+    final bool avatarChanged = _selectedImage != null && _selectedImage != _initialAvatar;
+    if (avatarChanged) {
+      final bytes = await _selectedImage!.readAsBytes();
+      final decoded = img.decodeImage(bytes);
+      if (decoded != null) {
+        final resized = img.copyResize(decoded, width: 60, height: 60);
+        final resizedBytes = Uint8List.fromList(img.encodePng(resized));
+        patch['avatar'] = Blob(resizedBytes);
+        _avatarBytes = resizedBytes; // update local preview after save
+      }
+    }
+
     try {
       await repo.updateDoctor(uid, patch);
 
-      // обновим initial-значения после успешного сохранения
+      // update initial values after successful save
       _initialName = _nameController.text;
       _initialSurname = _surnameController.text;
       _initialPhone = _phoneController.text;
@@ -183,13 +202,16 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
       _initialPlaceOfWork = _placeOfWorkController.text;
       _initialPrice = _priceController.text;
       _initialAbout = _aboutController.text;
-      //_initialAvatar = _selectedImage;
+      if (_selectedImage != null) {
+        _initialAvatar = _selectedImage!;
+      }
 
-      showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
+        showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
     } catch (e) {
       showCustomNotification(context, 'Ошибка при сохранении: $e');
     }
   }
+
 
   void _onCancelEdit() {
     setState(() {
@@ -234,6 +256,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
     }
     final uid = firebaseUser.uid;
 
+
     return StreamBuilder<DoctorModel?>(
       stream: repo.watchDoctor(uid),
       builder: (context, snap) {
@@ -265,6 +288,10 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
         }
 
         final model = snap.data!;
+
+        if (model.avatar != null) {
+          _avatarBytes = model.avatar!.bytes;
+        }
 
         // инициализация контроллеров единожды при первом snapshot
         if (!_isEditing && !_initializedFromSnapshot) {
@@ -364,14 +391,18 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                             children: [
                               _isEditing
                                   ? AvatarWithPicker(
-                                initialImage: _selectedImage,
+                                initialImage: _selectedImage,        // new pick preview
+                                firestoreBytes: _avatarBytes,        // Firestore fallback
                                 onImageSelected: (file) {
                                   setState(() {
-                                    _selectedImage = file;
+                                    _selectedImage = file;           // persist chosen image
                                   });
                                 },
                               )
-                                  : DisplayAvatar(image: _selectedImage),
+                                  : DisplayAvatar(
+                                image: _selectedImage,               // if user picked but not saved yet
+                                firestoreBytes: _avatarBytes,        // prefer Firestore if no local file
+                              ),
                               const SizedBox(width: 15),
                               Expanded(
                                 child: Column(
