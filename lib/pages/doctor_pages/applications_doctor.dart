@@ -369,7 +369,8 @@ class _ArchivedApplicationsView extends StatelessWidget {
                         description: r.description,
                         city: r.city,
                         cost: r.price,
-                        rating: '—',
+                        rating: '5',
+                        requestID: r.id,
                       );
                     },
                   );

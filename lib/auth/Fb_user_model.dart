@@ -36,12 +36,15 @@ class UserModel {
   final String phone;
   final String city;
 
+  final Blob? avatar;
+
   UserModel({
     required this.name,
     required this.surname,
     required this.realEmail,
     required this.phone,
     required this.city,
+    this.avatar,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -51,6 +54,7 @@ class UserModel {
       realEmail: map['realEmail'] ?? '',
       phone: map['phone'] ?? '',
       city: map['city'] ?? '',
+      avatar: map['avatar'] as Blob?,
     );
   }
 }

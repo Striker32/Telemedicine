@@ -103,6 +103,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                 newStatus: '1', // назначен
               );
               Navigator.pop(context,);
+              Navigator.pop(context,);
               showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
             }
           }
@@ -365,6 +366,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                             select: true,
                             newStatus: '1', // назначен
                           );
+                          Navigator.pop(context,);
                           Navigator.pop(context,);
                           showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
                         }

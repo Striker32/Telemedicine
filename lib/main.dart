@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:last_telemedicine/auth/auth_service.dart';
 import 'package:last_telemedicine/pages/Chat.dart';
 import 'package:last_telemedicine/pages/Choose_profile.dart';
 import 'package:last_telemedicine/pages/Main_screen.dart';
@@ -48,14 +49,8 @@ class Myapp extends StatelessWidget {
           cursorColor: AppColors.mainColor,
         ),
       ),
-      // home: SplashScreen(),
-      home: ChatScreen(
-        recieverID: 'o3Qk0eZM9GdGNfsQqC1WmPoG0Mr1',
-        requestID: 'tQvccYS59frDi5kXDFl6',
-        senderID: 'iP4WOlOacfYt0elrBMt5LUIeJuI3',
-      ),
-      // доктор o3Qk0eZM9GdGNfsQqC1WmPoG0Mr1
-      // юзер iP4WOlOacfYt0elrBMt5LUIeJuI3
+       home: SplashScreen(),
+      //home: ChatScreen(recieverID: '', requestID: ''),
     );
   }
 }
