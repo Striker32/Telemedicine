@@ -49,8 +49,7 @@ class Myapp extends StatelessWidget {
           cursorColor: AppColors.mainColor,
         ),
       ),
-       home: SplashScreen(),
-      //home: ChatScreen(recieverID: '', requestID: ''),
+      home: SplashScreen(),
     );
   }
 }
