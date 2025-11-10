@@ -23,8 +23,6 @@ class MainDoctor extends StatelessWidget {
   Widget build(BuildContext context) {
     final repo = RequestRepository();
 
-
-
     return DefaultTabController(
       length: 1,
       child: Scaffold(
@@ -32,14 +30,15 @@ class MainDoctor extends StatelessWidget {
         appBar: CustomAppBar(
           titleText: 'Лента',
           leading: AppBarButton(label: '', onTap: () {}),
-          action: AppBarButton(label: 'Локация', onTap: () async {
-            final selectedCity = await Navigator.push<String>(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChangeCityPage(selected: ''),
-              ),
-            );
-          }),
+          action: AppBarButton(
+            label: 'Локация',
+            onTap: () async {
+              final selectedCity = await Navigator.push<String>(
+                context,
+                MaterialPageRoute(builder: (_) => ChangeCityPage(selected: '')),
+              );
+            },
+          ),
         ),
         body: Column(
           children: [
@@ -64,7 +63,9 @@ class MainDoctor extends StatelessWidget {
                       // Есть элементы — показываем заголовок как элемент списка и далее сами карточки
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        itemCount: items.length + 1, // +1 для заголовка "Все объявления"
+                        itemCount:
+                            items.length +
+                            1, // +1 для заголовка "Все объявления"
                         itemBuilder: (context, index) {
                           if (index == 0) {
                             // Заголовок и отступ — это первый элемент списка, поэтому он прокручивается вместе с остальным
@@ -74,7 +75,10 @@ class MainDoctor extends StatelessWidget {
                                 Center(
                                   child: Text(
                                     'Все объявления',
-                                    style: TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.mutedTitle,
+                                    ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -90,7 +94,8 @@ class MainDoctor extends StatelessWidget {
                           return FutureBuilder<UserModel>(
                             future: UserRepository().getUser(r.userUid),
                             builder: (context, userSnap) {
-                              if (userSnap.connectionState == ConnectionState.waiting) {
+                              if (userSnap.connectionState ==
+                                  ConnectionState.waiting) {
                                 // Небольшой placeholder вместо PulseLoadingWidget
                                 return const Padding(
                                   padding: EdgeInsets.symmetric(vertical: 12.0),
@@ -100,16 +105,26 @@ class MainDoctor extends StatelessWidget {
                                       child: SizedBox(
                                         width: 20,
                                         height: 20,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 );
                               }
 
+                              if (!userSnap.hasData || userSnap.data == null) {
+                                debugPrint("DEBUG: DATA NULL - main_doctor");
+                                return const SizedBox();
+                              }
+
                               final fullName = userSnap.data!;
-                              final currentDoctorUid = FirebaseAuth.instance.currentUser!.uid;
-                              final responded = r.hasResponded(currentDoctorUid);
+                              final currentDoctorUid =
+                                  FirebaseAuth.instance.currentUser!.uid;
+                              final responded = r.hasResponded(
+                                currentDoctorUid,
+                              );
 
                               return ApplicationCard(
                                 title: r.reason,
@@ -130,7 +145,6 @@ class MainDoctor extends StatelessWidget {
                       );
                     },
                   ),
-
                 ],
               ),
             ),

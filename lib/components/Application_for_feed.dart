@@ -39,15 +39,14 @@ class ApplicationCard extends StatelessWidget {
     this.urgent = false,
   }) : super(key: key);
 
-
   // Палитра/токены
-  static const _bgPage = Color(0xFFEFEFF4);     // фон страницы (как у тебя)
+  static const _bgPage = Color(0xFFEFEFF4); // фон страницы (как у тебя)
   static const _cardBg = Color(0xFFFFFFFF);
   static const _shadow = Color(0x1A000000);
-  static const _label = Color(0xFF1D1D1F);      // светло‑серый для лейблов
+  static const _label = Color(0xFF1D1D1F); // светло‑серый для лейблов
   static const _text = Color(0xFF000000);
-  static const _pink = Color(0xFFFF2D55);       // iOS system pink
-  static const _divider = Color(0xFFE5E5EA);    // тонкие разделители
+  static const _pink = Color(0xFFFF2D55); // iOS system pink
+  static const _divider = Color(0xFFE5E5EA); // тонкие разделители
   static const _btnGreyBg = Color(0xFFF2F2F7);
   static const _btnGreyText = Color(0xFF8E8E93);
   static const _gray = Color(0xFF9BA1A5);
@@ -124,18 +123,38 @@ class ApplicationCard extends StatelessWidget {
 
             // Врач
             const SizedBox(height: 12),
-            const Text("Ищу врача", style: TextStyle(fontSize: 12, color: _label)),
+            const Text(
+              "Ищу врача",
+              style: TextStyle(fontSize: 12, color: _label),
+            ),
             const SizedBox(height: 4),
-            Text(doctor, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
+            Text(
+              doctor,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
+            ),
 
             const SizedBox(height: 12),
             const _ThinDivider(),
 
             // Причина
             const SizedBox(height: 12),
-            const Text("Причина", style: TextStyle(fontSize: 12, color: _label)),
+            const Text(
+              "Причина",
+              style: TextStyle(fontSize: 12, color: _label),
+            ),
             const SizedBox(height: 4),
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
+            ),
 
             const SizedBox(height: 12),
             const _ThinDivider(),
@@ -144,18 +163,32 @@ class ApplicationCard extends StatelessWidget {
             const SizedBox(height: 12),
             const Text("Город", style: TextStyle(fontSize: 12, color: _label)),
             const SizedBox(height: 4),
-            Text(city, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
+            Text(
+              city,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
+            ),
 
             const SizedBox(height: 12),
             const _ThinDivider(),
 
             // Предложенная стоимость
             const SizedBox(height: 12),
-            const Text("Предложенная стоимость", style: TextStyle(fontSize: 12, color: _label)),
+            const Text(
+              "Предложенная стоимость",
+              style: TextStyle(fontSize: 12, color: _label),
+            ),
             const SizedBox(height: 6),
             Text(
               "${_formatCost(cost)} ₽",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
             ),
 
             const SizedBox(height: 12),
@@ -163,9 +196,19 @@ class ApplicationCard extends StatelessWidget {
 
             // Дата публикации
             const SizedBox(height: 12),
-            const Text("Дата публикации", style: TextStyle(fontSize: 12, color: _label)),
+            const Text(
+              "Дата публикации",
+              style: TextStyle(fontSize: 12, color: _label),
+            ),
             const SizedBox(height: 6),
-            Text(datetime, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
+            Text(
+              datetime,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
+            ),
 
             const SizedBox(height: 30),
 
@@ -193,14 +236,19 @@ class ApplicationCard extends StatelessWidget {
                               );
 
                               if (confirmed) {
-                                showCustomNotification(context, 'Вы успешно уведомили пациента об отзыве отклика по заявке!');
+                                showCustomNotification(
+                                  context,
+                                  'Вы успешно уведомили пациента об отзыве отклика по заявке!',
+                                );
                                 final repo = RequestRepository();
                                 await repo.assignDoctorAtomically(
                                   requestId: requestID,
-                                  doctorData: {'uid': FirebaseAuth.instance.currentUser!.uid},
+                                  doctorData: {
+                                    'uid':
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                  },
                                   remove: true,
                                 );
-
                               }
                             } else {
                               final confirmed = await showConfirmationDialog(
@@ -212,19 +260,21 @@ class ApplicationCard extends StatelessWidget {
                               );
 
                               if (confirmed) {
-                                showCustomNotification(context, 'Вы успешно уведомили пациента о готовности работы с ним!');
+                                showCustomNotification(
+                                  context,
+                                  'Вы успешно уведомили пациента о готовности работы с ним!',
+                                );
                                 final repo = RequestRepository();
                                 await repo.assignDoctorAtomically(
                                   requestId: requestID,
                                   doctorData: {
-                                    'uid': FirebaseAuth.instance.currentUser!.uid,
+                                    'uid':
+                                        FirebaseAuth.instance.currentUser!.uid,
                                   },
                                   keepMultiple: true,
                                 );
-
                               }
                             }
-
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -238,12 +288,16 @@ class ApplicationCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                hasResponded ? "Вы откликнулись" : "Откликнуться",
+                                hasResponded
+                                    ? "Вы откликнулись"
+                                    : "Откликнуться",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: hasResponded
                                       ? const Color(0xFFF5F5F7) // светлый текст
-                                      : const Color(0xFFFF4361), // обычный розовый
+                                      : const Color(
+                                          0xFFFF4361,
+                                        ), // обычный розовый
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -317,15 +371,9 @@ class ApplicationCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                )
-
+                ),
               ],
             ),
-
-
-
-
-
           ],
         ),
       ),
@@ -352,13 +400,6 @@ class _ThinDivider extends StatelessWidget {
     return Container(height: 1, color: ApplicationCard._divider);
   }
 }
-
-
-
-
-
-
-
 
 // POPUP
 
@@ -395,7 +436,9 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
     _urgent = widget.urgent;
     final init = widget.initialValues ?? List<String>.filled(5, '');
     _controllers = List.generate(
-        5, (i) => TextEditingController(text: init.length > i ? init[i] : ''));
+      5,
+      (i) => TextEditingController(text: init.length > i ? init[i] : ''),
+    );
   }
 
   @override
@@ -409,15 +452,11 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery
-          .of(context)
-          .viewInsets
-          .bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
-        height: MediaQuery
-            .of(context)
-            .size
-            .height * 0.9,
+        height: MediaQuery.of(context).size.height * 0.9,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -453,9 +492,13 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      const url = 'https://ru.wiktionary.org/wiki/%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0';
+                      const url =
+                          'https://ru.wiktionary.org/wiki/%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0';
                       if (await canLaunchUrl(Uri.parse(url))) {
-                        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                        await launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        );
                       } else {
                         // Можно показать Snackbar или Alert
                         debugPrint('Не удалось открыть ссылку');
@@ -523,7 +566,6 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
               const SizedBox(height: 60),
 
-
               Row(
                 children: [
                   Expanded(
@@ -534,8 +576,13 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           backgroundColor: widget.hasResponded
                               ? const Color(0xFFFF4361) // ярко-красный
                               : const Color(0xFFFFF0F3), // светло-розовый
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
                           elevation: 0,
                         ),
                         onPressed: () async {
@@ -552,11 +599,16 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                               final repo = RequestRepository();
                               await repo.assignDoctorAtomically(
                                 requestId: widget.requestID,
-                                doctorData: {'uid': FirebaseAuth.instance.currentUser!.uid},
+                                doctorData: {
+                                  'uid': FirebaseAuth.instance.currentUser!.uid,
+                                },
                                 remove: true,
                               );
                               Navigator.pop(context);
-                              showCustomNotification(context, 'Вы успешно уведомили пациента об отзыве отклика по заявке!');
+                              showCustomNotification(
+                                context,
+                                'Вы успешно уведомили пациента об отзыве отклика по заявке!',
+                              );
                             }
                           } else {
                             final confirmed = await showConfirmationDialog(
@@ -571,17 +623,20 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                               final repo = RequestRepository();
                               await repo.assignDoctorAtomically(
                                 requestId: widget.requestID,
-                                doctorData: {'uid': FirebaseAuth.instance.currentUser!.uid},
+                                doctorData: {
+                                  'uid': FirebaseAuth.instance.currentUser!.uid,
+                                },
                                 keepMultiple: true,
                               );
                               Navigator.pop(context);
-                              showCustomNotification(context, 'Вы успешно уведомили пациента о готовности работы с ним!');
+                              showCustomNotification(
+                                context,
+                                'Вы успешно уведомили пациента о готовности работы с ним!',
+                              );
                               // TODO: откликнуться на заявку
                             }
                           }
                         },
-
-
 
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -595,11 +650,15 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              widget.hasResponded ? 'Вы откликнулись' : 'Откликнуться',
+                              widget.hasResponded
+                                  ? 'Вы откликнулись'
+                                  : 'Откликнуться',
                               style: TextStyle(
                                 color: widget.hasResponded
                                     ? const Color(0xFFF5F5F7) // светлый текст
-                                    : const Color(0xFFFF2D55), // обычный розовый
+                                    : const Color(
+                                        0xFFFF2D55,
+                                      ), // обычный розовый
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -621,12 +680,17 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                         child: TextButton(
                           style: TextButton.styleFrom(
                             backgroundColor: const Color(0xFFF5F6F7),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
                             elevation: 0,
                           ),
                           onPressed: () {
-                            // TODO: открыть чат
+                            // TODO: нихуя
                           },
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -651,12 +715,8 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       ),
                     ),
                   ),
-
-
                 ],
               ),
-
-
 
               const SizedBox(height: 20),
 
@@ -666,8 +726,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Врач",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Врач",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -681,17 +743,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -702,8 +768,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Причина",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Причина",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -717,17 +785,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 minLines: 1,
                 maxLines: 2,
@@ -740,8 +812,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Подробное описание",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Подробное описание",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -755,17 +829,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 minLines: 1,
                 maxLines: 12,
@@ -779,13 +857,17 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Город",
-                      style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 13)),
+                  child: const Text(
+                    "Город",
+                    style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
               DropdownButtonFormField<String>(
-                value: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
+                value: _controllers[3].text.isNotEmpty
+                    ? _controllers[3].text
+                    : null,
                 items: [
                   DropdownMenuItem<String>(
                     value: _controllers[3].text,
@@ -812,7 +894,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 style: const TextStyle(color: Color(0xFF1D1D1F)),
                 dropdownColor: const Color(0xFFF5F5F5),
@@ -825,8 +910,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Предлагаемая стоимость",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Предлагаемая стоимость",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -840,17 +927,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -865,14 +956,14 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
 // Helper-функция для показа попапа
 Future<Map<String, dynamic>?> showChangeApplicationPopup(
-    BuildContext context, {
-      List<String>? initialValues,
-      bool urgent = false,
-      String? datetime,
-      String? name,
-      bool hasResponded = false,
-                        required String requestID,
-    }) {
+  BuildContext context, {
+  List<String>? initialValues,
+  bool urgent = false,
+  String? datetime,
+  String? name,
+  bool hasResponded = false,
+  required String requestID,
+}) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
     isScrollControlled: true,
@@ -883,7 +974,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       datetime: datetime,
       name: name,
       hasResponded: hasResponded,
-              requestID: requestID,
+      requestID: requestID,
     ),
   );
 }

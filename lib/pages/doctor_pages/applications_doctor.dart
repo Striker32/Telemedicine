@@ -73,8 +73,14 @@ class ApplicationsPageDoctor extends StatelessWidget {
                                 labelColor: Colors.black,
                                 unselectedLabelColor: Colors.black54,
                                 tabs: const [
-                                  SizedBox(width: 105, child: Tab(text: "Активные")),
-                                  SizedBox(width: 105, child: Tab(text: "Архив")),
+                                  SizedBox(
+                                    width: 105,
+                                    child: Tab(text: "Активные"),
+                                  ),
+                                  SizedBox(
+                                    width: 105,
+                                    child: Tab(text: "Архив"),
+                                  ),
                                 ],
                               ),
                             ),
@@ -143,14 +149,14 @@ class _ActiveApplicationsView extends StatelessWidget {
           );
         }
         final items = snap.data ?? [];
-        final active = items.where((r) => r.hasResponded(doctor.uid) && !r.isArchived).toList();
+        final active = items
+            .where((r) => r.hasResponded(doctor.uid) && !r.isArchived)
+            .toList();
 
         String _activeLabel(int count) {
           if (count == 0) return 'Нет заявок';
           return pluralizeApplications(count);
         }
-
-
 
         // Верхний блок: отступ + текст с количеством заявок
         // Если нет активных заявок — покажем центр с сообщением "тут будут заявки"
@@ -163,7 +169,10 @@ class _ActiveApplicationsView extends StatelessWidget {
                 Center(
                   child: Text(
                     _activeLabel(active.length),
-                    style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.mutedTitle,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -175,7 +184,10 @@ class _ActiveApplicationsView extends StatelessWidget {
                     child: Center(
                       child: const Text(
                         'В данном разделе Вы можете отслеживать заявки на которые Вы откликнулись, а также просматривать их содержание и актуальный статус.',
-                        style: TextStyle(fontSize: 14, color: AppColors.primaryText),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primaryText,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -195,7 +207,10 @@ class _ActiveApplicationsView extends StatelessWidget {
               Center(
                 child: Text(
                   _activeLabel(active.length),
-                  style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.mutedTitle,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -219,12 +234,19 @@ class _ActiveApplicationsView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: SizedBox(
                             height: 80,
-                            child: Center(child: SizedBox(width: 48, height: 48, child: PulseLoadingWidget())),
+                            child: Center(
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: PulseLoadingWidget(),
+                              ),
+                            ),
                           ),
                         );
                       }
                       final fullName = userSnap.data!;
-                      final currentDoctorUid = FirebaseAuth.instance.currentUser!.uid;
+                      final currentDoctorUid =
+                          FirebaseAuth.instance.currentUser!.uid;
                       final responded = r.hasResponded(currentDoctorUid);
 
                       return ApplicationCard(
@@ -239,6 +261,7 @@ class _ActiveApplicationsView extends StatelessWidget {
                         urgent: r.urgent,
                         hasResponded: responded,
                         requestID: r.id,
+                        userID: r.userUid,
                       );
                     },
                   );
@@ -282,7 +305,9 @@ class _ArchivedApplicationsView extends StatelessWidget {
         }
 
         final items = snap.data ?? [];
-        final archived = items.where((r) => r.hasResponded(doctor.uid)).toList();
+        final archived = items
+            .where((r) => r.hasResponded(doctor.uid))
+            .toList();
 
         String _archiveLabel(int count) {
           if (count == 0) return 'Нет заявок';
@@ -299,7 +324,10 @@ class _ArchivedApplicationsView extends StatelessWidget {
                 Center(
                   child: Text(
                     _archiveLabel(archived.length),
-                    style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.mutedTitle,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -311,7 +339,10 @@ class _ArchivedApplicationsView extends StatelessWidget {
                     child: Center(
                       child: const Text(
                         'В данном разделе хранятся Ваши архивные заявки, по которым Вы уже оказали помощь.',
-                        style: TextStyle(fontSize: 14, color: AppColors.primaryText),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primaryText,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -331,7 +362,10 @@ class _ArchivedApplicationsView extends StatelessWidget {
               Center(
                 child: Text(
                   _archiveLabel(archived.length),
-                  style: const TextStyle(fontSize: 12, color: AppColors.mutedTitle),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.mutedTitle,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -354,7 +388,13 @@ class _ArchivedApplicationsView extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: SizedBox(
                             height: 80,
-                            child: Center(child: SizedBox(width: 48, height: 48, child: PulseLoadingWidget())),
+                            child: Center(
+                              child: SizedBox(
+                                width: 48,
+                                height: 48,
+                                child: PulseLoadingWidget(),
+                              ),
+                            ),
                           ),
                         );
                       }
@@ -382,5 +422,4 @@ class _ArchivedApplicationsView extends StatelessWidget {
       },
     );
   }
-
 }

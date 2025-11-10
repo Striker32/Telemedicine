@@ -352,7 +352,7 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
       c.dispose();
     }
     super.dispose();
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {

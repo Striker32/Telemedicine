@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
+import 'package:last_telemedicine/pages/Chat.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,7 +12,6 @@ import '../../components/Confirmation.dart';
 import '../../components/Notification.dart';
 import '../auth/Fb_request_model.dart';
 
-
 class _ThinDivider extends StatelessWidget {
   const _ThinDivider();
 
@@ -19,7 +20,6 @@ class _ThinDivider extends StatelessWidget {
     return Container(height: 1, color: ApplicationCard._divider);
   }
 }
-
 
 // ЗАЯВКИ
 
@@ -34,11 +34,11 @@ class ApplicationCard extends StatelessWidget {
   final String requestID;
   final bool urgent;
 
-// поле: список откликнувшихся врачей
+  // поле: список откликнувшихся врачей
   final List<Map<String, dynamic>> responders;
   final Map<String, dynamic> physician; // Типо лечащий врач
 
-// флаг, есть ли отклики (по умолчанию false)
+  // флаг, есть ли отклики (по умолчанию false)
   final bool hasResponse;
 
   const ApplicationCard({
@@ -57,15 +57,14 @@ class ApplicationCard extends StatelessWidget {
     this.hasResponse = false,
   }) : super(key: key);
 
-
   // Палитра/токены
-  static const _bgPage = Color(0xFFEFEFF4);     // фон страницы (как у тебя)
+  static const _bgPage = Color(0xFFEFEFF4); // фон страницы (как у тебя)
   static const _cardBg = Color(0xFFFFFFFF);
   static const _shadow = Color(0x1A000000);
-  static const _label = Color(0xFF1D1D1F);      // светло‑серый для лейблов
+  static const _label = Color(0xFF1D1D1F); // светло‑серый для лейблов
   static const _text = Color(0xFF000000);
-  static const _pink = Color(0xFFFF2D55);       // iOS system pink
-  static const _divider = Color(0xFFE5E5EA);    // тонкие разделители
+  static const _pink = Color(0xFFFF2D55); // iOS system pink
+  static const _divider = Color(0xFFE5E5EA); // тонкие разделители
   static const _btnGreyBg = Color(0xFFF2F2F7);
   static const _btnGreyText = Color(0xFF8E8E93);
   static const _gray = Color(0xFF9BA1A5);
@@ -105,9 +104,9 @@ class ApplicationCard extends StatelessWidget {
                 SizedBox(width: 30),
                 if (urgent)
                   SvgPicture.asset(
-                      'assets/images/icons/lightning.svg',
-                      width: 30,
-                      height: 25
+                    'assets/images/icons/lightning.svg',
+                    width: 30,
+                    height: 25,
                   ),
               ],
             ),
@@ -118,27 +117,35 @@ class ApplicationCard extends StatelessWidget {
             Row(
               children: [
                 SvgPicture.asset(
-                    'assets/images/icons/userProfile.svg',
-                    width: 29,
-                    height: 29
+                  'assets/images/icons/userProfile.svg',
+                  width: 29,
+                  height: 29,
                 ),
                 const SizedBox(width: 10),
                 // Имя
                 Text(
                   user,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: _text,
+                  ),
                 ),
                 const SizedBox(width: 20),
                 SvgPicture.asset(
-                    'assets/images/icons/calendar.svg',
-                    width: 28,
-                    height: 28
+                  'assets/images/icons/calendar.svg',
+                  width: 28,
+                  height: 28,
                 ),
                 const SizedBox(width: 10),
                 // Дата
                 Text(
                   datetime,
-                  style: const TextStyle(fontSize: 16, color: _gray, fontWeight: FontWeight.w400),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: _gray,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
@@ -149,14 +156,24 @@ class ApplicationCard extends StatelessWidget {
             const SizedBox(height: 12),
             const Text("Врач", style: TextStyle(fontSize: 12, color: _label)),
             const SizedBox(height: 4),
-            Text(doctor, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
+            Text(
+              doctor,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
+            ),
 
             const SizedBox(height: 12),
             const _ThinDivider(),
 
             // Описание с фейдом без троеточия (только если переполнение)
             const SizedBox(height: 12),
-            const Text("Описание", style: TextStyle(fontSize: 12, color: _label)),
+            const Text(
+              "Описание",
+              style: TextStyle(fontSize: 12, color: _label),
+            ),
             const SizedBox(height: 4),
             Text(
               description,
@@ -176,18 +193,32 @@ class ApplicationCard extends StatelessWidget {
             const SizedBox(height: 12),
             const Text("Город", style: TextStyle(fontSize: 12, color: _label)),
             const SizedBox(height: 4),
-            Text(city, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text)),
+            Text(
+              city,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
+            ),
 
             const SizedBox(height: 12),
             const _ThinDivider(),
 
             // Предложенная стоимость
             const SizedBox(height: 12),
-            const Text("Предложенная стоимость", style: TextStyle(fontSize: 12, color: _label)),
+            const Text(
+              "Предложенная стоимость",
+              style: TextStyle(fontSize: 12, color: _label),
+            ),
             const SizedBox(height: 6),
             Text(
               "${_formatCost(cost)} ₽",
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: _text,
+              ),
             ),
 
             const SizedBox(height: 30),
@@ -201,7 +232,9 @@ class ApplicationCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       child: Material(
                         // если есть отклики — кнопка ярко-красная, иначе светло-розовая
-                        color: hasResponse ? const Color(0xFFFF4361) : const Color(0xFFFFECF1),
+                        color: hasResponse
+                            ? const Color(0xFFFF4361)
+                            : const Color(0xFFFFECF1),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
                           onTap: () async {
@@ -251,7 +284,9 @@ class ApplicationCard extends StatelessWidget {
                                 "Открыть заявку",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: hasResponse ? const Color(0xFFF5F5F7) : const Color(0xFFFF4361),
+                                  color: hasResponse
+                                      ? const Color(0xFFF5F5F7)
+                                      : const Color(0xFFFF4361),
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -272,7 +307,9 @@ class ApplicationCard extends StatelessWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Material(
-                        color: hasResponse ? const Color(0xFFFFFAFB) : Colors.white,
+                        color: hasResponse
+                            ? const Color(0xFFFFFAFB)
+                            : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                           side: const BorderSide(color: Color(0x544A4B4E)),
@@ -300,15 +337,9 @@ class ApplicationCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                )
-
+                ),
               ],
             ),
-
-
-
-
-
           ],
         ),
       ),
@@ -326,8 +357,6 @@ class ApplicationCard extends StatelessWidget {
     return buf.toString();
   }
 }
-
-
 
 // POPUP ЗАЯВОК
 
@@ -363,7 +392,9 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
       context,
       MaterialPageRoute(
         builder: (_) => ChangeCityPage(
-          selected: _controllers[3].text.isNotEmpty ? _controllers[3].text : null,
+          selected: _controllers[3].text.isNotEmpty
+              ? _controllers[3].text
+              : null,
         ),
       ),
     );
@@ -375,20 +406,18 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
     }
   }
 
-  bool get _allFilled =>
-      _controllers.every((c) =>
-      c.text
-          .trim()
-          .isNotEmpty);
+  bool get _allFilled => _controllers.every((c) => c.text.trim().isNotEmpty);
 
   @override
   void initState() {
     super.initState();
-    var  d = widget.requestID;
+    var d = widget.requestID;
     _urgent = widget.urgent;
     final init = widget.initialValues ?? List<String>.filled(5, '');
     _controllers = List.generate(
-        5, (i) => TextEditingController(text: init.length > i ? init[i] : ''));
+      5,
+      (i) => TextEditingController(text: init.length > i ? init[i] : ''),
+    );
   }
 
   @override
@@ -399,19 +428,14 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery
-          .of(context)
-          .viewInsets
-          .bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
-        height: MediaQuery
-            .of(context)
-            .size
-            .height * 0.9,
+        height: MediaQuery.of(context).size.height * 0.9,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -453,7 +477,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       }
 
                       if (!_allFilled) {
-                        showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+                        showCustomNotification(
+                          context,
+                          'Пожалуйста, заполните все поля!',
+                        );
                         return;
                       }
 
@@ -469,11 +496,17 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
                       try {
                         final repo = RequestRepository();
-                        await repo.updateRequest(widget.requestID, patch); // ← обновление в БД
+                        await repo.updateRequest(
+                          widget.requestID,
+                          patch,
+                        ); // ← обновление в БД
                         Navigator.pop(context, patch);
                         showCustomNotification(context, 'Заявка обновлена');
                       } catch (e) {
-                        showCustomNotification(context, 'Ошибка обновления: $e');
+                        showCustomNotification(
+                          context,
+                          'Ошибка обновления: $e',
+                        );
                         debugPrint('DEBUG: ct="$c4"');
                       }
                     },
@@ -485,7 +518,6 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       ),
                     ),
                   ),
-
                 ],
               ),
 
@@ -523,7 +555,6 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
               const SizedBox(height: 60),
 
-
               Row(
                 children: [
                   // Левая кнопка
@@ -533,20 +564,37 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       child: TextButton(
                         style: TextButton.styleFrom(
                           backgroundColor: const Color(0xFFF5F6F7),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
                           elevation: 0,
                         ),
                         onPressed: () {
-                          // TODO: открыть чат
+                          final sender = FirebaseAuth.instance.currentUser;
+                          if (sender != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                  senderID: sender.uid,
+                                  recieverID: widget.physician['id'],
+                                  requestID: widget.requestID,
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SvgPicture.asset(
-                                'assets/images/icons/chat.svg',
-                                width: 18,
-                                height: 20
+                              'assets/images/icons/chat.svg',
+                              width: 18,
+                              height: 20,
                             ),
                             const SizedBox(height: 4),
                             const Text(
@@ -572,29 +620,40 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       child: TextButton(
                         style: TextButton.styleFrom(
                           backgroundColor: const Color(0xFFFFF0F3),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
                           elevation: 0,
                         ),
                         // Кнопка активна только если есть выбранный врач
                         onPressed: (widget.physician.isNotEmpty)
                             ? () async {
-                          final confirmed = await showConfirmationDialog(
-                            context,
-                            'Завершить заявку',
-                            'Данная заявка будет завершена\n и помещена в архив заявок профиля.\n Врачи больше не смогут её посмотреть.',
-                            'Завершить',
-                            'Отмена',
-                          );
+                                final confirmed = await showConfirmationDialog(
+                                  context,
+                                  'Завершить заявку',
+                                  'Данная заявка будет завершена\n и помещена в архив заявок профиля.\n Врачи больше не смогут её посмотреть.',
+                                  'Завершить',
+                                  'Отмена',
+                                );
 
-                          if (confirmed) {
-                            final patch = { 'status': '2' };
-                            final repo = RequestRepository();
-                            await repo.updateRequest(widget.requestID, patch);
-                            Navigator.pop(context, patch);
-                            showCustomNotification(context, 'Заявка была успешно завершена!');
-                          }
-                        }
+                                if (confirmed) {
+                                  final patch = {'status': '2'};
+                                  final repo = RequestRepository();
+                                  await repo.updateRequest(
+                                    widget.requestID,
+                                    patch,
+                                  );
+                                  Navigator.pop(context, patch);
+                                  showCustomNotification(
+                                    context,
+                                    'Заявка была успешно завершена!',
+                                  );
+                                }
+                              }
                             : null, // ← отключаем кнопку
                         child: Opacity(
                           // Визуально приглушаем, если disabled
@@ -602,7 +661,11 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SvgPicture.asset('assets/images/icons/checkmark.svg', width: 20, height: 20),
+                              SvgPicture.asset(
+                                'assets/images/icons/checkmark.svg',
+                                width: 20,
+                                height: 20,
+                              ),
                               const SizedBox(height: 4),
                               const Text(
                                 'Завершить',
@@ -630,8 +693,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   padding: const EdgeInsets.only(left: 15),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: const Text("Лечащий врач",
-                        style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                    child: const Text(
+                      "Лечащий врач",
+                      style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -645,25 +710,27 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
-                          isArchived: false,
-                          isActive: true,
-                          name: widget.physician['name'],
-                          surname: widget.physician['surname'],
-                          specialization: widget.physician['specialization'],
-                          rating: widget.physician['rating'],
-                          applications_quant: widget.physician['completed'],
-                          phone_num: widget.physician['phone'],
-                          email: widget.physician['email'],
-                          city: widget.physician['city'],
-                          work_exp: widget.physician['experience'],
-                          services_cost: widget.physician['price'],
-                          work_place: widget.physician['workplace'],
-                          about: widget.physician['about'],
-                          datetime: widget.datetime as String,
-                          requestID: widget.requestID,
-                          id : widget.physician['id'],
-                        )),
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePageFromUserPers(
+                            isArchived: false,
+                            isActive: true,
+                            name: widget.physician['name'],
+                            surname: widget.physician['surname'],
+                            specialization: widget.physician['specialization'],
+                            rating: widget.physician['rating'],
+                            applications_quant: widget.physician['completed'],
+                            phone_num: widget.physician['phone'],
+                            email: widget.physician['email'],
+                            city: widget.physician['city'],
+                            work_exp: widget.physician['experience'],
+                            services_cost: widget.physician['price'],
+                            work_place: widget.physician['workplace'],
+                            about: widget.physician['about'],
+                            datetime: widget.datetime as String,
+                            requestID: widget.requestID,
+                            id: widget.physician['id'],
+                          ),
+                        ),
                       );
                     },
                     child: Container(
@@ -671,7 +738,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                         color: Color(0xFFF5F6F7),
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
                           SvgPicture.asset(
@@ -722,8 +792,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   padding: const EdgeInsets.only(left: 15),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: const Text("Откликнувшиеся врачи",
-                        style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                    child: const Text(
+                      "Откликнувшиеся врачи",
+                      style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -741,12 +813,15 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                     itemCount: widget.responders.length,
                     // separator ставим строго между элементами; если элементов <=1 будет пусто
                     separatorBuilder: (context, index) {
-                      return widget.responders.length > 1 ? const _ThinDivider() : const SizedBox.shrink();
+                      return widget.responders.length > 1
+                          ? const _ThinDivider()
+                          : const SizedBox.shrink();
                     },
                     itemBuilder: (context, index) {
                       final responder = widget.responders[index];
                       final String name = (responder['name'] ?? '') as String;
-                      final String surname = (responder['surname'] ?? '') as String;
+                      final String surname =
+                          (responder['surname'] ?? '') as String;
 
                       // Рассчитываем радиусы в зависимости от позиции
                       final bool isFirst = index == 0;
@@ -772,25 +847,27 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                         onTap: () {
                           Navigator.push(
                             context, // 'context' здесь очень важен!
-                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
-                              isArchived: false,
-                              isActive: false,
-                              id: responder['id'],
-                              name: responder['name'],
-                              surname: responder['surname'],
-                              specialization: responder['specialization'],
-                              rating: responder['rating'],
-                              applications_quant: responder['completed'],
-                              phone_num: responder['phone'],
-                              email: responder['email'],
-                              city: responder['city'],
-                              work_exp: responder['experience'],
-                              services_cost: responder['price'],
-                              work_place: responder['workplace'],
-                              about: responder['about'],
-                              datetime: widget.datetime as String,
-                              requestID: widget.requestID,
-                            )), // Замените DoctorScreen() на ваш виджет
+                            MaterialPageRoute(
+                              builder: (context) => ProfilePageFromUserPers(
+                                isArchived: false,
+                                isActive: false,
+                                id: responder['id'],
+                                name: responder['name'],
+                                surname: responder['surname'],
+                                specialization: responder['specialization'],
+                                rating: responder['rating'],
+                                applications_quant: responder['completed'],
+                                phone_num: responder['phone'],
+                                email: responder['email'],
+                                city: responder['city'],
+                                work_exp: responder['experience'],
+                                services_cost: responder['price'],
+                                work_place: responder['workplace'],
+                                about: responder['about'],
+                                datetime: widget.datetime as String,
+                                requestID: widget.requestID,
+                              ),
+                            ), // Замените DoctorScreen() на ваш виджет
                           );
                         },
                         child: Container(
@@ -800,14 +877,17 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             color: Color(0xFFF5F6F7),
                             borderRadius: itemRadius,
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
                           child: Row(
                             children: [
                               // Серый кружок вместо фото
                               SvgPicture.asset(
-                                  'assets/images/icons/userProfile.svg',
-                                  width: 60,
-                                  height: 60
+                                'assets/images/icons/userProfile.svg',
+                                width: 60,
+                                height: 60,
                               ),
 
                               const SizedBox(width: 12),
@@ -842,9 +922,9 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
                               // Серый кружок вместо стрелки
                               SvgPicture.asset(
-                                  'assets/images/icons/arrow_right.svg',
-                                  width: 7,
-                                  height: 12
+                                'assets/images/icons/arrow_right.svg',
+                                width: 7,
+                                height: 12,
                               ),
                             ],
                           ),
@@ -857,15 +937,16 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 const SizedBox(height: 20),
               ],
 
-
               // Поля ввода
               // Поле 1: Врач
               Padding(
                 padding: const EdgeInsets.only(left: 15, bottom: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Врач",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Врач",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -879,17 +960,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -900,8 +985,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Причина",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Причина",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -915,17 +1002,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -936,8 +1027,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Подробное описание",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Подробное описание",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -951,17 +1044,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 minLines: 1,
                 maxLines: 12,
@@ -975,55 +1072,68 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Город",
-                      style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 13)),
+                  child: const Text(
+                    "Город",
+                    style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
               _isEditing
                   ? TextFormField(
-                controller: _controllers[3],
-                readOnly: true,
-                onTap: _openChangeCity,
-                decoration: InputDecoration(
-                  hintText: "Выберите город",
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  suffixIcon: const Icon(Icons.chevron_right, color: Color(0xFF9BA1A5)),
-                ),
-                style: const TextStyle(color: Color(0xFF1D1D1F)),
-              )
+                      controller: _controllers[3],
+                      readOnly: true,
+                      onTap: _openChangeCity,
+                      decoration: InputDecoration(
+                        hintText: "Выберите город",
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                        suffixIcon: const Icon(
+                          Icons.chevron_right,
+                          color: Color(0xFF9BA1A5),
+                        ),
+                      ),
+                      style: const TextStyle(color: Color(0xFF1D1D1F)),
+                    )
                   : TextFormField(
-                controller: _controllers[3],
-                readOnly: true,
-                enabled: false,
-                decoration: InputDecoration(
-                  hintText: "Выберите город",
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                ),
-                style: const TextStyle(color: Color(0xFF1D1D1F)),
-              ),
+                      controller: _controllers[3],
+                      readOnly: true,
+                      enabled: false,
+                      decoration: InputDecoration(
+                        hintText: "Выберите город",
+                        filled: true,
+                        fillColor: const Color(0xFFF5F5F5),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
+                      ),
+                      style: const TextStyle(color: Color(0xFF1D1D1F)),
+                    ),
               const SizedBox(height: 12),
 
               // Поле 5: Предлагаемая стоимость
@@ -1031,8 +1141,10 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Предлагаемая стоимость",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Предлагаемая стоимость",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -1046,17 +1158,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -1066,21 +1182,25 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Срочно",
-                      style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 16)),
+                  const Text(
+                    "Срочно",
+                    style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 16),
+                  ),
                   SizedBox(
                     width: 51,
                     height: 31,
                     child: Switch(
                       value: _urgent,
-                      onChanged: _isEditing ? (val) =>
-                          setState(() => _urgent = val) : null,
+                      onChanged: _isEditing
+                          ? (val) => setState(() => _urgent = val)
+                          : null,
                       activeTrackColor: const Color(0xFF77D572),
                       inactiveTrackColor: const Color(0xFFE9E9EA),
                       activeColor: Colors.white,
                       inactiveThumbColor: Colors.white,
                       trackOutlineColor: MaterialStateProperty.all(
-                          Colors.transparent),
+                        Colors.transparent,
+                      ),
                     ),
                   ),
                 ],
@@ -1096,14 +1216,14 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
 
 // Helper-функция для показа попапа
 Future<Map<String, dynamic>?> showChangeApplicationPopup(
-    BuildContext context, {
-      List<String>? initialValues,
-      bool urgent = false,
-      String? datetime,
-      List<Map<String, dynamic>> responders = const [],
-      Map<String, dynamic> physician = const {},
-      required String requestID,
-    }) {
+  BuildContext context, {
+  List<String>? initialValues,
+  bool urgent = false,
+  String? datetime,
+  List<Map<String, dynamic>> responders = const [],
+  Map<String, dynamic> physician = const {},
+  required String requestID,
+}) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
     isScrollControlled: true,
@@ -1118,4 +1238,3 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
     ),
   );
 }
-
