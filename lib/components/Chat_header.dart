@@ -27,7 +27,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
     required bool online,
     Object? lastSeenAgo, // Timestamp | DateTime | null
   }) {
-    if (online) return 'онлайн';
+    if (online) return 'в сети';
     if (lastSeenAgo == null) return 'был(-а) в сети давно';
 
     final seen = lastSeenAgo is Timestamp
@@ -61,7 +61,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final title = '${firstName.trim()} ${lastName.trim()}'.trim();
-    final status = _statusText(online: false, lastSeenAgo: lastSeenAgo);
+    final status = _statusText(online: online, lastSeenAgo: lastSeenAgo);
 
     return AppBar(
       backgroundColor: Colors.white,
@@ -92,11 +92,11 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
           if (status.isNotEmpty)
             Text(
               status,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'SF Pro Display',
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: AppColors.addLightText,
+                color: online ? AppColors.addLightText : AppColors.mainColor,
               ),
               overflow: TextOverflow.ellipsis,
             ),

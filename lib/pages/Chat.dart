@@ -10,6 +10,7 @@ import '../../themes/AppColors.dart';
 import '../components/Chat_header.dart';
 import '../components/DividerLine.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class ChatScreen extends StatefulWidget {
   final String requestID;
@@ -30,6 +31,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final _chatService = ChatService();
+  bool online = false;
+  Timestamp? lastSeenAgo;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -59,8 +62,6 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _canSend = false;
   String firstname = '';
   String lastname = '';
-  bool online = false;
-  Timestamp lastSeenAgo = Timestamp(0, 0);
   String avatarUrl = '';
 
   Future<void> _loadRecieverData() async {
@@ -107,13 +108,40 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
-      appBar: ChatHeader(
-        firstName: firstname,
-        lastName: lastname,
-        online: online,
-        lastSeenAgo: lastSeenAgo,
-        avatarUrl: avatarUrl,
-        onBack: () => Navigator.maybePop(context),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: StreamBuilder(
+          stream: FirebaseDatabase.instance
+              .ref('presence/${widget.recieverID}')
+              .onValue,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
+              return ChatHeader(
+                firstName: firstname,
+                lastName: lastname,
+                online: false,
+                lastSeenAgo: Timestamp(0, 0),
+                avatarUrl: avatarUrl,
+                onBack: () => Navigator.maybePop(context),
+              );
+            }
+
+            final data = snapshot.data!.snapshot.value as Map<dynamic, dynamic>;
+            final isOnline = data['online'] as bool;
+            final lastSeen = data['lastSeen'] != null
+                ? Timestamp.fromMillisecondsSinceEpoch(data['lastSeen'])
+                : null;
+
+            return ChatHeader(
+              firstName: firstname,
+              lastName: lastname,
+              online: isOnline,
+              lastSeenAgo: lastSeen,
+              avatarUrl: avatarUrl,
+              onBack: () => Navigator.maybePop(context),
+            );
+          },
+        ),
       ),
       body:
           // Center(
@@ -314,6 +342,21 @@ class _ChatScreenState extends State<ChatScreen> {
 
     for (var doc in unread.docs) {
       doc.reference.update({"isRead": true});
+    }
+  }
+
+  Future<void> _loadPresence() async {
+    final ref = FirebaseDatabase.instance.ref('presence/${widget.recieverID}');
+    final snapshot = await ref.get();
+
+    if (snapshot.exists) {
+      final data = snapshot.value as Map<dynamic, dynamic>;
+      setState(() {
+        online = data['online'] == true;
+        lastSeenAgo = data['lastSeen'] != null
+            ? Timestamp.fromMillisecondsSinceEpoch(data['lastSeen'])
+            : null;
+      });
     }
   }
 }
