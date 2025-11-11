@@ -33,7 +33,7 @@ class ChatService {
       recieverID: recieverID,
       requestID: requestID,
       message: message,
-      createdAt: Timestamp.now(),
+      createdAt: FieldValue.serverTimestamp(),
       isRead: false, // Мб потом поменять, хз пока че с этим делать
     );
 

@@ -19,7 +19,7 @@ Widget buildMessageItem(DocumentSnapshot doc, senderID, context) {
     bottomRight: Radius.circular(isSender ? 5 : 20),
   );
 
-  final timestamp = data['createdAt'] as Timestamp?;
+  final timestamp = data['createdAt'];
   final timeString = timestamp != null
       ? "${timestamp.toDate().hour.toString().padLeft(2, '0')}:${timestamp.toDate().minute.toString().padLeft(2, '0')}"
       : "--:--";

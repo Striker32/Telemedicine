@@ -5,7 +5,7 @@ class ChatMessage {
   final String recieverID;
   final String requestID;
   final String message;
-  final Timestamp createdAt;
+  final FieldValue createdAt;
   final bool isRead;
 
   const ChatMessage({
