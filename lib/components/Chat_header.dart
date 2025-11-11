@@ -43,6 +43,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
     final hours = diff.inHours;
     final days = diff.inDays;
 
+    if (minutes < 1) return 'был(-а) в сети только что';
     if (minutes <= 60) return 'был(-а) в сети $minutes минут назад';
     if (hours < 24) return 'был(-а) в сети $hours часов назад';
     if (days == 1) return 'был(-а) в сети вчера';
