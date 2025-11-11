@@ -17,7 +17,7 @@ class PresenceService with WidgetsBindingObserver {
   }
 
   void _setOnline() {
-    ref.set({"online": true, "lastSeen": ServerValue.timestamp});
+    ref.set({"online": true});
     ref.onDisconnect().set({
       "online": false,
       "lastSeen": ServerValue.timestamp,
@@ -26,11 +26,6 @@ class PresenceService with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
       _setOnline();
-    } else if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
-      ref.set({"online": false, "lastSeen": ServerValue.timestamp});
-    }
   }
 }
