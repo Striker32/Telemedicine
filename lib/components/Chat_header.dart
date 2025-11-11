@@ -96,7 +96,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
                 fontFamily: 'SF Pro Display',
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
-                color: online ? AppColors.addLightText : AppColors.mainColor,
+                color: online ? AppColors.mainColor : AppColors.addLightText,
               ),
               overflow: TextOverflow.ellipsis,
             ),
