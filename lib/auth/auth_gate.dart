@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/PresenceService.dart';
 import 'package:last_telemedicine/auth/login_or_register.dart';
 import 'package:last_telemedicine/pages/Main_screen.dart';
 import 'package:last_telemedicine/pages/legacy/home_page.dart';
@@ -22,11 +23,16 @@ class AuthGate extends StatelessWidget {
           if (snapshot.hasData) {
             final email = snapshot.data!.email ?? '';
             final domain = email.split('@').last;
+            final user = snapshot.data!;
 
             // debugPrint('DEBUG FULL EMAIL: email="${userEmail}"');
             if (domain == "doctor.com") {
+              PresenceService.init(
+                user.uid,
+              ); // ← запускаем presence для доктора
               return const BottomNavigator(usertype: "doctor");
             } else if (domain == "user.com") {
+              PresenceService.init(user.uid); // ← запускаем presence для юзера
               return const BottomNavigator(usertype: "user");
             } else {
               return const ChooseProfile();
