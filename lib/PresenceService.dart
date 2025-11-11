@@ -13,11 +13,13 @@ class PresenceService with WidgetsBindingObserver {
     final ref = FirebaseDatabase.instance.ref("presence/$uid");
     _instance = PresenceService._(uid, ref);
     WidgetsBinding.instance.addObserver(_instance!);
-    _instance!._setOnline();
+    _instance!._setOnline(); // при старте сразу онлайн
   }
 
   void _setOnline() {
-    ref.set({"online": true, "lastSeen": ServerValue.timestamp});
+    // отмечаем онлайн
+    ref.set({"online": true});
+    // регистрируем серверное правило на случай обрыва
     ref.onDisconnect().set({
       "online": false,
       "lastSeen": ServerValue.timestamp,
@@ -26,10 +28,9 @@ class PresenceService with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _setOnline();
-    } else if (state == AppLifecycleState.paused ||
+    if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
+      // при паузе/выгрузке сами пишем оффлайн
       ref.set({"online": false, "lastSeen": ServerValue.timestamp});
     }
   }
