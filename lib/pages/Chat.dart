@@ -284,6 +284,8 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         }
 
+        markMessagesAsRead(widget.requestID, widget.senderID);
+
         return ListView(
           reverse: true,
           padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -299,5 +301,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _playSendSound() async {
     _audioPlayer.play(AssetSource('sounds/send.mp3'));
+  }
+
+  void markMessagesAsRead(String requestID, String senderID) async {
+    final unread = await FirebaseFirestore.instance
+        .collection("chat_rooms")
+        .doc(requestID)
+        .collection("messages")
+        .where("senderID", isNotEqualTo: senderID)
+        .where("isRead", isEqualTo: false)
+        .get();
+
+    for (var doc in unread.docs) {
+      doc.reference.update({"isRead": true});
+    }
   }
 }

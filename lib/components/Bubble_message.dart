@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 Widget buildMessageItem(DocumentSnapshot doc, senderID, context) {
   final data = doc.data() as Map<String, dynamic>;
   final bool isSender = data['senderID'] == senderID;
+  final bool isRead = data["isRead"] == false;
 
   final screenWidth = MediaQuery.of(context).size.width;
   final maxBubbleWidth = screenWidth - 125;
@@ -51,12 +53,35 @@ Widget buildMessageItem(DocumentSnapshot doc, senderID, context) {
             ),
           ),
           const SizedBox(width: 20),
-          Text(
-            timeString,
-            style: TextStyle(
-              fontSize: 12,
-              color: isSender ? AppColors.mainColor : AppColors.addLightText,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                timeString,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isSender
+                      ? AppColors.mainColor
+                      : AppColors.addLightText,
+                ),
+              ),
+              if (isSender) ...[
+                const SizedBox(width: 4),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 3.5,
+                  ), // подгоняй вручную
+                  child: SvgPicture.asset(
+                    isRead
+                        ? 'assets/images/icons/message-unread.svg'
+                        : 'assets/images/icons/message-read.svg',
+                    width: isRead ? 14 : 10.5,
+                    height: 8,
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),

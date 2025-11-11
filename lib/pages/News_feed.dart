@@ -78,13 +78,14 @@ class _ProfilePageState extends State<NewsFeedPage> {
                           ),
                           alignment: Alignment.center,
                           child: CreateRequestButton(
-                            onTap: () async {
-                              // await showModalBottomSheet(
-                              // context: context,
-                              // isScrollControlled: true,
-                              // backgroundColor: Colors.transparent,
-                              // builder: (_) => const CreateApplicationPopup(),
-                              // );
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) =>
+                                    const CreateApplicationPopup(),
+                              );
                             },
                           ),
                         ),
