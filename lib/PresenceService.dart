@@ -28,9 +28,10 @@ class PresenceService with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
+    if (state == AppLifecycleState.resumed) {
+      ref.set({"online": true});
+    } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
-      // при паузе/выгрузке сами пишем оффлайн
       ref.set({"online": false, "lastSeen": ServerValue.timestamp});
     }
   }
