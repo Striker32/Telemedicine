@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/chat/chat_service.dart';
-import 'package:last_telemedicine/components/Loading.dart';
+import 'package:last_telemedicine/components/Bubble_message.dart';
 import 'package:last_telemedicine/components/Notification.dart';
 import '../../themes/AppColors.dart';
 import '../components/Chat_header.dart';
@@ -30,17 +31,28 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final _chatService = ChatService();
 
-  void sendMessage() async {
-    final message = _controller.text;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
+  void sendMessage() async {
+    final cleanedMessage = _controller.text
+        .split('\n')
+        .map((line) => line.trim().replaceAll(RegExp(r'\s+'), ' '))
+        .where((line) => line.isNotEmpty)
+        .join('\n');
     // Очистка поля ввода
     _controller.clear();
 
-    await _chatService.sendMessage(
+    _playSendSound();
+
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _controller.clear();
+    });
+
+    _chatService.sendMessage(
       widget.recieverID,
       widget.senderID,
       widget.requestID,
-      message,
+      cleanedMessage,
     );
   }
 
@@ -78,7 +90,13 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadRecieverData();
 
     _controller.addListener(() {
-      final hasText = _controller.text.trim().isNotEmpty;
+      final cleanedText = _controller.text
+          .split('\n')
+          .map((line) => line.trim().replaceAll(RegExp(r'\s+'), ' '))
+          .where((line) => line.isNotEmpty)
+          .join('\n');
+      final hasText = cleanedText.isNotEmpty;
+
       if (hasText != _canSend) {
         setState(() => _canSend = hasText);
       }
@@ -196,7 +214,22 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     const SizedBox(width: 10),
                     GestureDetector(
-                      onTap: sendMessage,
+                      onTap: () {
+                        final cleanedText = _controller.text
+                            .split('\n')
+                            .map(
+                              (line) =>
+                                  line.trim().replaceAll(RegExp(r'\s+'), ' '),
+                            )
+                            .where((line) => line.isNotEmpty)
+                            .join('\n');
+
+                        final hasText = cleanedText.isNotEmpty;
+
+                        if (hasText) {
+                          sendMessage();
+                        }
+                      },
                       child: Opacity(
                         opacity: _canSend ? 1.0 : 0.1,
                         child: Center(
@@ -252,75 +285,19 @@ class _ChatScreenState extends State<ChatScreen> {
         }
 
         return ListView(
+          reverse: true,
+          padding: const EdgeInsets.only(top: 8, bottom: 8),
           children: snap.data!.docs
-              .map((doc) => _buildMessageItem(doc, widget.senderID))
-              .toList(),
+              .map((doc) => buildMessageItem(doc, widget.senderID, context))
+              .toList()
+              .reversed
+              .toList(), // ← инвертируем порядок
         );
       },
     );
   }
 
-  Widget _buildMessageItem(DocumentSnapshot doc, senderID) {
-    final data = doc.data() as Map<String, dynamic>;
-    final bool isSender = data['senderID'] == senderID;
-
-    final screenWidth = MediaQuery.of(context).size.width;
-    final maxBubbleWidth = screenWidth - 125;
-
-    final alignment = isSender ? Alignment.centerRight : Alignment.centerLeft;
-    final borderRadius = BorderRadius.only(
-      topLeft: const Radius.circular(20),
-      topRight: const Radius.circular(20),
-      bottomLeft: Radius.circular(isSender ? 20 : 5),
-      bottomRight: Radius.circular(isSender ? 5 : 20),
-    );
-
-    final timestamp = data['createdAt'] as Timestamp?;
-    final timeString = timestamp != null
-        ? "${timestamp.toDate().hour.toString().padLeft(2, '0')}:${timestamp.toDate().minute.toString().padLeft(2, '0')}"
-        : "--:--";
-
-    return Container(
-      alignment: alignment,
-      margin: isSender
-          ? const EdgeInsets.only(bottom: 5, right: 12)
-          : const EdgeInsets.only(bottom: 5, left: 12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-        constraints: BoxConstraints(maxWidth: maxBubbleWidth),
-        decoration: BoxDecoration(
-          color: isSender
-              ? AppColors.additionalAccent
-              : const Color(0xFFFFFFFF),
-          borderRadius: borderRadius,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Flexible(
-              fit: FlexFit.loose,
-              child: Text(
-                data["message"] ?? '',
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.primaryText,
-                ),
-              ),
-            ),
-            const SizedBox(width: 20),
-            Text(
-              timeString,
-              style: TextStyle(
-                fontSize: 12,
-                color: isSender ? AppColors.mainColor : AppColors.addLightText,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _playSendSound() async {
+    _audioPlayer.play(AssetSource('sounds/send.mp3'));
   }
 }

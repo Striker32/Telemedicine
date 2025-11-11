@@ -28,6 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  audioplayers: ^5.2.1
   url_launcher: ^6.2.1
   path_provider: ^2.0.15
   flutter:
@@ -69,6 +70,7 @@ flutter:
     - assets/fonts/
     - assets/images/icons/
     - assets/images/app/
+    - assets/sounds/send.mp3
 
   fonts:
     - family: SF Pro Display
