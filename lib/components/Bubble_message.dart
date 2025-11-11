@@ -62,8 +62,8 @@ Widget buildMessageItem(DocumentSnapshot doc, senderID, context) {
                 style: TextStyle(
                   fontSize: 12,
                   color: isSender
-                      ? AppColors.addLightText
-                      : AppColors.mainColor,
+                      ? AppColors.mainColor
+                      : AppColors.addLightText,
                 ),
               ),
               if (isSender) ...[
