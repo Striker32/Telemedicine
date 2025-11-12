@@ -35,6 +35,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Timestamp? lastSeenAgo;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  late DatabaseReference _presenceRef;
+  late Stream<DatabaseEvent> _presenceStream;
 
   void sendMessage() async {
     final cleanedMessage = _controller.text
@@ -46,10 +48,6 @@ class _ChatScreenState extends State<ChatScreen> {
     _controller.clear();
 
     _playSendSound();
-
-    Future.delayed(const Duration(milliseconds: 50), () {
-      _controller.clear();
-    });
 
     _chatService.sendMessage(
       widget.recieverID,
@@ -79,14 +77,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
+
+    _presenceRef = FirebaseDatabase.instance.ref(
+      'presence/${widget.recieverID}',
+    );
+    _presenceStream =
+        _presenceRef.onValue; // кэшируем один раз для этого экрана
 
     _loadRecieverData();
 
@@ -105,15 +103,31 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void didUpdateWidget(covariant ChatScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.recieverID != widget.recieverID) {
+      _presenceRef = FirebaseDatabase.instance.ref(
+        'presence/${widget.recieverID}',
+      );
+      _presenceStream = _presenceRef.onValue;
+      setState(() {}); // перерисовать header с новым стримом
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: StreamBuilder(
-          stream: FirebaseDatabase.instance
-              .ref('presence/${widget.recieverID}')
-              .onValue,
+        child: StreamBuilder<DatabaseEvent>(
+          stream: _presenceStream,
           builder: (context, snapshot) {
             if (!snapshot.hasData || snapshot.data!.snapshot.value == null) {
               return ChatHeader(
@@ -342,21 +356,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
     for (var doc in unread.docs) {
       doc.reference.update({"isRead": true});
-    }
-  }
-
-  Future<void> _loadPresence() async {
-    final ref = FirebaseDatabase.instance.ref('presence/${widget.recieverID}');
-    final snapshot = await ref.get();
-
-    if (snapshot.exists) {
-      final data = snapshot.value as Map<dynamic, dynamic>;
-      setState(() {
-        online = data['online'] == true;
-        lastSeenAgo = data['lastSeen'] != null
-            ? Timestamp.fromMillisecondsSinceEpoch(data['lastSeen'])
-            : null;
-      });
     }
   }
 }

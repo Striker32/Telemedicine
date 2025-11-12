@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
+import 'package:last_telemedicine/auth/auth_gate.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
 
@@ -18,7 +19,6 @@ class LoginPageUser extends StatefulWidget {
 }
 
 class _LoginPageUserState extends State<LoginPageUser> {
-
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
@@ -41,11 +41,9 @@ class _LoginPageUserState extends State<LoginPageUser> {
       // caught auth service
       final authService = AuthService();
 
-
       // DEBUG, DELETE
       final phone_num = _phoneController.text;
       final pass = _pwController.text;
-
 
       final email = '${phone_num}@user.com';
 
@@ -55,21 +53,19 @@ class _LoginPageUserState extends State<LoginPageUser> {
       try {
         await authService.signInWithEmailPassword(email, pass);
 
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AuthGate()),
+          (Route<dynamic> route) => false,
+        );
       }
-
       // catch errors
       catch (e) {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text(e.toString()),
-          ),
+          builder: (context) => AlertDialog(title: Text(e.toString())),
         );
       }
-
     }
-
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -86,7 +82,6 @@ class _LoginPageUserState extends State<LoginPageUser> {
             children: [
               const SizedBox(height: 24),
 
-
               // Заголовок
               const Text(
                 'Авторизация',
@@ -101,8 +96,6 @@ class _LoginPageUserState extends State<LoginPageUser> {
 
               const SizedBox(height: 18),
 
-
-
               // Подзаголовок
               Text(
                 'Пожалуйста, введите данные, которые\nВы указывали при регистрации.',
@@ -116,14 +109,10 @@ class _LoginPageUserState extends State<LoginPageUser> {
 
               const SizedBox(height: 22),
 
-
               const SizedBox(height: 80),
 
               // Divider before first field (как в макете)
               const DividerLine(),
-
-
-
 
               // Телефон: +7 и поле
               Container(
@@ -137,11 +126,16 @@ class _LoginPageUserState extends State<LoginPageUser> {
                     Container(
                       decoration: BoxDecoration(
                         border: Border(
-                          right: BorderSide(color: AppColors.greyDivider, width: 1),
+                          right: BorderSide(
+                            color: AppColors.greyDivider,
+                            width: 1,
+                          ),
                         ),
                       ),
                       width: 72,
-                      padding: const EdgeInsets.symmetric(vertical: 20), // размер палка справа от +7
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 20,
+                      ), // размер палка справа от +7
                       alignment: Alignment.centerLeft,
                       // граница между кодом и полем — реализована визуально через контейнер
                       child: Center(
@@ -185,7 +179,6 @@ class _LoginPageUserState extends State<LoginPageUser> {
                 ),
               ),
 
-
               // Пароль
               Container(
                 decoration: BoxDecoration(
@@ -217,8 +210,6 @@ class _LoginPageUserState extends State<LoginPageUser> {
 
               const SizedBox(height: 20),
 
-
-
               // Политика конфиденциальности + переключатель
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -244,7 +235,6 @@ class _LoginPageUserState extends State<LoginPageUser> {
                   ),
                 ],
               ),
-
             ],
           ),
         ),
@@ -258,7 +248,10 @@ class _LoginPageUserState extends State<LoginPageUser> {
               if (_isFormValid) {
                 login(context);
               } else {
-                showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+                showCustomNotification(
+                  context,
+                  'Пожалуйста, заполните все поля!',
+                );
               }
             },
             style: ElevatedButton.styleFrom(

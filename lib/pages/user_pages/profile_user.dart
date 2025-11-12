@@ -76,7 +76,9 @@ class _ProfilePageState extends State<ProfilePageUser> {
   Future<void> _loadDefaultAvatar() async {
     // убираем присвоение _selectedImage = file;
     try {
-      final byteData = await rootBundle.load('assets/images/app/userProfile.png');
+      final byteData = await rootBundle.load(
+        'assets/images/app/userProfile.png',
+      );
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/userProfile.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
@@ -168,7 +170,9 @@ class _ProfilePageState extends State<ProfilePageUser> {
   Widget build(BuildContext context) {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser == null) {
-      return const Scaffold(body: Center(child: Text('Пользователь не авторизован')));
+      return const Scaffold(
+        body: Center(child: Text('Пользователь не авторизован')),
+      );
     }
     final uid = firebaseUser.uid;
 
@@ -195,7 +199,10 @@ class _ProfilePageState extends State<ProfilePageUser> {
                 setState(() => _isEditing = false);
               },
               onSettings: () {
-                Navigator.push(context, MaterialPageRoute(builder: (c) => ProfileSettingsPageUser()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (c) => ProfileSettingsPageUser()),
+                );
               },
             ),
             body: const Center(child: Text('Профиль не найден')),
@@ -208,7 +215,9 @@ class _ProfilePageState extends State<ProfilePageUser> {
         if (!_isEditing && (!_initializedFromSnapshot)) {
           _nameController.text = model.name;
           _surnameController.text = model.surname;
-          _emailController.text = (model.realEmail.isNotEmpty ? model.realEmail : model.realEmail);
+          _emailController.text = (model.realEmail.isNotEmpty
+              ? model.realEmail
+              : model.realEmail);
           _phoneController.text = model.phone;
           _currentCity = model.city.isEmpty ? 'Не указан' : model.city;
 
@@ -222,7 +231,6 @@ class _ProfilePageState extends State<ProfilePageUser> {
           if (model.avatar != null) {
             _avatarBytes = model.avatar!.bytes;
           }
-
 
           _initializedFromSnapshot = true;
         }
@@ -241,11 +249,11 @@ class _ProfilePageState extends State<ProfilePageUser> {
             onDone: () async {
               final bool hasChanges =
                   _nameController.text != (_initialName ?? '') ||
-                      _surnameController.text != (_initialSurname ?? '') ||
-                      _phoneController.text != (_initialPhone ?? '') ||
-                      _emailController.text != (_initialEmail ?? '') ||
-                      _currentCity != (_initialCity ?? '') ||
-                      _selectedImage?.path != _initialAvatar?.path;
+                  _surnameController.text != (_initialSurname ?? '') ||
+                  _phoneController.text != (_initialPhone ?? '') ||
+                  _emailController.text != (_initialEmail ?? '') ||
+                  _currentCity != (_initialCity ?? '') ||
+                  _selectedImage?.path != _initialAvatar?.path;
 
               setState(() {
                 _isEditing = false;
@@ -258,16 +266,25 @@ class _ProfilePageState extends State<ProfilePageUser> {
               }
             },
             onSettings: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileSettingsPageUser()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileSettingsPageUser(),
+                ),
+              );
             },
           ),
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
                     child: IntrinsicHeight(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -277,7 +294,10 @@ class _ProfilePageState extends State<ProfilePageUser> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               border: Border(
-                                bottom: BorderSide(color: AppColors.dividerLine, width: 1),
+                                bottom: BorderSide(
+                                  color: AppColors.dividerLine,
+                                  width: 1,
+                                ),
                               ),
                             ),
                             child: Padding(
@@ -289,20 +309,27 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                 children: [
                                   _isEditing
                                       ? AvatarWithPicker(
-                                    initialImage: _selectedImage,        // ← сюда приходит новый файл
-                                    firestoreBytes: _avatarBytes,        // ← старый Blob, если файла нет
-                                    onImageSelected: (file) {
-                                      setState(() {
-                                        _selectedImage = file;           // ← обновляем состояние страницы
-                                      });
-                                    },
-                                  )
-                                      : DisplayAvatar(image: _selectedImage, firestoreBytes: _avatarBytes),
+                                          initialImage:
+                                              _selectedImage, // ← сюда приходит новый файл
+                                          firestoreBytes:
+                                              _avatarBytes, // ← старый Blob, если файла нет
+                                          onImageSelected: (file) {
+                                            setState(() {
+                                              _selectedImage =
+                                                  file; // ← обновляем состояние страницы
+                                            });
+                                          },
+                                        )
+                                      : DisplayAvatar(
+                                          image: _selectedImage,
+                                          firestoreBytes: _avatarBytes,
+                                        ),
 
                                   const SizedBox(width: 15),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         TextField(
                                           controller: _nameController,
@@ -312,7 +339,8 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                             border: InputBorder.none,
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
-                                            visualDensity: VisualDensity.compact,
+                                            visualDensity:
+                                                VisualDensity.compact,
                                           ),
                                           style: TextStyle(
                                             height: 1.2,
@@ -334,7 +362,8 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                             border: InputBorder.none,
                                             contentPadding: EdgeInsets.zero,
                                             isDense: true,
-                                            visualDensity: VisualDensity.compact,
+                                            visualDensity:
+                                                VisualDensity.compact,
                                             hintText: 'Фамилия',
                                             hintStyle: TextStyle(
                                               color: AppColors.addLightText,

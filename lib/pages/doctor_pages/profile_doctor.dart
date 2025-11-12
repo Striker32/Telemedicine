@@ -26,7 +26,6 @@ import '../user_pages/subpages/Change_city.dart';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
-
 // добавленные импорты
 
 class ProfilePageDoctor extends StatefulWidget {
@@ -100,7 +99,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
   final TextEditingController _aboutController = TextEditingController(
     text:
-    'Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен, а также проведении профессиональной гигиены полости рта\n\n'
+        'Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен, а также проведении профессиональной гигиены полости рта\n\n'
         'Помогаю пациентам сохранить здоровье зубов и красивую улыбку, подбираю индивидуальный подход к каждому случаю\n\n'
         'Провожу консультации онлайн и разрабатываю план лечения с учётом ваших потребностей ',
   );
@@ -130,7 +129,9 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
 
   Future<void> _loadDefaultAvatar() async {
     try {
-      final byteData = await rootBundle.load('assets/images/app/userProfile.png');
+      final byteData = await rootBundle.load(
+        'assets/images/app/userProfile.png',
+      );
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/userProfile.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
@@ -141,7 +142,6 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
       });
     } catch (_) {}
   }
-
 
   void logout() {
     Navigator.of(context).popUntil((route) => route.isFirst);
@@ -176,7 +176,8 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
     };
 
     // Save avatar only if user picked a new image
-    final bool avatarChanged = _selectedImage != null && _selectedImage != _initialAvatar;
+    final bool avatarChanged =
+        _selectedImage != null && _selectedImage != _initialAvatar;
     if (avatarChanged) {
       final bytes = await _selectedImage!.readAsBytes();
       final decoded = img.decodeImage(bytes);
@@ -206,12 +207,14 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
         _initialAvatar = _selectedImage!;
       }
 
-        showCustomNotification(context, 'Данные Вашего профиля были успешно изменены!');
+      showCustomNotification(
+        context,
+        'Данные Вашего профиля были успешно изменены!',
+      );
     } catch (e) {
       showCustomNotification(context, 'Ошибка при сохранении: $e');
     }
   }
-
 
   void _onCancelEdit() {
     setState(() {
@@ -252,10 +255,11 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   Widget build(BuildContext context) {
     final firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser == null) {
-      return const Scaffold(body: Center(child: Text('Пользователь не авторизован')));
+      return const Scaffold(
+        body: Center(child: Text('Пользователь не авторизован')),
+      );
     }
     final uid = firebaseUser.uid;
-
 
     return StreamBuilder<DoctorModel?>(
       stream: repo.watchDoctor(uid),
@@ -280,7 +284,10 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                 setState(() => _isEditing = false);
               },
               onSettings: () {
-                Navigator.push(context, MaterialPageRoute(builder: (c) => ProfileSettingsPageUser()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (c) => ProfileSettingsPageUser()),
+                );
               },
             ),
             body: const Center(child: Text('Профиль не найден')),
@@ -336,16 +343,16 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
             onDone: () async {
               final bool hasChanges =
                   _nameController.text != _initialName ||
-                      _surnameController.text != _initialSurname ||
-                      _phoneController.text != _initialPhone ||
-                      _emailController.text != _initialEmail ||
-                      _currentCity != _initialCity ||
-                      _selectedImage?.path != _initialAvatar?.path ||
-                      _specializationController.text != _initialSpecialization ||
-                      _experienceController.text != _initialExperience ||
-                      _placeOfWorkController.text != _initialPlaceOfWork ||
-                      _priceController.text != _initialPrice ||
-                      _aboutController.text != _initialAbout;
+                  _surnameController.text != _initialSurname ||
+                  _phoneController.text != _initialPhone ||
+                  _emailController.text != _initialEmail ||
+                  _currentCity != _initialCity ||
+                  _selectedImage?.path != _initialAvatar?.path ||
+                  _specializationController.text != _initialSpecialization ||
+                  _experienceController.text != _initialExperience ||
+                  _placeOfWorkController.text != _initialPlaceOfWork ||
+                  _priceController.text != _initialPrice ||
+                  _aboutController.text != _initialAbout;
 
               setState(() {
                 _isEditing = false;
@@ -360,7 +367,12 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
               }
             },
             onSettings: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileSettingsPageUser()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfileSettingsPageUser(),
+                ),
+              );
             },
           ),
           body: SafeArea(
@@ -368,7 +380,9 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
               child: ConstrainedBox(
                 constraints: BoxConstraints(
                   minHeight:
-                  MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+                      MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).padding.top -
+                      MediaQuery.of(context).padding.bottom,
                 ),
                 child: IntrinsicHeight(
                   child: Column(
@@ -391,18 +405,23 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                             children: [
                               _isEditing
                                   ? AvatarWithPicker(
-                                initialImage: _selectedImage,        // new pick preview
-                                firestoreBytes: _avatarBytes,        // Firestore fallback
-                                onImageSelected: (file) {
-                                  setState(() {
-                                    _selectedImage = file;           // persist chosen image
-                                  });
-                                },
-                              )
+                                      initialImage:
+                                          _selectedImage, // new pick preview
+                                      firestoreBytes:
+                                          _avatarBytes, // Firestore fallback
+                                      onImageSelected: (file) {
+                                        setState(() {
+                                          _selectedImage =
+                                              file; // persist chosen image
+                                        });
+                                      },
+                                    )
                                   : DisplayAvatar(
-                                image: _selectedImage,               // if user picked but not saved yet
-                                firestoreBytes: _avatarBytes,        // prefer Firestore if no local file
-                              ),
+                                      image:
+                                          _selectedImage, // if user picked but not saved yet
+                                      firestoreBytes:
+                                          _avatarBytes, // prefer Firestore if no local file
+                                    ),
                               const SizedBox(width: 15),
                               Expanded(
                                 child: Column(
@@ -410,26 +429,28 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                                   children: [
                                     _isEditing
                                         ? TextField(
-                                      controller: _nameController,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: _ProfilePageState.kPrimaryText,
-                                      ),
-                                      decoration: const InputDecoration(
-                                        isDense: true,
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-                                    )
+                                            controller: _nameController,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: _ProfilePageState
+                                                  .kPrimaryText,
+                                            ),
+                                            decoration: const InputDecoration(
+                                              isDense: true,
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.zero,
+                                            ),
+                                          )
                                         : Text(
-                                      _nameController.text,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: _ProfilePageState.kPrimaryText,
-                                      ),
-                                    ),
+                                            _nameController.text,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w500,
+                                              color: _ProfilePageState
+                                                  .kPrimaryText,
+                                            ),
+                                          ),
                                     if (_isEditing) ...[
                                       const SizedBox(height: 6),
                                       DividerLine(),
@@ -437,26 +458,28 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                                     ],
                                     _isEditing
                                         ? TextField(
-                                      controller: _surnameController,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                        color: _ProfilePageState.kSecondaryText,
-                                      ),
-                                      decoration: const InputDecoration(
-                                        isDense: true,
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.zero,
-                                      ),
-                                    )
+                                            controller: _surnameController,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                              color: _ProfilePageState
+                                                  .kSecondaryText,
+                                            ),
+                                            decoration: const InputDecoration(
+                                              isDense: true,
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.zero,
+                                            ),
+                                          )
                                         : Text(
-                                      _surnameController.text,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w400,
-                                        color: _ProfilePageState.kSecondaryText,
-                                      ),
-                                    ),
+                                            _surnameController.text,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400,
+                                              color: _ProfilePageState
+                                                  .kSecondaryText,
+                                            ),
+                                          ),
                                   ],
                                 ),
                               ),
@@ -621,7 +644,9 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                           minLines: 1,
                           maxLines: 16,
                           style: TextStyle(
-                            color: _isEditing ? const Color(0xFF1D1D1F) : const Color(0xFF9BA1A5),
+                            color: _isEditing
+                                ? const Color(0xFF1D1D1F)
+                                : const Color(0xFF9BA1A5),
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
@@ -650,9 +675,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                         ),
 
                       const Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 30,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 30),
                         child: Text(
                           textAlign: TextAlign.center,
                           'Для изменения логина\nили пароля - обратитесь в поддержку',
