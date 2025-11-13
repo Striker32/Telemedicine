@@ -570,38 +570,49 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           elevation: 0,
                         ),
                         onPressed: () {
-                          final sender = FirebaseAuth.instance.currentUser;
-                          if (sender != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                  senderID: sender.uid,
-                                  recieverID: widget.physician['id'],
-                                  requestID: widget.requestID,
+                          if (widget.physician.isNotEmpty) {
+                            final sender = FirebaseAuth.instance.currentUser;
+                            if (sender != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ChatScreen(
+                                    senderID: sender.uid,
+                                    recieverID: widget.physician['id'],
+                                    requestID: widget.requestID,
+                                  ),
                                 ),
-                              ),
+                              );
+                            }
+                          } else {
+                            showCustomNotification(
+                              context,
+                              'Вы не можете открыть чат, пока не выбрали врача',
                             );
                           }
                         },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/images/icons/chat.svg',
-                              width: 18,
-                              height: 20,
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Открыть чат',
-                              style: TextStyle(
-                                color: ApplicationCard._label,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
+                        child: Opacity(
+                          // Визуально приглушаем, если disabled
+                          opacity: widget.physician.isNotEmpty ? 1.0 : 0.5,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/icons/chat.svg',
+                                width: 18,
+                                height: 20,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Открыть чат',
+                                style: TextStyle(
+                                  color: ApplicationCard._label,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -626,31 +637,34 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           elevation: 0,
                         ),
                         // Кнопка активна только если есть выбранный врач
-                        onPressed: (widget.physician.isNotEmpty)
-                            ? () async {
-                                final confirmed = await showConfirmationDialog(
-                                  context,
-                                  'Завершить заявку',
-                                  'Данная заявка будет завершена\n и помещена в архив заявок профиля.\n Врачи больше не смогут её посмотреть.',
-                                  'Завершить',
-                                  'Отмена',
-                                );
+                        onPressed: () async {
+                          if (widget.physician.isEmpty) {
+                            showCustomNotification(
+                              context,
+                              'Вы не можете завершить заявку, пока не выбрали врача',
+                            );
+                            return;
+                          }
 
-                                if (confirmed) {
-                                  final patch = {'status': '2'};
-                                  final repo = RequestRepository();
-                                  await repo.updateRequest(
-                                    widget.requestID,
-                                    patch,
-                                  );
-                                  Navigator.pop(context, patch);
-                                  showCustomNotification(
-                                    context,
-                                    'Заявка была успешно завершена!',
-                                  );
-                                }
-                              }
-                            : null, // ← отключаем кнопку
+                          final confirmed = await showConfirmationDialog(
+                            context,
+                            'Завершить заявку',
+                            'Данная заявка будет завершена\nи помещена в архив заявок профиля.\nВрачи больше не смогут её посмотреть.',
+                            'Завершить',
+                            'Отмена',
+                          );
+
+                          if (confirmed) {
+                            final patch = {'status': '2'};
+                            final repo = RequestRepository();
+                            await repo.updateRequest(widget.requestID, patch);
+                            Navigator.pop(context, patch);
+                            showCustomNotification(
+                              context,
+                              'Заявка была успешно завершена!',
+                            );
+                          }
+                        },
                         child: Opacity(
                           // Визуально приглушаем, если disabled
                           opacity: widget.physician.isNotEmpty ? 1.0 : 0.5,
@@ -852,7 +866,8 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                                 surname: responder['surname'],
                                 specialization: responder['specialization'],
                                 rating: responder['rating'],
-                                applications_quant: responder['completed'],
+                                applications_quant:
+                                    (responder['completed'] ?? '0').toString(),
                                 phone_num: responder['phone'],
                                 email: responder['email'],
                                 city: responder['city'],

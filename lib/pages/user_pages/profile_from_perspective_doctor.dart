@@ -25,7 +25,7 @@ class ProfilePageFromUserPers extends StatefulWidget {
   final String surname;
   final String specialization;
   final String rating;
-  final int applications_quant;
+  final String applications_quant;
   final String phone_num;
   final String email;
   final String city;
@@ -47,7 +47,7 @@ class ProfilePageFromUserPers extends StatefulWidget {
     this.surname = '',
     this.specialization = 'Врач',
     this.rating = "-",
-    this.applications_quant = 0,
+    this.applications_quant = '0',
     this.phone_num = '',
     this.email = '',
     this.city = '',
@@ -67,6 +67,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   late Stream<DatabaseEvent> _presenceStream;
   bool _isOnline = false;
   Timestamp? _lastSeen;
+  late final int quantity;
 
   // Дизайн-токены (подгоняются под макет)
 
@@ -81,6 +82,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   @override
   void initState() {
     super.initState();
+    quantity = int.tryParse(widget.applications_quant?.toString() ?? '') ?? 0;
 
     _presenceRef = FirebaseDatabase.instance.ref('presence/${widget.id}');
     _presenceStream = _presenceRef.onValue;
@@ -99,6 +101,16 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
     });
   }
 
+  String pluralizeMinutes(int minutes) {
+    final mod10 = minutes % 10;
+    final mod100 = minutes % 100;
+
+    if (mod10 == 1 && mod100 != 11) return 'минута';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
+      return 'минуты';
+    return 'минут';
+  }
+
   String _statusText(bool online, Timestamp? lastSeenAgo) {
     if (online) return 'в сети';
     if (lastSeenAgo == null) return 'был(-а) в сети давно';
@@ -111,8 +123,11 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
 
     if (minutes < 1) return 'был(-а) в сети только что';
     if (minutes < 2) return 'был(-а) в сети минуту назад';
-    if (minutes < 5) return 'был(-а) в сети $minutes минуты';
-    if (minutes <= 60) return 'был(-а) в сети $minutes минут назад';
+    if (minutes < 5) return 'был(-а) в сети $minutes минуты назад';
+    if (minutes <= 60) {
+      final label = pluralizeMinutes(minutes);
+      return 'был(-а) в сети $minutes $label назад';
+    }
     if (hours < 24) return 'был(-а) в сети $hours часов назад';
     if (days == 1) return 'был(-а) в сети вчера';
     if (days == 2) return 'был(-а) в сети позавчера';
@@ -307,9 +322,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    pluralizeApplications(
-                                      widget.applications_quant,
-                                    ),
+                                    pluralizeApplications(quantity),
                                     style: TextStyle(
                                       color: AppColors.primaryText,
                                       fontSize: 14,

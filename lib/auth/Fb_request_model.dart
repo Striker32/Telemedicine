@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 /// Модель заявки
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 /// Модель заявки
 class RequestModel {
@@ -98,16 +98,15 @@ class RequestModel {
   bool get isArchived => status == '3' || status.toLowerCase() == 'archived';
 }
 
-
-  /// Сериализация doctorUids в поле doctorUid.
-  /// Формат: если несколько — сохраняем как Map {uid: true, ...} (удобно для атомарных set/tx),
-  /// если ровно один — сохраняем как String для совместимости.
+/// Сериализация doctorUids в поле doctorUid.
+/// Формат: если несколько — сохраняем как Map {uid: true, ...} (удобно для атомарных set/tx),
+/// если ровно один — сохраняем как String для совместимости.
 class RequestRepository {
   final FirebaseFirestore _db;
   CollectionReference get _col => _db.collection('requests');
 
   RequestRepository({FirebaseFirestore? firestore})
-      : _db = firestore ?? FirebaseFirestore.instance;
+    : _db = firestore ?? FirebaseFirestore.instance;
 
   Future<RequestModel?> getRequest(String id) async {
     final doc = await _col.doc(id).get();
@@ -127,9 +126,16 @@ class RequestRepository {
         .where('userUid', isEqualTo: userUid)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-        .map((d) => RequestModel.fromMap(d.id, d.data()! as Map<String, dynamic>))
-        .toList());
+        .map(
+          (snap) => snap.docs
+              .map(
+                (d) => RequestModel.fromMap(
+                  d.id,
+                  d.data()! as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+        );
   }
 
   Stream<List<RequestModel>> watchRequestsByStatus(String status) {
@@ -137,9 +143,16 @@ class RequestRepository {
         .where('status', isEqualTo: status)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snap) => snap.docs
-        .map((d) => RequestModel.fromMap(d.id, d.data()! as Map<String, dynamic>))
-        .toList());
+        .map(
+          (snap) => snap.docs
+              .map(
+                (d) => RequestModel.fromMap(
+                  d.id,
+                  d.data()! as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+        );
   }
 
   Future<String> createRequest(RequestModel model) async {
@@ -155,24 +168,43 @@ class RequestRepository {
   }
 
   Future<void> updateRequest(String id, Map<String, dynamic> patch) async {
-    final data = {
-      ...patch,
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
+    final data = {...patch, 'updatedAt': FieldValue.serverTimestamp()};
     await _col.doc(id).set(data, SetOptions(merge: true));
   }
 
   Future<void> deleteRequest(String id) async {
+    final chatRoomsCol = _db.collection('chat_rooms');
+
+    // Ссылка на документ chat_rooms/{requestId}
+    final chatRoomDocRef = chatRoomsCol.doc(id);
+
+    // Удаляем подколлекцию messages порциями (batchSize <= 500)
+    const int batchSize = 400;
+    final messagesCol = chatRoomDocRef.collection('messages');
+
+    while (true) {
+      final msgSnap = await messagesCol.limit(batchSize).get();
+      if (msgSnap.docs.isEmpty) break;
+      final batch = _db.batch();
+      for (final m in msgSnap.docs) batch.delete(m.reference);
+      await batch.commit();
+      if (msgSnap.docs.length < batchSize) break;
+    }
+
+    // Удаляем сам документ chat_rooms/{requestId} (он теперь пуст)
+    await chatRoomDocRef.delete();
+
+    // Наконец удаляем документ в коллекции requests
     await _col.doc(id).delete();
   }
-
 
   Future<List<RequestModel>> getRequestsPage({
     required String status,
     DocumentSnapshot? startAfter,
     int limit = 10,
   }) async {
-    Query q = _db.collection('requests')
+    Query q = _db
+        .collection('requests')
         .where('status', isEqualTo: status)
         .orderBy('updatedAt', descending: true)
         .limit(limit);
@@ -183,10 +215,11 @@ class RequestRepository {
 
     final snap = await q.get();
     return snap.docs
-        .map((d) => RequestModel.fromMap(d.id, d.data()! as Map<String, dynamic>))
+        .map(
+          (d) => RequestModel.fromMap(d.id, d.data()! as Map<String, dynamic>),
+        )
         .toList();
   }
-
 
   /// Добавление или удаление врача
   Future<void> assignDoctorAtomically({
@@ -195,7 +228,7 @@ class RequestRepository {
     bool keepMultiple = false,
     bool remove = false,
     bool select = false, // новый флаг: выбор врача
-    String? newStatus,   // статус при выборе (например '1' = назначен)
+    String? newStatus, // статус при выборе (например '1' = назначен)
   }) async {
     final ref = _col.doc(requestId);
     await _db.runTransaction((tx) async {
@@ -205,13 +238,15 @@ class RequestRepository {
       final data = snap.data() as Map<String, dynamic>;
       final rawDoctors = data['doctorUids'] as List? ?? [];
 
-      List<Map<String, dynamic>> currentList =
-      rawDoctors.whereType<Map<String, dynamic>>().toList();
+      List<Map<String, dynamic>> currentList = rawDoctors
+          .whereType<Map<String, dynamic>>()
+          .toList();
 
       if (remove) {
         // удаляем врача по uid
-        currentList =
-            currentList.where((d) => d['uid'] != doctorData['uid']).toList();
+        currentList = currentList
+            .where((d) => d['uid'] != doctorData['uid'])
+            .toList();
 
         tx.set(ref, {
           'doctorUids': currentList,
@@ -256,5 +291,4 @@ class RequestRepository {
       }
     });
   }
-
 }

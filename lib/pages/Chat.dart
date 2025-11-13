@@ -70,9 +70,6 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         firstname = recieverData['name'] ?? '';
         lastname = recieverData['surname'] ?? '';
-        // avatarUrl = recieverData['avatarUrl'] ?? '';
-        // lastSeenAgo = recieverData['updatedAt'] ?? Timestamp(0, 0);
-        // online = recieverData['online'] ?? false;
       });
     }
   }
@@ -193,7 +190,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VideoCallPage(channelName: "telechannel", token: "007eJxTYPhf+qxDZ+Nh9V/dJzrfG3vsT5f8dHrL9OcZuQyliVqKrY8UGIxS08zSkiwtDBMNDE3MDFIsDc2Sk4zNk00NEy2NDcwSJcTFMhsCGRlUo7wZGKEQxOdmKEnNSU3OSMzLS81hYAAApgch7A=="),
+                            builder: (context) => VideoCallPage(
+                              channelName: "telechannel",
+                              token:
+                                  "007eJxTYPhf+qxDZ+Nh9V/dJzrfG3vsT5f8dHrL9OcZuQyliVqKrY8UGIxS08zSkiwtDBMNDE3MDFIsDc2Sk4zNk00NEy2NDcwSJcTFMhsCGRlUo7wZGKEQxOdmKEnNSU3OSMzLS81hYAAApgch7A==",
+                            ),
                           ),
                         );
                         debugPrint('Позвонить хотел? А вот хуй');
