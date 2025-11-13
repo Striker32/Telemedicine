@@ -7,6 +7,7 @@ import 'package:last_telemedicine/chat/chat_service.dart';
 import 'package:last_telemedicine/components/Bubble_message.dart';
 import 'package:last_telemedicine/components/Notification.dart';
 import '../../themes/AppColors.dart';
+import '../Services/Videocall_page.dart';
 import '../components/Chat_header.dart';
 import '../components/DividerLine.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -189,6 +190,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoCallPage(channelName: "telechannel", token: "007eJxTYPhf+qxDZ+Nh9V/dJzrfG3vsT5f8dHrL9OcZuQyliVqKrY8UGIxS08zSkiwtDBMNDE3MDFIsDc2Sk4zNk00NEy2NDcwSJcTFMhsCGRlUo7wZGKEQxOdmKEnNSU3OSMzLS81hYAAApgch7A=="),
+                          ),
+                        );
                         debugPrint('Позвонить хотел? А вот хуй');
                         // TODO: Начало звонка
                       },
