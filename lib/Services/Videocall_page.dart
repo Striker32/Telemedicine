@@ -186,25 +186,25 @@ class _VideoCallPageState extends State<VideoCallPage> {
             ),
           ),
           // Локальное видео в углу
-          // Positioned(
-          //   left: 16,
-          //   top: 40,
-          //   child: SizedBox(
-          //     width: 100,
-          //     height: 180,
-          //     child: ClipRRect(
-          //       borderRadius: BorderRadius.circular(12),
-          //       child: _videoDisabled
-          //           ? Container(color: Colors.black54, child: Icon(Icons.videocam_off, color: Colors.white, size: 40))
-          //           : AgoraVideoView(
-          //         controller: VideoViewController(
-          //           rtcEngine: _engine,
-          //           canvas: const VideoCanvas(uid: 0),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          Positioned(
+            left: 16,
+            top: 40,
+            child: SizedBox(
+              width: 100,
+              height: 180,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _videoDisabled
+                    ? Container(color: Colors.black54, child: Icon(Icons.videocam_off, color: Colors.white, size: 40))
+                    : AgoraVideoView(
+                  controller: VideoViewController(
+                    rtcEngine: _engine,
+                    canvas: const VideoCanvas(uid: 0),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       );
     } else {
@@ -228,18 +228,21 @@ class _VideoCallPageState extends State<VideoCallPage> {
   }
 
   // ПАНЕЛЬ ИНСТРУМЕНТОВ
+  // ПАНЕЛЬ ИНСТРУМЕНТОВ
   Widget _buildToolbar() {
     if (_isInitializing) return const SizedBox.shrink(); // Не показывать панель при инициализации
 
     return Container(
       alignment: Alignment.bottomCenter,
-      padding: const EdgeInsets.symmetric(vertical: 48),
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 16), // Добавим горизонтальный отступ для красоты
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        // Используем spaceEvenly для автоматического распределения
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
+          // Отступы (SizedBox) больше не нужны
           _buildToolbarButton(_onToggleMute, _muted ? Icons.mic_off : Icons.mic, _muted),
-          const SizedBox(width: 20),
-          // Кнопка ЗАВЕРШИТЬ ВЫЗОВ (особый стиль)
+
+          // Кнопка завершения вызова
           RawMaterialButton(
             onPressed: _onCallEnd,
             shape: const CircleBorder(),
@@ -248,14 +251,15 @@ class _VideoCallPageState extends State<VideoCallPage> {
             padding: const EdgeInsets.all(15.0),
             child: const Icon(Icons.call_end, color: Colors.white, size: 35.0),
           ),
-          const SizedBox(width: 20),
+
           _buildToolbarButton(_onToggleVideo, _videoDisabled ? Icons.videocam_off : Icons.videocam, _videoDisabled),
-          const SizedBox(width: 20),
+
           _buildToolbarButton(_onSwitchCamera, Icons.switch_camera, false),
         ],
       ),
     );
   }
+
 
   // Вспомогательный виджет для создания кнопок панели
   Widget _buildToolbarButton(VoidCallback onPressed, IconData icon, bool isActive) {
