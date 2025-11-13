@@ -1,13 +1,13 @@
 // CircleAvatar(
-// radius: 30,
+// radius: 30, // размеры подравнять, если нужно
 // backgroundImage: widget.physician['avatar'] != null // вот тут убрать widget, либо widget.physician
 // ? MemoryImage((widget.physician['avatar'].bytes as Uint8List)) // вот тут убрать widget, либо widget.physician
 //     : null,
 // child: widget.physician['avatar'] == null // вот тут убрать widget, либо widget.physician
 // ? SvgPicture.asset(
 // 'assets/images/icons/userProfile.svg',
-// width: 60,
-// height: 60,
+// width: 60, // размеры подравнять, если нужно
+// height: 60, // размеры подравнять, если нужно
 // )
 //     : null,
 // ),
