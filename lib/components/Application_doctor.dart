@@ -292,54 +292,51 @@ class ApplicationCard extends StatelessWidget {
                 Expanded(
                   child: SizedBox(
                     height: 61,
-                    child: Opacity(
-                      opacity: 0.5,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFFF5F6F7),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
-                          ),
-                          elevation: 0,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        backgroundColor: const Color(0xFFF5F6F7),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        onPressed: () {
-                          final sender = FirebaseAuth.instance.currentUser;
-                          if (sender != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                  senderID: sender.uid,
-                                  recieverID: userID,
-                                  requestID: requestID,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/images/icons/chat.svg',
-                              width: 18,
-                              height: 20,
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Открыть чат',
-                              style: TextStyle(
-                                color: ApplicationCard._label,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 8,
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: () {
+                        final sender = FirebaseAuth.instance.currentUser;
+                        if (sender != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                senderID: sender.uid,
+                                recieverID: userID,
+                                requestID: requestID,
                               ),
                             ),
-                          ],
-                        ),
+                          );
+                        }
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/icons/chat.svg',
+                            width: 18,
+                            height: 20,
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Открыть чат',
+                            style: TextStyle(
+                              color: ApplicationCard._label,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

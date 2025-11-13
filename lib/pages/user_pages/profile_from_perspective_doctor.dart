@@ -99,6 +99,16 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
     });
   }
 
+  String pluralizeMinutes(int minutes) {
+    final mod10 = minutes % 10;
+    final mod100 = minutes % 100;
+
+    if (mod10 == 1 && mod100 != 11) return 'минута';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
+      return 'минуты';
+    return 'минут';
+  }
+
   String _statusText(bool online, Timestamp? lastSeenAgo) {
     if (online) return 'в сети';
     if (lastSeenAgo == null) return 'был(-а) в сети давно';
@@ -111,8 +121,11 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
 
     if (minutes < 1) return 'был(-а) в сети только что';
     if (minutes < 2) return 'был(-а) в сети минуту назад';
-    if (minutes < 5) return 'был(-а) в сети $minutes минуты';
-    if (minutes <= 60) return 'был(-а) в сети $minutes минут назад';
+    if (minutes < 5) return 'был(-а) в сети $minutes минуты назад';
+    if (minutes <= 60) {
+      final label = pluralizeMinutes(minutes);
+      return 'был(-а) в сети $minutes $label назад';
+    }
     if (hours < 24) return 'был(-а) в сети $hours часов назад';
     if (days == 1) return 'был(-а) в сети вчера';
     if (days == 2) return 'был(-а) в сети позавчера';
