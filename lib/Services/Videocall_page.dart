@@ -29,7 +29,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
   bool _localUserJoined = false;
   bool _isInitializing = true; // Флаг для отслеживания инициализации
   bool _muted = false;
-  bool _videoDisabled = false;
+  bool _videoDisabled = true;
+  bool _remoteUserVideoDisabled = false;
 
   @override
   void initState() {
@@ -62,6 +63,8 @@ class _VideoCallPageState extends State<VideoCallPage> {
     await _engine.enableVideo();
     await _engine.startPreview();
 
+    await _engine.muteLocalVideoStream(_videoDisabled);
+
     // Присоединяемся к каналу, используя переданные channelName и token
     await _joinChannel();
 
@@ -90,6 +93,27 @@ class _VideoCallPageState extends State<VideoCallPage> {
         },
         onError: (ErrorCodeType code, String message) {
           debugPrint("❗️ Ошибка Agora: $code, Сообщение: $message");
+        },
+        onRemoteVideoStateChanged: (RtcConnection connection, int remoteUid, RemoteVideoState state, RemoteVideoStateReason reason, int elapsed) {
+          debugPrint("🎥 Состояние видео удаленного пользователя $remoteUid изменилось: $state, причина: $reason");
+
+          // Проверяем, остановил ли пользователь видео сам
+          final bool isVideoMuted = state == RemoteVideoState.remoteVideoStateStopped && reason == RemoteVideoStateReason.remoteVideoStateReasonRemoteMuted;
+          // Или видео снова включено
+          final bool isVideoPlaying = state == RemoteVideoState.remoteVideoStateStarting || state == RemoteVideoState.remoteVideoStateDecoding;
+
+          if (mounted) {
+            setState(() {
+              // Если пользователь включил видео, флаг - false
+              if (isVideoPlaying) {
+                _remoteUserVideoDisabled = false;
+              }
+              // Если выключил - true
+              else if (isVideoMuted) {
+                _remoteUserVideoDisabled = true;
+              }
+            });
+          }
         },
       ),
     );
@@ -159,8 +183,10 @@ class _VideoCallPageState extends State<VideoCallPage> {
   }
 
   // ОСНОВНОЕ ОКНО С ВИДЕО
+  // ОСНОВНОЕ ОКНО С ВИДЕО
   Widget _buildVideoViews() {
     if (_isInitializing || !_localUserJoined) {
+      // ... (экран подключения остается без изменений)
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -173,59 +199,87 @@ class _VideoCallPageState extends State<VideoCallPage> {
       );
     }
 
+    // --- ЛОКАЛЬНЫЙ ПРЕДПРОСМОТР (теперь это отдельный виджет) ---
+    Widget localPreview = Positioned(
+      right: 16,
+      top: 50, // Небольшой отступ сверху
+      child: SizedBox(
+        width: 120, // Ширина окна предпросмотра
+        height: 180, // Высота окна предпросмотра
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: _videoDisabled
+          // Если видео выключено, показываем заглушку
+              ? Container(
+            color: Colors.black54,
+            child: const Center(
+              child: Icon(Icons.videocam_off, color: Colors.white, size: 40),
+            ),
+          )
+          // Если видео включено, показываем превью
+              : AgoraVideoView(
+            controller: VideoViewController(
+              rtcEngine: _engine,
+              canvas: const VideoCanvas(uid: 0), // uid: 0 для локального пользователя
+            ),
+          ),
+        ),
+      ),
+    );
+
     if (_remoteUid != null) {
-      // Оба пользователя в чате
+      // --- ОБА ПОЛЬЗОВАТЕЛЯ В ЧАТЕ ---
       return Stack(
         children: [
-          // Видео удаленного пользователя на весь экран
-          AgoraVideoView(
+          _remoteUserVideoDisabled
+              ? const Center(
+            // Показываем заглушку, если видео выключено
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.videocam_off, color: Colors.white, size: 60),
+                SizedBox(height: 16),
+                Text("Собеседник отключил камеру", style: TextStyle(color: Colors.white70)),
+              ],
+            ),
+          )
+              : AgoraVideoView(
+            // Показываем видео, если оно включено
             controller: VideoViewController.remote(
               rtcEngine: _engine,
               canvas: VideoCanvas(uid: _remoteUid!),
               connection: RtcConnection(channelId: widget.channelName),
             ),
           ),
-          // Локальное видео в углу
-          Positioned(
-            left: 16,
-            top: 40,
-            child: SizedBox(
-              width: 100,
-              height: 180,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: _videoDisabled
-                    ? Container(color: Colors.black54, child: Icon(Icons.videocam_off, color: Colors.white, size: 40))
-                    : AgoraVideoView(
-                  controller: VideoViewController(
-                    rtcEngine: _engine,
-                    canvas: const VideoCanvas(uid: 0),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Наше локальное видео в углу
+          localPreview,
         ],
       );
     } else {
-      // Только локальный пользователь, ждем собеседника
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      // --- ТОЛЬКО ЛОКАЛЬНЫЙ ПОЛЬЗОВАТЕЛЬ, ЖДЕМ СОБЕСЕДНИКА ---
+      return Stack(
         children: [
-          SizedBox(
-            width: 200,
-            height: 200,
-            child: Icon(Icons.person_search, color: Colors.white70, size: 100),
+          // Фон с иконкой и текстом ожидания
+          const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.person_search, color: Colors.white70, size: 150),
+                SizedBox(height: 20),
+                Text(
+                  "Ожидание собеседника...",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ],
+            ),
           ),
-          Text(
-            "Ожидание собеседника...",
-            style: TextStyle(color: Colors.white, fontSize: 18),
-          ),
-          SizedBox(height: 150), // Отступ для панели управления
+          // Поверх фона показываем локальный предпросмотр
+          localPreview,
         ],
       );
     }
   }
+
 
   // ПАНЕЛЬ ИНСТРУМЕНТОВ
   // ПАНЕЛЬ ИНСТРУМЕНТОВ

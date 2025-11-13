@@ -58,15 +58,11 @@ class ApplicationCard extends StatelessWidget {
   }) : super(key: key);
 
   // Палитра/токены
-  static const _bgPage = Color(0xFFEFEFF4); // фон страницы (как у тебя)
   static const _cardBg = Color(0xFFFFFFFF);
   static const _shadow = Color(0x1A000000);
   static const _label = Color(0xFF1D1D1F); // светло‑серый для лейблов
   static const _text = Color(0xFF000000);
-  static const _pink = Color(0xFFFF2D55); // iOS system pink
   static const _divider = Color(0xFFE5E5EA); // тонкие разделители
-  static const _btnGreyBg = Color(0xFFF2F2F7);
-  static const _btnGreyText = Color(0xFF8E8E93);
   static const _gray = Color(0xFF9BA1A5);
 
   @override
