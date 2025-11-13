@@ -571,6 +571,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               'workplace': d.placeOfWork,
                               'about': d.about,
                               'completed': int.parse(d.completed),
+                              'avatar': d.avatar,
                             };
                             return ApplicationCard(
                               title: r.reason,

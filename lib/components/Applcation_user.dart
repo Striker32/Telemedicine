@@ -1,3 +1,19 @@
+// CircleAvatar(
+// radius: 30,
+// backgroundImage: widget.physician['avatar'] != null // вот тут убрать widget, либо widget.physician
+// ? MemoryImage((widget.physician['avatar'].bytes as Uint8List)) // вот тут убрать widget, либо widget.physician
+//     : null,
+// child: widget.physician['avatar'] == null // вот тут убрать widget, либо widget.physician
+// ? SvgPicture.asset(
+// 'assets/images/icons/userProfile.svg',
+// width: 60,
+// height: 60,
+// )
+//     : null,
+// ),
+
+import 'dart:typed_data';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -754,11 +770,21 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                       ),
                       child: Row(
                         children: [
-                          SvgPicture.asset(
-                            'assets/images/icons/userProfile.svg',
-                            width: 60,
-                            height: 60,
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: widget.physician['avatar'] != null
+                                ? MemoryImage((widget.physician['avatar'].bytes as Uint8List))
+                                : null,
+                            child: widget.physician['avatar'] == null
+                                ? SvgPicture.asset(
+                              'assets/images/icons/userProfile.svg',
+                              width: 60,
+                              height: 60,
+                            )
+                                : null,
                           ),
+
+
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
