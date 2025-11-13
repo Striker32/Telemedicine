@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/auth/auth_gate.dart';
 
 import '../../Services/Bottom_Navigator.dart';
 import '../../auth/auth_service.dart';
@@ -19,7 +20,6 @@ class LoginPageDoctor extends StatefulWidget {
 }
 
 class _LoginPageDoctorState extends State<LoginPageDoctor> {
-
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
@@ -35,7 +35,6 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
 
   @override
   Widget build(BuildContext context) {
-
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
     const dividerOfContinue = 10.0;
@@ -44,11 +43,9 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
       // caught auth service
       final authService = AuthService();
 
-
       // DEBUG, DELETE
       final phone_num = _loginController.text;
       final pass = _pwController.text;
-
 
       final email = '${phone_num}@doctor.com';
 
@@ -58,21 +55,19 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
       try {
         await authService.signInWithEmailPassword(email, pass);
 
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AuthGate()),
+          (Route<dynamic> route) => false,
+        );
       }
-
       // catch errors
       catch (e) {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text(e.toString()),
-          ),
+          builder: (context) => AlertDialog(title: Text(e.toString())),
         );
       }
-
     }
-
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -81,16 +76,18 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
         backgroundColor: Colors.white,
       ),
 
-
-
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 0),
+          padding: const EdgeInsets.fromLTRB(
+            horizontalPadding,
+            0,
+            horizontalPadding,
+            0,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 24),
-
 
               // Заголовок
               const Text(
@@ -106,8 +103,6 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
 
               const SizedBox(height: 18),
 
-
-
               // Подзаголовок
               Text(
                 'Пожалуйста, введите данные, которые\nВам предоставила поликлинника.',
@@ -121,15 +116,10 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
 
               const SizedBox(height: 22),
 
-
               const SizedBox(height: 80),
 
               // Divider before first field (как в макете)
               const DividerLine(),
-
-
-
-
 
               Container(
                 decoration: BoxDecoration(
@@ -139,8 +129,6 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
                 ),
                 child: Row(
                   children: [
-
-
                     const SizedBox(width: 12),
 
                     Expanded(
@@ -169,7 +157,6 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
                   ],
                 ),
               ),
-
 
               // Пароль
               Container(
@@ -202,8 +189,6 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
               ),
 
               const SizedBox(height: 20),
-
-
 
               // Политика конфиденциальности + переключатель
               Row(
@@ -257,7 +242,6 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
                   ),
                 ],
               ),
-
             ],
           ),
         ),
@@ -272,7 +256,10 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
               if (_isFormValid) {
                 login(context);
               } else {
-                showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+                showCustomNotification(
+                  context,
+                  'Пожалуйста, заполните все поля!',
+                );
               }
             },
             style: ElevatedButton.styleFrom(

@@ -29,10 +29,14 @@ class AuthGate extends StatelessWidget {
             if (domain == "doctor.com") {
               PresenceService.init(
                 user.uid,
+                online: true,
               ); // ← запускаем presence для доктора
               return const BottomNavigator(usertype: "doctor");
             } else if (domain == "user.com") {
-              PresenceService.init(user.uid); // ← запускаем presence для юзера
+              PresenceService.init(
+                user.uid,
+                online: true,
+              ); // ← запускаем presence для юзера
               return const BottomNavigator(usertype: "user");
             } else {
               return const ChooseProfile();
