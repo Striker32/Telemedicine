@@ -744,7 +744,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             surname: widget.physician['surname'],
                             specialization: widget.physician['specialization'],
                             rating: widget.physician['rating'],
-                            applications_quant: widget.physician['completed'],
+                            applications_quant: (widget.physician['completed'] ?? '0').toString(),
                             phone_num: widget.physician['phone'],
                             email: widget.physician['email'],
                             city: widget.physician['city'],
