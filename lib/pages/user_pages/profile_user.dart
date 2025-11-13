@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:last_telemedicine/PresenceService.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:last_telemedicine/components/Avatar/AvatarWithPicker.dart';
@@ -96,8 +97,9 @@ class _ProfilePageState extends State<ProfilePageUser> {
     }
   }
 
-  void logout() {
+  void logout(uid) {
     Navigator.of(context).popUntil((route) => route.isFirst);
+    PresenceService.init(uid, online: false);
     final _auth = AuthService();
     _auth.signOut();
   }
@@ -456,7 +458,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
                                 const DividerLine(),
                                 CustomButton(
                                   onTap: () {
-                                    logout();
+                                    logout(uid);
                                   },
                                   label: 'Выйти',
                                   color: AppColors.mainColor,

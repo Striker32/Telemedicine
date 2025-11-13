@@ -1,3 +1,5 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/auth/Fb_request_model.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
@@ -54,7 +56,6 @@ class ProfilePageFromUserPers extends StatefulWidget {
     this.work_place = '',
     this.about = '',
     this.datetime = '',
-
   }) : super(key: key);
 
   @override
@@ -62,6 +63,11 @@ class ProfilePageFromUserPers extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePageFromUserPers> {
+  late DatabaseReference _presenceRef;
+  late Stream<DatabaseEvent> _presenceStream;
+  bool _isOnline = false;
+  Timestamp? _lastSeen;
+
   // Дизайн-токены (подгоняются под макет)
 
   static const Color kBackground = Color(0xFFEFEFF4); // цвет фона
@@ -75,7 +81,47 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   @override
   void initState() {
     super.initState();
-    // print('Рейтинг: ${widget.rating}');
+
+    _presenceRef = FirebaseDatabase.instance.ref('presence/${widget.id}');
+    _presenceStream = _presenceRef.onValue;
+
+    _presenceStream.listen((event) {
+      final data = event.snapshot.value as Map<dynamic, dynamic>?;
+
+      if (data != null) {
+        setState(() {
+          _isOnline = data['online'] == true;
+          _lastSeen = data['lastSeen'] != null
+              ? Timestamp.fromMillisecondsSinceEpoch(data['lastSeen'])
+              : null;
+        });
+      }
+    });
+  }
+
+  String _statusText(bool online, Timestamp? lastSeenAgo) {
+    if (online) return 'в сети';
+    if (lastSeenAgo == null) return 'был(-а) в сети давно';
+
+    final seen = lastSeenAgo.toDate().toUtc();
+    final diff = DateTime.now().toUtc().difference(seen);
+    final minutes = diff.inMinutes;
+    final hours = diff.inHours;
+    final days = diff.inDays;
+
+    if (minutes < 1) return 'был(-а) в сети только что';
+    if (minutes < 2) return 'был(-а) в сети минуту назад';
+    if (minutes < 5) return 'был(-а) в сети $minutes минуты';
+    if (minutes <= 60) return 'был(-а) в сети $minutes минут назад';
+    if (hours < 24) return 'был(-а) в сети $hours часов назад';
+    if (days == 1) return 'был(-а) в сети вчера';
+    if (days == 2) return 'был(-а) в сети позавчера';
+    if (days < 7) {
+      final suffix = (days >= 2 && days <= 4) ? 'дня' : 'дней';
+      return 'был(-а) в сети $days $suffix назад';
+    }
+
+    return 'был(-а) в сети давно';
   }
 
   @override
@@ -85,36 +131,42 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
       appBar: CustomAppBar(
         titleText: 'Информация',
         leading: AppBarButton(label: 'Назад'),
-        action: AppBarButton(label: (widget.isActive || widget.isArchived) ? '' : 'Выбрать', onTap: () async {
-          final confirmed = await showConfirmationDialog(
-            context,
-            'Выбрать врача',
-            'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
-            'Выбрать',
-            'Отмена',
-          );
+        action: AppBarButton(
+          label: (widget.isActive || widget.isArchived) ? '' : 'Выбрать',
+          onTap: () async {
+            final confirmed = await showConfirmationDialog(
+              context,
+              'Выбрать врача',
+              'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
+              'Выбрать',
+              'Отмена',
+            );
 
-          if (confirmed) {
             if (confirmed) {
-              await repo.assignDoctorAtomically(
-                requestId: widget.requestID,
-                doctorData: {'uid': widget.id},
-                select: true,
-                newStatus: '1', // назначен
-              );
-              Navigator.pop(context,);
-              Navigator.pop(context,);
-              showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
+              if (confirmed) {
+                await repo.assignDoctorAtomically(
+                  requestId: widget.requestID,
+                  doctorData: {'uid': widget.id},
+                  select: true,
+                  newStatus: '1', // назначен
+                );
+                Navigator.pop(context);
+                Navigator.pop(context);
+                showCustomNotification(
+                  context,
+                  'Вы успешно выбрали своего\nлечащего врача!',
+                );
+              }
             }
-          }
-        }),
+          },
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight:
-              MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top -
                   MediaQuery.of(context).padding.bottom,
             ),
@@ -124,9 +176,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                 children: [
                   // Блок аватара, имени и телефона
                   Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                    ),
+                    decoration: BoxDecoration(color: Colors.white),
 
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -154,10 +204,12 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                                   ),
                                 ),
                                 Text(
-                                  'в сети 13 минут назад',
+                                  _statusText(_isOnline, _lastSeen),
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: AppColors.addLightText,
+                                    color: _isOnline
+                                        ? AppColors.mainColor
+                                        : AppColors.addLightText,
                                   ),
                                 ),
                               ],
@@ -171,7 +223,6 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                               badgeSize: 36,
                             ),
                           },
-
                         ],
                       ),
                     ),
@@ -188,9 +239,16 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                             height: 61,
                             child: TextButton(
                               style: TextButton.styleFrom(
-                                backgroundColor: const Color(0xFFFFF0F3), // светло-розовый фон (под скрин)
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                backgroundColor: const Color(
+                                  0xFFFFF0F3,
+                                ), // светло-розовый фон (под скрин)
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
                                 elevation: 0,
                               ),
                               onPressed: () {
@@ -200,9 +258,9 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset(
-                                      'assets/images/icons/stethoscope.svg',
-                                      width: 20,
-                                      height: 20
+                                    'assets/images/icons/stethoscope.svg',
+                                    width: 20,
+                                    height: 20,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -227,8 +285,13 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                             child: TextButton(
                               style: TextButton.styleFrom(
                                 backgroundColor: const Color(0xFFF5F6F7),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
                                 elevation: 0,
                               ),
                               onPressed: () {
@@ -238,13 +301,15 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset(
-                                      'assets/images/icons/checkmark-black.svg',
-                                      width: 20,
-                                      height: 20
+                                    'assets/images/icons/checkmark-black.svg',
+                                    width: 20,
+                                    height: 20,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    pluralizeApplications(widget.applications_quant),
+                                    pluralizeApplications(
+                                      widget.applications_quant,
+                                    ),
                                     style: TextStyle(
                                       color: AppColors.primaryText,
                                       fontSize: 14,
@@ -256,8 +321,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                             ),
                           ),
                         ),
-
-                        ],
+                      ],
                     ),
                   ),
 
@@ -278,20 +342,14 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                           child: const DividerLine(),
                         ),
 
-                        FieldDoctorView(
-                          title: 'Почта',
-                          mainText: widget.email,
-                        ),
+                        FieldDoctorView(title: 'Почта', mainText: widget.email),
 
                         Padding(
                           padding: const EdgeInsets.only(left: 15),
                           child: const DividerLine(),
                         ),
 
-                        FieldDoctorView(
-                          title: 'Город',
-                          mainText: widget.city,
-                        ),
+                        FieldDoctorView(title: 'Город', mainText: widget.city),
 
                         Padding(
                           padding: const EdgeInsets.only(left: 15),
@@ -333,8 +391,6 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                           mainText: widget.about,
                           aboutself: true,
                         ),
-
-
                       ],
                     ),
                   ),
@@ -342,43 +398,45 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                   if (!widget.isArchived) ...{
                     const SizedBox(height: 40),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10,),
-                      child: DoctorRespondedButton(isActive: widget.isActive, onTap: () async {
-                        final confirmed = await showConfirmationDialog(
-                          context,
-                          'Выбрать врача',
-                          'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
-                          'Выбрать',
-                          'Отмена',
-                        );
-
-                        if (confirmed) {
-                          widget.isActive ?
-
-                          await repo.assignDoctorAtomically(
-                            requestId: widget.requestID,
-                            doctorData: {'uid': widget.id},
-                            remove: true, // назначен
-                          )
-                              : await repo.assignDoctorAtomically(
-                            requestId: widget.requestID,
-                            doctorData: {'uid': widget.id},
-                            select: true,
-                            newStatus: '1', // назначен
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: DoctorRespondedButton(
+                        isActive: widget.isActive,
+                        onTap: () async {
+                          final confirmed = await showConfirmationDialog(
+                            context,
+                            'Выбрать врача',
+                            'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
+                            'Выбрать',
+                            'Отмена',
                           );
-                          Navigator.pop(context,);
-                          Navigator.pop(context,);
-                          showCustomNotification(context, 'Вы успешно выбрали своего\nлечащего врача!');
-                        }
-                      }, height: 60,),
+
+                          if (confirmed) {
+                            widget.isActive
+                                ? await repo.assignDoctorAtomically(
+                                    requestId: widget.requestID,
+                                    doctorData: {'uid': widget.id},
+                                    remove: true, // назначен
+                                  )
+                                : await repo.assignDoctorAtomically(
+                                    requestId: widget.requestID,
+                                    doctorData: {'uid': widget.id},
+                                    select: true,
+                                    newStatus: '1', // назначен
+                                  );
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            showCustomNotification(
+                              context,
+                              'Вы успешно выбрали своего\nлечащего врача!',
+                            );
+                          }
+                        },
+                        height: 60,
+                      ),
                     ),
                   },
 
-                  const SizedBox(height: 10,)
-
-
-
-
+                  const SizedBox(height: 10),
                 ],
               ),
             ),

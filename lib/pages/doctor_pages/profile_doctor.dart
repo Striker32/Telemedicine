@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:last_telemedicine/PresenceService.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -143,8 +144,9 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
     } catch (_) {}
   }
 
-  void logout() {
+  void logout(uid) {
     Navigator.of(context).popUntil((route) => route.isFirst);
+    PresenceService.init(uid, online: false);
     final _auth = AuthService();
     _auth.signOut();
   }
@@ -665,7 +667,7 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                             const DividerLine(),
                             CustomButton(
                               onTap: () {
-                                logout();
+                                logout(uid);
                               },
                               label: 'Выйти',
                               color: AppColors.mainColor,
