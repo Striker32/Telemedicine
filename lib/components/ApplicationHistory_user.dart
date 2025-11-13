@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
+import 'package:last_telemedicine/pages/ChatHistory.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
@@ -20,7 +22,6 @@ class _ThinDivider extends StatelessWidget {
   }
 }
 
-
 // ЗАЯВКИ ИСТОРИИ
 
 class HistoryApplicationCard extends StatelessWidget {
@@ -33,7 +34,6 @@ class HistoryApplicationCard extends StatelessWidget {
   final String rating;
   final String cost;
   final String requestID;
-
 
   final List<dynamic> responder;
 
@@ -51,21 +51,17 @@ class HistoryApplicationCard extends StatelessWidget {
     this.rating = '',
   }) : super(key: key);
 
-
   // Палитра/токены
-  static const _bgPage = Color(0xFFEFEFF4);     // фон страницы (как у тебя)
+  static const _bgPage = Color(0xFFEFEFF4); // фон страницы (как у тебя)
   static const _cardBg = Color(0xFFFFFFFF);
   static const _shadow = Color(0x1A000000);
-  static const _label = Color(0xFF1D1D1F);      // светло‑серый для лейблов
+  static const _label = Color(0xFF1D1D1F); // светло‑серый для лейблов
   static const _text = Color(0xFF000000);
-  static const _pink = Color(0xFFFF2D55);       // iOS system pink
-  static const _divider = Color(0xFFE5E5EA);    // тонкие разделители
+  static const _pink = Color(0xFFFF2D55); // iOS system pink
+  static const _divider = Color(0xFFE5E5EA); // тонкие разделители
   static const _btnGreyBg = Color(0xFFF2F2F7);
   static const _btnGreyText = Color(0xFF8E8E93);
   static const _gray = Color(0xFF9BA1A5);
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -137,27 +133,35 @@ class HistoryApplicationCard extends StatelessWidget {
             Row(
               children: [
                 SvgPicture.asset(
-                    'assets/images/icons/userProfile.svg',
-                    width: 29,
-                    height: 29
+                  'assets/images/icons/userProfile.svg',
+                  width: 29,
+                  height: 29,
                 ),
                 const SizedBox(width: 10),
                 // Имя
                 Text(
                   user,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: _text),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: _text,
+                  ),
                 ),
                 const SizedBox(width: 20),
                 SvgPicture.asset(
-                    'assets/images/icons/calendar.svg',
-                    width: 28,
-                    height: 28
+                  'assets/images/icons/calendar.svg',
+                  width: 28,
+                  height: 28,
                 ),
                 const SizedBox(width: 10),
                 // Дата
                 Text(
                   datetime,
-                  style: const TextStyle(fontSize: 16, color: _gray, fontWeight: FontWeight.w400),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: _gray,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
@@ -255,7 +259,10 @@ class HistoryApplicationCard extends StatelessWidget {
                             if (confirmed) {
                               final repo = RequestRepository();
                               await repo.deleteRequest(requestID);
-                              showCustomNotification(context, 'Заявка была успешно удалена');
+                              showCustomNotification(
+                                context,
+                                'Заявка была успешно удалена',
+                              );
                             }
                           },
                           child: Column(
@@ -282,15 +289,9 @@ class HistoryApplicationCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                )
-
+                ),
               ],
             ),
-
-
-
-
-
           ],
         ),
       ),
@@ -308,7 +309,6 @@ class HistoryApplicationCard extends StatelessWidget {
     return buf.toString();
   }
 }
-
 
 // POPUP ЗАЯВОК ИСТОРИИ
 
@@ -331,7 +331,8 @@ class HistoryApplicationPopup extends StatefulWidget {
   });
 
   @override
-  _HistoryApplicationPopupState createState() => _HistoryApplicationPopupState();
+  _HistoryApplicationPopupState createState() =>
+      _HistoryApplicationPopupState();
 }
 
 class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
@@ -343,7 +344,9 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
     super.initState();
     final init = widget.initialValues ?? List<String>.filled(5, '');
     _controllers = List.generate(
-        5, (i) => TextEditingController(text: init.length > i ? init[i] : ''));
+      5,
+      (i) => TextEditingController(text: init.length > i ? init[i] : ''),
+    );
   }
 
   @override
@@ -352,20 +355,16 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
       c.dispose();
     }
     super.dispose();
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery
-          .of(context)
-          .viewInsets
-          .bottom),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
-        height: MediaQuery
-            .of(context)
-            .size
-            .height * 0.9,
+        height: MediaQuery.of(context).size.height * 0.9,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -401,9 +400,13 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   ),
                   GestureDetector(
                     onTap: () async {
-                      const url = 'https://ru.wiktionary.org/wiki/%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0';
+                      const url =
+                          'https://ru.wiktionary.org/wiki/%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0';
                       if (await canLaunchUrl(Uri.parse(url))) {
-                        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                        await launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        );
                       } else {
                         // Можно показать Snackbar или Alert
                         debugPrint('Не удалось открыть ссылку');
@@ -458,7 +461,6 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
 
               const SizedBox(height: 60),
 
-
               Row(
                 children: [
                   // Левая кнопка
@@ -468,20 +470,38 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                       child: TextButton(
                         style: TextButton.styleFrom(
                           backgroundColor: const Color(0xFFF5F6F7),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
                           elevation: 0,
                         ),
                         onPressed: () {
-                          // TODO: открыть чат
+                          final sender = FirebaseAuth.instance.currentUser;
+                          final responder = widget.responder[0];
+                          if (sender != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChathistoryScreen(
+                                  senderID: sender.uid,
+                                  recieverID: responder['id'],
+                                  requestID: widget.requestID,
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SvgPicture.asset(
-                                'assets/images/icons/chat.svg',
-                                width: 18,
-                                height: 20
+                              'assets/images/icons/chat.svg',
+                              width: 18,
+                              height: 20,
                             ),
                             const SizedBox(height: 4),
                             const Text(
@@ -528,9 +548,11 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                                 final repo = RequestRepository();
                                 await repo.deleteRequest(widget.requestID);
                                 Navigator.pop(context);
-                                showCustomNotification(context, 'Заявка была успешно удалена');
+                                showCustomNotification(
+                                  context,
+                                  'Заявка была успешно удалена',
+                                );
                               }
-
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -556,7 +578,7 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
 
@@ -569,8 +591,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   padding: const EdgeInsets.only(left: 15),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: const Text("Лечащий врач",
-                        style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                    child: const Text(
+                      "Лечащий врач",
+                      style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -587,37 +611,42 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: widget.responder.length,
                     separatorBuilder: (context, index) {
-                      return widget.responder.length > 1 ? const _ThinDivider() : const SizedBox.shrink();
+                      return widget.responder.length > 1
+                          ? const _ThinDivider()
+                          : const SizedBox.shrink();
                     },
                     itemBuilder: (context, index) {
                       final responder = widget.responder[index];
                       final bool hasRating = widget.hasRating ?? false;
                       final String rating = widget.rating ?? '';
                       final String name = (responder['name'] ?? '') as String;
-                      final String surname = (responder['surname'] ?? '') as String;
+                      final String surname =
+                          (responder['surname'] ?? '') as String;
 
                       return InkWell(
                         onTap: () {
                           Navigator.push(
                             context, // 'context' здесь очень важен!
-                            MaterialPageRoute(builder: (context) => ProfilePageFromUserPers(
-                              isArchived: true,
-                              isActive: false,
-                              name: responder['name'],
-                              surname: responder['surname'],
-                              specialization: responder['specialization'],
-                              rating: responder['rating'],
-                              applications_quant: responder['completed'],
-                              phone_num: responder['phone'],
-                              email: responder['email'],
-                              city: responder['city'],
-                              work_exp: responder['experience'],
-                              services_cost: responder['price'],
-                              work_place: responder['workplace'],
-                              about: responder['about'],
-                              requestID: widget.requestID,
-                              id : responder['id'],
-                            )),
+                            MaterialPageRoute(
+                              builder: (context) => ProfilePageFromUserPers(
+                                isArchived: true,
+                                isActive: false,
+                                name: responder['name'],
+                                surname: responder['surname'],
+                                specialization: responder['specialization'],
+                                rating: responder['rating'],
+                                applications_quant: responder['completed'],
+                                phone_num: responder['phone'],
+                                email: responder['email'],
+                                city: responder['city'],
+                                work_exp: responder['experience'],
+                                services_cost: responder['price'],
+                                work_place: responder['workplace'],
+                                about: responder['about'],
+                                requestID: widget.requestID,
+                                id: responder['id'],
+                              ),
+                            ),
                           );
                         },
                         child: Container(
@@ -625,7 +654,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                             color: Color(0xFFF5F6F7),
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
+                          ),
                           child: Row(
                             children: [
                               SvgPicture.asset(
@@ -668,7 +700,9 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(30),
                                   ),
-                                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -696,14 +730,13 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                                 width: 7,
                                 height: 12,
                               ),
-
                             ],
                           ),
                         ),
                       );
                     },
                   ),
-                )
+                ),
               ],
 
               const SizedBox(height: 20),
@@ -714,8 +747,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Врач",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Врач",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -729,17 +764,21 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -750,8 +789,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Причина",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Причина",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -765,17 +806,21 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 minLines: 1,
                 maxLines: 2,
@@ -788,8 +833,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Подробное описание",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Подробное описание",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -803,17 +850,21 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 minLines: 1,
                 maxLines: 12,
@@ -827,8 +878,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Город",
-                      style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 13)),
+                  child: const Text(
+                    "Город",
+                    style: TextStyle(color: Color(0xFF9BA1A5), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -842,9 +895,13 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  _controllers[3].text.isNotEmpty ? _controllers[3].text : 'Выберите город',
+                  _controllers[3].text.isNotEmpty
+                      ? _controllers[3].text
+                      : 'Выберите город',
                   style: TextStyle(
-                    color: _controllers[3].text.isNotEmpty ? const Color(0xFF1D1D1F) : const Color(0xFF9BA1A5),
+                    color: _controllers[3].text.isNotEmpty
+                        ? const Color(0xFF1D1D1F)
+                        : const Color(0xFF9BA1A5),
                     fontSize: 16,
                   ),
                   maxLines: 1,
@@ -859,8 +916,10 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                 padding: const EdgeInsets.only(left: 15, bottom: 5, top: 5),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: const Text("Предлагаемая стоимость",
-                      style: TextStyle(color: Color(0xFF677076), fontSize: 13)),
+                  child: const Text(
+                    "Предлагаемая стоимость",
+                    style: TextStyle(color: Color(0xFF677076), fontSize: 13),
+                  ),
                 ),
               ),
               const SizedBox(height: 4),
@@ -874,17 +933,21 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -899,14 +962,14 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
 
 // Helper-функция для показа попапа
 Future<Map<String, dynamic>?> showHistoryApplicationPopup(
-    BuildContext context, {
-      List<String>? initialValues,
-      String? datetime,
-      List<dynamic> responder = const [],
-      bool? hasRating,
-      String? rating,
-      required String requestID,
-    }) {
+  BuildContext context, {
+  List<String>? initialValues,
+  String? datetime,
+  List<dynamic> responder = const [],
+  bool? hasRating,
+  String? rating,
+  required String requestID,
+}) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
     isScrollControlled: true,
@@ -921,4 +984,3 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
     ),
   );
 }
-

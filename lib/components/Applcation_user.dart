@@ -870,7 +870,8 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                                 surname: responder['surname'],
                                 specialization: responder['specialization'],
                                 rating: responder['rating'],
-                                applications_quant: responder['completed'],
+                                applications_quant:
+                                    (responder['completed'] ?? '0').toString(),
                                 phone_num: responder['phone'],
                                 email: responder['email'],
                                 city: responder['city'],

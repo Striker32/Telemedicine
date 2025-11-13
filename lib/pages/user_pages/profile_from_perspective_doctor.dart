@@ -25,7 +25,7 @@ class ProfilePageFromUserPers extends StatefulWidget {
   final String surname;
   final String specialization;
   final String rating;
-  final int applications_quant;
+  final String applications_quant;
   final String phone_num;
   final String email;
   final String city;
@@ -47,7 +47,7 @@ class ProfilePageFromUserPers extends StatefulWidget {
     this.surname = '',
     this.specialization = 'Врач',
     this.rating = "-",
-    this.applications_quant = 0,
+    this.applications_quant = '0',
     this.phone_num = '',
     this.email = '',
     this.city = '',
@@ -67,6 +67,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   late Stream<DatabaseEvent> _presenceStream;
   bool _isOnline = false;
   Timestamp? _lastSeen;
+  late final int quantity;
 
   // Дизайн-токены (подгоняются под макет)
 
@@ -81,6 +82,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   @override
   void initState() {
     super.initState();
+    quantity = int.tryParse(widget.applications_quant?.toString() ?? '') ?? 0;
 
     _presenceRef = FirebaseDatabase.instance.ref('presence/${widget.id}');
     _presenceStream = _presenceRef.onValue;
@@ -320,9 +322,7 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    pluralizeApplications(
-                                      widget.applications_quant,
-                                    ),
+                                    pluralizeApplications(quantity),
                                     style: TextStyle(
                                       color: AppColors.primaryText,
                                       fontSize: 14,

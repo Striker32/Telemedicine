@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:last_telemedicine/pages/ChatHistory.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:ui' as ui;
@@ -30,6 +32,7 @@ class HistoryApplicationCard extends StatelessWidget {
   final String rating;
   final String cost;
   final String requestID;
+  final String userID;
 
   const HistoryApplicationCard({
     Key? key,
@@ -42,6 +45,7 @@ class HistoryApplicationCard extends StatelessWidget {
     required this.city,
     required this.cost,
     required this.requestID,
+    required this.userID,
     this.rating = '',
   }) : super(key: key);
 
@@ -215,6 +219,7 @@ class HistoryApplicationCard extends StatelessWidget {
                               name: name,
                               surname: surname,
                               requestID: requestID,
+                              userID: userID,
                             );
 
                             if (result != null) {
@@ -339,6 +344,7 @@ class HistoryApplicationPopup extends StatefulWidget {
   final String? name;
   final String? surname;
   final String requestID;
+  final String userID;
 
   const HistoryApplicationPopup({
     super.key,
@@ -350,6 +356,7 @@ class HistoryApplicationPopup extends StatefulWidget {
     this.surname = "",
     this.responder = const [],
     required this.requestID,
+    required this.userID,
   });
 
   @override
@@ -564,7 +571,19 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                           elevation: 0,
                         ),
                         onPressed: () {
-                          // TODO: открыть историю чатов
+                          final sender = FirebaseAuth.instance.currentUser;
+                          if (sender != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChathistoryScreen(
+                                  senderID: sender.uid,
+                                  recieverID: widget.userID,
+                                  requestID: widget.requestID,
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -899,6 +918,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
   String? name,
   String? surname,
   required String requestID,
+  required String userID,
 }) {
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -913,6 +933,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
       name: name,
       surname: surname,
       requestID: requestID,
+      userID: userID,
     ),
   );
 }
