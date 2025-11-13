@@ -186,25 +186,25 @@ class _VideoCallPageState extends State<VideoCallPage> {
             ),
           ),
           // Локальное видео в углу
-          Positioned(
-            left: 16,
-            top: 40,
-            child: SizedBox(
-              width: 120,
-              height: 180,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: _videoDisabled
-                    ? Container(color: Colors.black54, child: Icon(Icons.videocam_off, color: Colors.white, size: 40))
-                    : AgoraVideoView(
-                  controller: VideoViewController(
-                    rtcEngine: _engine,
-                    canvas: const VideoCanvas(uid: 0),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   left: 16,
+          //   top: 40,
+          //   child: SizedBox(
+          //     width: 100,
+          //     height: 180,
+          //     child: ClipRRect(
+          //       borderRadius: BorderRadius.circular(12),
+          //       child: _videoDisabled
+          //           ? Container(color: Colors.black54, child: Icon(Icons.videocam_off, color: Colors.white, size: 40))
+          //           : AgoraVideoView(
+          //         controller: VideoViewController(
+          //           rtcEngine: _engine,
+          //           canvas: const VideoCanvas(uid: 0),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       );
     } else {
