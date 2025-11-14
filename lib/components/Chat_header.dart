@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,7 +12,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
   final String lastName;
   final bool online;
   final Timestamp? lastSeenAgo;
-  final String? avatarUrl;
+  final Blob? avatarUrl;
   final VoidCallback? onBack;
 
   const ChatHeader({
@@ -19,7 +21,7 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
     this.lastName = '',
     this.online = false,
     this.lastSeenAgo,
-    this.avatarUrl,
+    this.avatarUrl = null,
     this.onBack,
   }) : super(key: key);
 
@@ -125,24 +127,25 @@ class ChatHeader extends StatelessWidget implements PreferredSizeWidget {
           child: SizedBox(
             width: 38,
             height: 38,
-            child: avatarUrl != null && avatarUrl!.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                      4,
-                    ), // или 0 если нужен прямоугольный
-                    child: Image.network(
-                      avatarUrl!,
-                      width: 38,
-                      height: 38,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : SvgPicture.asset(
-                    'assets/images/icons/userProfile.svg',
-                    width: 38,
-                    height: 38,
-                    fit: BoxFit.contain,
-                  ),
+            child: CircleAvatar(
+              radius: 19, // размеры подравнять, если нужно
+              backgroundImage:
+                  avatarUrl !=
+                      null // вот тут убрать widget, либо widget.physician
+                  ? MemoryImage(
+                      (avatarUrl!.bytes as Uint8List),
+                    ) // вот тут убрать widget, либо widget.physician
+                  : null,
+              child:
+                  avatarUrl ==
+                      null // вот тут убрать widget, либо widget.physician
+                  ? SvgPicture.asset(
+                      'assets/images/icons/userProfile.svg',
+                      width: 38, // размеры подравнять, если нужно
+                      height: 38, // размеры подравнять, если нужно
+                    )
+                  : null,
+            ),
           ),
         ),
       ],

@@ -130,6 +130,7 @@ class MainDoctor extends StatelessWidget {
                                 title: r.reason,
                                 name: fullName.name,
                                 surname: fullName.surname,
+                                avatar: fullName.avatar,
                                 datetime: dtStr,
                                 doctor: r.specializationRequested,
                                 description: r.description,

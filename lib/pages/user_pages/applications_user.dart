@@ -298,7 +298,9 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                                 'id': d.uid,
                                 'name': d.name,
                                 'surname': d.surname,
-                                'rating': d.rating,
+                                'avatar': d.avatar,
+                                'rating':
+                                    double.tryParse(d.rating.toString()) ?? 0.0,
                                 'specialization': d.specialization,
                                 'phone': d.phone,
                                 'email': d.realEmail,
@@ -314,6 +316,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                             return HistoryApplicationCard(
                               title: r.reason,
                               user: displayName,
+                              avatar: u.avatar,
                               datetime: dtStr,
                               doctor: r.specializationRequested,
                               description: r.description,
@@ -393,7 +396,10 @@ class _ApplicationsEmptyView extends StatelessWidget {
 
             String _activeLabel(int count) {
               if (count == 0) return 'Нет заявок';
-              final base = pluralizeApplications(count);
+              final base = pluralizeApplications(
+                int.tryParse(count.toString())?.toString() ?? "Нет",
+              );
+
               final parts = base.split(' ');
               return parts.length >= 2
                   ? '${parts.first} активных ${parts.sublist(1).join(' ')}'
@@ -570,12 +576,13 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               'price': d.price,
                               'workplace': d.placeOfWork,
                               'about': d.about,
-                              'completed': int.parse(d.completed),
+                              'completed': d.completed,
                               'avatar': d.avatar,
                             };
                             return ApplicationCard(
                               title: r.reason,
                               user: displayName,
+                              avatar: u.avatar,
                               datetime: dtStr,
                               doctor: r.specializationRequested,
                               description: r.description,
@@ -583,6 +590,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               cost: r.price,
                               requestID: r.id,
                               physician: physician,
+                              urgent: r.urgent,
                             );
                           },
                         );
@@ -614,7 +622,10 @@ class _ApplicationsEmptyView extends StatelessWidget {
                                   'id': d.uid,
                                   'name': d.name,
                                   'surname': d.surname,
-                                  'rating': d.rating,
+                                  'avatar': d.avatar,
+                                  'rating':
+                                      double.tryParse(d.rating.toString()) ??
+                                      0.0,
                                   'specialization': d.specialization,
                                   'phone': d.phone,
                                   'email': d.realEmail,
@@ -623,7 +634,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                                   'price': d.price,
                                   'workplace': d.placeOfWork,
                                   'about': d.about,
-                                  'completed': int.parse(d.completed),
+                                  'completed': d.completed,
                                 },
                               )
                               .toList();
@@ -631,6 +642,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                           return ApplicationCard(
                             title: r.reason,
                             user: displayName,
+                            avatar: u.avatar,
                             datetime: dtStr,
                             doctor: r.specializationRequested,
                             description: r.description,
@@ -638,6 +650,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                             cost: r.price,
                             requestID: r.id,
                             responders: responders,
+                            urgent: r.urgent,
                           );
                         },
                       );

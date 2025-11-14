@@ -14,6 +14,7 @@
 
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -42,6 +43,7 @@ class _ThinDivider extends StatelessWidget {
 class ApplicationCard extends StatelessWidget {
   final String title;
   final String user;
+  final Blob? avatar;
   final String datetime;
   final String doctor;
   final String description;
@@ -67,6 +69,7 @@ class ApplicationCard extends StatelessWidget {
     required this.city,
     required this.cost,
     required this.requestID,
+    this.avatar = null,
     this.urgent = false,
     this.responders = const [],
     this.physician = const {},
@@ -128,11 +131,26 @@ class ApplicationCard extends StatelessWidget {
             // Аватар + имя + дата (в одной строке)
             Row(
               children: [
-                SvgPicture.asset(
-                  'assets/images/icons/userProfile.svg',
-                  width: 29,
-                  height: 29,
+                CircleAvatar(
+                  radius: 15, // размеры подравнять, если нужно
+                  backgroundImage:
+                      avatar !=
+                          null // вот тут убрать widget, либо widget.physician
+                      ? MemoryImage(
+                          (avatar!.bytes as Uint8List),
+                        ) // вот тут убрать widget, либо widget.physician
+                      : null,
+                  child:
+                      avatar ==
+                          null // вот тут убрать widget, либо widget.physician
+                      ? SvgPicture.asset(
+                          'assets/images/icons/userProfile.svg',
+                          width: 30, // размеры подравнять, если нужно
+                          height: 30, // размеры подравнять, если нужно
+                        )
+                      : null,
                 ),
+
                 const SizedBox(width: 10),
                 // Имя
                 Text(
@@ -596,6 +614,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                                     senderID: sender.uid,
                                     recieverID: widget.physician['id'],
                                     requestID: widget.requestID,
+                                    avatar: widget.physician['avatar'],
                                   ),
                                 ),
                               );
@@ -742,9 +761,14 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             isActive: true,
                             name: widget.physician['name'],
                             surname: widget.physician['surname'],
+                            avatar: widget.physician['avatar'],
                             specialization: widget.physician['specialization'],
-                            rating: widget.physician['rating'],
-                            applications_quant: (widget.physician['completed'] ?? '0').toString(),
+                            rating:
+                                double.tryParse(widget.physician['rating']) ??
+                                0.0,
+                            applications_quant:
+                                (widget.physician['completed'] ?? '0')
+                                    .toString(),
                             phone_num: widget.physician['phone'],
                             email: widget.physician['email'],
                             city: widget.physician['city'],
@@ -773,17 +797,19 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           CircleAvatar(
                             radius: 30,
                             backgroundImage: widget.physician['avatar'] != null
-                                ? MemoryImage((widget.physician['avatar'].bytes as Uint8List))
+                                ? MemoryImage(
+                                    (widget.physician['avatar'].bytes
+                                        as Uint8List),
+                                  )
                                 : null,
                             child: widget.physician['avatar'] == null
                                 ? SvgPicture.asset(
-                              'assets/images/icons/userProfile.svg',
-                              width: 60,
-                              height: 60,
-                            )
+                                    'assets/images/icons/userProfile.svg',
+                                    width: 60,
+                                    height: 60,
+                                  )
                                 : null,
                           ),
-
 
                           const SizedBox(width: 12),
                           Expanded(
@@ -890,6 +916,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                                 id: responder['id'],
                                 name: responder['name'],
                                 surname: responder['surname'],
+                                avatar: responder['avatar'],
                                 specialization: responder['specialization'],
                                 rating: responder['rating'],
                                 applications_quant:
@@ -921,10 +948,27 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           child: Row(
                             children: [
                               // Серый кружок вместо фото
-                              SvgPicture.asset(
-                                'assets/images/icons/userProfile.svg',
-                                width: 60,
-                                height: 60,
+                              CircleAvatar(
+                                radius: 30, // размеры подравнять, если нужно
+                                backgroundImage:
+                                    responder['avatar'] !=
+                                        null // вот тут убрать widget, либо widget.physician
+                                    ? MemoryImage(
+                                        (responder['avatar'].bytes
+                                            as Uint8List),
+                                      ) // вот тут убрать widget, либо widget.physician
+                                    : null,
+                                child:
+                                    responder['avatar'] ==
+                                        null // вот тут убрать widget, либо widget.physician
+                                    ? SvgPicture.asset(
+                                        'assets/images/icons/userProfile.svg',
+                                        width:
+                                            60, // размеры подравнять, если нужно
+                                        height:
+                                            60, // размеры подравнять, если нужно
+                                      )
+                                    : null,
                               ),
 
                               const SizedBox(width: 12),
