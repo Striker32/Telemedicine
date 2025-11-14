@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:last_telemedicine/Services/makeCall.dart';
 import 'package:last_telemedicine/chat/chat_service.dart';
 import 'package:last_telemedicine/components/Bubble_message.dart';
 import 'package:last_telemedicine/components/Notification.dart';
@@ -180,16 +181,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VideoCallPage(
-                              channelName: "telechannel",
-                              token:
-                                  "007eJxTYPhf+qxDZ+Nh9V/dJzrfG3vsT5f8dHrL9OcZuQyliVqKrY8UGIxS08zSkiwtDBMNDE3MDFIsDc2Sk4zNk00NEy2NDcwSJcTFMhsCGRlUo7wZGKEQxOdmKEnNSU3OSMzLS81hYAAApgch7A==",
-                            ),
-                          ),
-                        );
+                        makeCall(context, applicationId: widget.requestID);
                       },
                       child: Center(
                         child: Column(

@@ -12,12 +12,12 @@ const String appId = "2ef6fb981a01460d916cb37c51a9306a";
 
 class VideoCallPage extends StatefulWidget {
   final String channelName; // Имя канала, уникальное для чата
-  final String token; // Токен доступа для этого канала
+ // final String token; // Токен доступа для этого канала
 
   const VideoCallPage({
     Key? key,
     required this.channelName,
-    required this.token,
+    //required this.token,
   }) : super(key: key);
 
   @override
@@ -29,7 +29,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
   int? _remoteUid;
   bool _localUserJoined = false;
   bool _isInitializing = true; // Флаг для отслеживания инициализации
-  bool _muted = false;
+  bool _muted = true;
   bool _videoDisabled = true;
   bool _remoteUserVideoDisabled = false;
 
@@ -67,6 +67,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
     await _engine.startPreview();
 
     await _engine.muteLocalVideoStream(_videoDisabled);
+    await _engine.muteLocalAudioStream(_muted);
 
     // Присоединяемся к каналу, используя переданные channelName и token
     await _joinChannel();
@@ -149,7 +150,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
     await _engine.joinChannel(
-      token: widget.token,
+     token: "",
       channelId: widget.channelName,
       options: const ChannelMediaOptions(),
       uid: 0, // uid = 0, Agora назначает UID автоматически
