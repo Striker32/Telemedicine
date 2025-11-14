@@ -52,7 +52,7 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
   Future<void> _createRequest() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      await showCustomNotification(context, 'Сначала войдите в аккаунт');
+      showCustomNotification(context, 'Сначала войдите в аккаунт');
       return;
     }
 
@@ -87,10 +87,10 @@ class _CreateApplicationPopupState extends State<CreateApplicationPopup> {
       final createdId = await _repo.createRequest(model);
       // успешно создана заявка
       Navigator.pop(context); // возвращаем id созданной заявки (опционально)
-      await showCustomNotification(context, 'Заявка успешно создана');
+      showCustomNotification(context, 'Заявка успешно создана');
     } catch (e) {
       debugPrint('create request error: $e');
-      await showCustomNotification(context, 'Ошибка при создании заявки: $e');
+      showCustomNotification(context, 'Ошибка при создании заявки: $e');
     }
   }
 

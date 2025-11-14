@@ -3,6 +3,7 @@ import 'package:last_telemedicine/Services/Bottom_Navigator.dart';
 import 'package:last_telemedicine/auth/auth_gate.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_user.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../auth/auth_service.dart';
 import '../../components/Checkbox.dart';
@@ -22,10 +23,12 @@ class _LoginPageUserState extends State<LoginPageUser> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
-  bool _isChecked = false;
+  bool _isPrivacyChecked = false;
+  bool _isOathChecked = false;
 
   bool get _isFormValid {
-    return _isChecked &&
+    return _isPrivacyChecked &&
+        _isOathChecked &&
         _phoneController.text.trim().isNotEmpty &&
         _pwController.text.trim().isNotEmpty;
   }
@@ -207,28 +210,81 @@ class _LoginPageUserState extends State<LoginPageUser> {
 
               const SizedBox(height: 20),
 
-              // Политика конфиденциальности + переключатель
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Политика конфиденциальности',
+                    'Согласие на передачу данных приложению, отметьте ниже, если Вы прочитали и принимаете:',
                     style: TextStyle(
                       fontFamily: 'SF Pro Display',
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: AppColors.addLightText,
                     ),
                   ),
-                  // В макете круглый свайч справа
-                  // Использую значение false по умолчанию — заменить на состояние по необходимости.
-                  Checkboxswitch(
-                    value: _isChecked,
-                    onChanged: (val) {
-                      setState(() {
-                        _isChecked = val;
-                      });
-                    },
+
+                  const SizedBox(height: 20),
+
+                  // Политика конфиденциальности + переключатель (ссылка)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () => launchUrl(
+                          Uri.parse('https://example.com/privacy'),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                        child: Text(
+                          'Пользовательское соглашение',
+                          style: TextStyle(
+                            fontFamily: 'SF Pro Display',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.mainColor,
+                          ),
+                        ),
+                      ),
+                      Checkboxswitch(
+                        value: _isPrivacyChecked,
+                        onChanged: (val) {
+                          setState(() {
+                            _isPrivacyChecked = val;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Клятва гиппократа + переключатель (ссылка)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () => launchUrl(
+                          Uri.parse('https://example.com/oath'),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                        child: Text(
+                          'Политику обработки персональных\nданных',
+                          style: TextStyle(
+                            fontFamily: 'SF Pro Display',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.mainColor,
+                          ),
+                        ),
+                      ),
+                      Checkboxswitch(
+                        value: _isOathChecked,
+                        onChanged: (val) {
+                          setState(() {
+                            _isOathChecked = val;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
