@@ -167,8 +167,33 @@ class RequestRepository {
     return id;
   }
 
-  Future<void> updateRequest(String id, Map<String, dynamic> patch) async {
+  Future<void> updateRequest(
+    String id,
+    Map<String, dynamic> patch, {
+    String? doctorUid,
+  }) async {
     final data = {...patch, 'updatedAt': FieldValue.serverTimestamp()};
+    final isStatus2 = patch['status']?.toString() == '2';
+
+    if (isStatus2 && doctorUid != null && doctorUid.isNotEmpty) {
+      final doctorRef = _db.collection('doctors').doc(doctorUid);
+      final doctorSnap = await doctorRef.get();
+
+      String completedStr = '0';
+      if (doctorSnap.exists) {
+        final raw = (doctorSnap.data() ?? {})['completed'];
+        if (raw != null) completedStr = raw.toString();
+      }
+
+      final completedInt = (int.tryParse(completedStr) ?? 0) + 1;
+      await doctorRef.set({
+        'completed': completedInt.toString(),
+      }, SetOptions(merge: true));
+
+      await _col.doc(id).set(data, SetOptions(merge: true));
+      return;
+    }
+
     await _col.doc(id).set(data, SetOptions(merge: true));
   }
 

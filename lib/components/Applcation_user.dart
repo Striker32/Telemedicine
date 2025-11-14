@@ -692,7 +692,11 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           if (confirmed) {
                             final patch = {'status': '2'};
                             final repo = RequestRepository();
-                            await repo.updateRequest(widget.requestID, patch);
+                            await repo.updateRequest(
+                              widget.requestID,
+                              patch,
+                              doctorUid: widget.physician["id"],
+                            );
                             Navigator.pop(context, patch);
                             showCustomNotification(
                               context,

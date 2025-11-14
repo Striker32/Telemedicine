@@ -8,6 +8,7 @@ import 'package:last_telemedicine/PresenceService.dart';
 import 'package:last_telemedicine/components/custom_button.dart';
 import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:last_telemedicine/components/pluralizeApplications.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../auth/Fb_doctor_model.dart';
 import '../../auth/auth_service.dart';
@@ -66,44 +67,24 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
   Uint8List? _avatarBytes;
 
   // контроллеры
-  final TextEditingController _phoneController = TextEditingController(
-    text: '+ 7 900 502 93',
-  );
+  final TextEditingController _phoneController = TextEditingController();
 
-  final TextEditingController _emailController = TextEditingController(
-    text: 'example@mail.ru',
-  );
+  final TextEditingController _emailController = TextEditingController();
 
-  final TextEditingController _nameController = TextEditingController(
-    text: 'Мария Денисовна',
-  );
+  final TextEditingController _nameController = TextEditingController();
 
-  final TextEditingController _surnameController = TextEditingController(
-    text: 'Речнекова',
-  );
+  final TextEditingController _surnameController = TextEditingController();
 
-  final TextEditingController _specializationController = TextEditingController(
-    text: 'Стоматолог',
-  );
+  final TextEditingController _specializationController =
+      TextEditingController();
 
-  final TextEditingController _experienceController = TextEditingController(
-    text: '13 лет',
-  );
+  final TextEditingController _experienceController = TextEditingController();
 
-  final TextEditingController _placeOfWorkController = TextEditingController(
-    text: 'Городская больница №28',
-  );
+  final TextEditingController _placeOfWorkController = TextEditingController();
 
-  final TextEditingController _priceController = TextEditingController(
-    text: '3900 ₽',
-  );
+  final TextEditingController _priceController = TextEditingController();
 
-  final TextEditingController _aboutController = TextEditingController(
-    text:
-        'Специализируюсь на лечении кариеса, пульпита, заболеваний дёсен, а также проведении профессиональной гигиены полости рта\n\n'
-        'Помогаю пациентам сохранить здоровье зубов и красивую улыбку, подбираю индивидуальный подход к каждому случаю\n\n'
-        'Провожу консультации онлайн и разрабатываю план лечения с учётом ваших потребностей ',
-  );
+  final TextEditingController _aboutController = TextEditingController();
 
   String _currentCity = 'Санкт-Петербург';
 
@@ -487,8 +468,11 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                               ),
                               if (!_isEditing) ...{
                                 RatingBadge(
-                                  rating: '4,8',
-                                  subtitle: '23 заявки',
+                                  rating: (double.tryParse(model.rating) ?? 0.0)
+                                      .toString(),
+                                  subtitle: pluralizeApplications(
+                                    model.completed,
+                                  ),
                                   badgeColor: AppColors.additionalAccent,
                                   badgeSize: 36,
                                 ),
