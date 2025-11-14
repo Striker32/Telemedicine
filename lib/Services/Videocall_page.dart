@@ -28,7 +28,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
   int? _remoteUid;
   bool _localUserJoined = false;
   bool _isInitializing = true; // Флаг для отслеживания инициализации
-  bool _muted = false;
+  bool _muted = true;
   bool _videoDisabled = true;
   bool _remoteUserVideoDisabled = false;
 
@@ -64,6 +64,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
     await _engine.startPreview();
 
     await _engine.muteLocalVideoStream(_videoDisabled);
+    await _engine.muteLocalAudioStream(_muted);
 
     // Присоединяемся к каналу, используя переданные channelName и token
     await _joinChannel();
