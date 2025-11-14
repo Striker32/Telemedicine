@@ -155,7 +155,9 @@ class _ActiveApplicationsView extends StatelessWidget {
 
         String _activeLabel(int count) {
           if (count == 0) return 'Нет заявок';
-          return pluralizeApplications(count);
+          return pluralizeApplications(
+            int.tryParse(count.toString())?.toString() ?? "Нет",
+          );
         }
 
         // Верхний блок: отступ + текст с количеством заявок
@@ -253,6 +255,7 @@ class _ActiveApplicationsView extends StatelessWidget {
                         title: r.reason,
                         name: fullName.name,
                         surname: fullName.surname,
+                        avatar: fullName.avatar,
                         datetime: dtStr,
                         doctor: r.specializationRequested,
                         description: r.description,
@@ -311,7 +314,9 @@ class _ArchivedApplicationsView extends StatelessWidget {
 
         String _archiveLabel(int count) {
           if (count == 0) return 'Нет заявок';
-          return pluralizeApplications(count);
+          return pluralizeApplications(
+            int.tryParse(count.toString())?.toString() ?? "Нет",
+          );
         }
 
         // Пустое состояние: показываем заголовок и центральное сообщение
@@ -404,6 +409,7 @@ class _ArchivedApplicationsView extends StatelessWidget {
                         title: r.reason,
                         name: fullName.name,
                         surname: fullName.surname,
+                        avatar: fullName.avatar,
                         datetime: dtStr,
                         doctor: r.specializationRequested,
                         description: r.description,

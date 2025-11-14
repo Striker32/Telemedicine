@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,6 +30,7 @@ class _ThinDivider extends StatelessWidget {
 class HistoryApplicationCard extends StatelessWidget {
   final String title;
   final String user;
+  final Blob? avatar;
   final String datetime;
   final String doctor;
   final String description;
@@ -48,6 +52,7 @@ class HistoryApplicationCard extends StatelessWidget {
     required this.cost,
     required this.responder,
     required this.requestID,
+    this.avatar = null,
     this.rating = '',
   }) : super(key: key);
 
@@ -132,10 +137,24 @@ class HistoryApplicationCard extends StatelessWidget {
             // Аватар + имя + дата (в одной строке)
             Row(
               children: [
-                SvgPicture.asset(
-                  'assets/images/icons/userProfile.svg',
-                  width: 29,
-                  height: 29,
+                CircleAvatar(
+                  radius: 15, // размеры подравнять, если нужно
+                  backgroundImage:
+                      avatar !=
+                          null // вот тут убрать widget, либо widget.physician
+                      ? MemoryImage(
+                          (avatar!.bytes as Uint8List),
+                        ) // вот тут убрать widget, либо widget.physician
+                      : null,
+                  child:
+                      avatar ==
+                          null // вот тут убрать widget, либо widget.physician
+                      ? SvgPicture.asset(
+                          'assets/images/icons/userProfile.svg',
+                          width: 30, // размеры подравнять, если нужно
+                          height: 30, // размеры подравнять, если нужно
+                        )
+                      : null,
                 ),
                 const SizedBox(width: 10),
                 // Имя
@@ -490,6 +509,7 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                                   senderID: sender.uid,
                                   recieverID: responder['id'],
                                   requestID: widget.requestID,
+                                  avatar: responder["avatar"],
                                 ),
                               ),
                             );
@@ -633,9 +653,11 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                                 isActive: false,
                                 name: responder['name'],
                                 surname: responder['surname'],
+                                avatar: responder['avatar'],
                                 specialization: responder['specialization'],
                                 rating: responder['rating'],
-                                applications_quant: responder['completed'],
+                                applications_quant:
+                                    (responder['completed'] ?? '0').toString(),
                                 phone_num: responder['phone'],
                                 email: responder['email'],
                                 city: responder['city'],
@@ -660,10 +682,21 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                           ),
                           child: Row(
                             children: [
-                              SvgPicture.asset(
-                                'assets/images/icons/userProfile.svg',
-                                width: 60,
-                                height: 60,
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage: responder['avatar'] != null
+                                    ? MemoryImage(
+                                        (responder['avatar'].bytes
+                                            as Uint8List),
+                                      )
+                                    : null,
+                                child: responder['avatar'] == null
+                                    ? SvgPicture.asset(
+                                        'assets/images/icons/userProfile.svg',
+                                        width: 60,
+                                        height: 60,
+                                      )
+                                    : null,
                               ),
                               const SizedBox(width: 12),
                               Expanded(

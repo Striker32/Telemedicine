@@ -262,9 +262,13 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                 children: [
                   const SizedBox(height: 5),
                   Text(
-                    '${archived.length} архивных заявок',
+                    archived.isEmpty
+                        ? 'Нет архивных заявок'
+                        : '${archived.length} '
+                              '${archived.length % 10 == 1 && archived.length % 100 != 11 ? "архивная заявка" : (archived.length % 10 >= 2 && archived.length % 10 <= 4 && (archived.length % 100 < 10 || archived.length % 100 >= 20) ? "архивные заявки" : "архивных заявок")}',
                     style: const TextStyle(fontSize: 12, color: Colors.black54),
                   ),
+
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -298,7 +302,9 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                                 'id': d.uid,
                                 'name': d.name,
                                 'surname': d.surname,
-                                'rating': d.rating,
+                                'avatar': d.avatar,
+                                'rating':
+                                    double.tryParse(d.rating.toString()) ?? 0.0,
                                 'specialization': d.specialization,
                                 'phone': d.phone,
                                 'email': d.realEmail,
@@ -314,6 +320,7 @@ class _HistoryApplicationsEmptyView extends StatelessWidget {
                             return HistoryApplicationCard(
                               title: r.reason,
                               user: displayName,
+                              avatar: u.avatar,
                               datetime: dtStr,
                               doctor: r.specializationRequested,
                               description: r.description,
@@ -393,11 +400,29 @@ class _ApplicationsEmptyView extends StatelessWidget {
 
             String _activeLabel(int count) {
               if (count == 0) return 'Нет заявок';
-              final base = pluralizeApplications(count);
+
+              // пробуем преобразовать в строку, иначе "Нет"
+              final base = int.tryParse(count.toString()) != null
+                  ? pluralizeApplications(count.toString())
+                  : "Нет";
+
               final parts = base.split(' ');
+
+              // правильное окончание для прилагательного
+              String adj;
+              if (count % 10 == 1 && count % 100 != 11) {
+                adj = 'активная';
+              } else if (count % 10 >= 2 &&
+                  count % 10 <= 4 &&
+                  (count % 100 < 10 || count % 100 >= 20)) {
+                adj = 'активные';
+              } else {
+                adj = 'активных';
+              }
+
               return parts.length >= 2
-                  ? '${parts.first} активных ${parts.sublist(1).join(' ')}'
-                  : '$base активных';
+                  ? '${parts.first} $adj ${parts.sublist(1).join(' ')}'
+                  : '$base $adj';
             }
 
             if (active.isEmpty) {
@@ -570,12 +595,13 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               'price': d.price,
                               'workplace': d.placeOfWork,
                               'about': d.about,
-                              'completed': int.parse(d.completed),
+                              'completed': d.completed,
                               'avatar': d.avatar,
                             };
                             return ApplicationCard(
                               title: r.reason,
                               user: displayName,
+                              avatar: u.avatar,
                               datetime: dtStr,
                               doctor: r.specializationRequested,
                               description: r.description,
@@ -583,6 +609,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               cost: r.price,
                               requestID: r.id,
                               physician: physician,
+                              urgent: r.urgent,
                             );
                           },
                         );
@@ -614,7 +641,10 @@ class _ApplicationsEmptyView extends StatelessWidget {
                                   'id': d.uid,
                                   'name': d.name,
                                   'surname': d.surname,
-                                  'rating': d.rating,
+                                  'avatar': d.avatar,
+                                  'rating':
+                                      double.tryParse(d.rating.toString()) ??
+                                      0.0,
                                   'specialization': d.specialization,
                                   'phone': d.phone,
                                   'email': d.realEmail,
@@ -623,7 +653,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                                   'price': d.price,
                                   'workplace': d.placeOfWork,
                                   'about': d.about,
-                                  'completed': int.parse(d.completed),
+                                  'completed': d.completed,
                                 },
                               )
                               .toList();
@@ -631,6 +661,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                           return ApplicationCard(
                             title: r.reason,
                             user: displayName,
+                            avatar: u.avatar,
                             datetime: dtStr,
                             doctor: r.specializationRequested,
                             description: r.description,
@@ -638,6 +669,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                             cost: r.price,
                             requestID: r.id,
                             responders: responders,
+                            urgent: r.urgent,
                           );
                         },
                       );

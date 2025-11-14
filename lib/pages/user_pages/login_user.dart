@@ -60,10 +60,7 @@ class _LoginPageUserState extends State<LoginPageUser> {
       }
       // catch errors
       catch (e) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(title: Text(e.toString())),
-        );
+        showCustomNotification(context, 'Неправильный логин или пароль');
       }
     }
 

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +25,9 @@ class ProfilePageFromUserPers extends StatefulWidget {
   final bool isActive;
   final String name;
   final String surname;
+  final Blob? avatar;
   final String specialization;
-  final String rating;
+  final double rating;
   final String applications_quant;
   final String phone_num;
   final String email;
@@ -45,8 +48,9 @@ class ProfilePageFromUserPers extends StatefulWidget {
     required this.requestID,
     required this.id,
     this.surname = '',
+    this.avatar = null,
     this.specialization = 'Врач',
-    this.rating = "-",
+    this.rating = 0.0,
     this.applications_quant = '0',
     this.phone_num = '',
     this.email = '',
@@ -67,7 +71,6 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   late Stream<DatabaseEvent> _presenceStream;
   bool _isOnline = false;
   Timestamp? _lastSeen;
-  late final int quantity;
 
   // Дизайн-токены (подгоняются под макет)
 
@@ -82,7 +85,6 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
   @override
   void initState() {
     super.initState();
-    quantity = int.tryParse(widget.applications_quant?.toString() ?? '') ?? 0;
 
     _presenceRef = FirebaseDatabase.instance.ref('presence/${widget.id}');
     _presenceStream = _presenceRef.onValue;
@@ -200,10 +202,25 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                       ),
                       child: Row(
                         children: [
-                          SvgPicture.asset(
-                            'assets/images/icons/userProfile.svg',
-                            width: 60,
-                            height: 60,
+                          CircleAvatar(
+                            radius: 19, // размеры подравнять, если нужно
+                            backgroundImage:
+                                widget.avatar !=
+                                    null // вот тут убрать widget, либо widget.physician
+                                ? MemoryImage(
+                                    (widget.avatar!.bytes as Uint8List),
+                                  ) // вот тут убрать widget, либо widget.physician
+                                : null,
+                            child:
+                                widget.avatar ==
+                                    null // вот тут убрать widget, либо widget.physician
+                                ? SvgPicture.asset(
+                                    'assets/images/icons/userProfile.svg',
+                                    width: 38, // размеры подравнять, если нужно
+                                    height:
+                                        38, // размеры подравнять, если нужно
+                                  )
+                                : null,
                           ),
                           const SizedBox(width: 15),
                           Expanded(
@@ -322,7 +339,9 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    pluralizeApplications(quantity),
+                                    pluralizeApplications(
+                                      widget.applications_quant,
+                                    ),
                                     style: TextStyle(
                                       color: AppColors.primaryText,
                                       fontSize: 14,
@@ -415,33 +434,51 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                       child: DoctorRespondedButton(
                         isActive: widget.isActive,
                         onTap: () async {
-                          final confirmed = await showConfirmationDialog(
-                            context,
-                            'Выбрать врача',
-                            'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
-                            'Выбрать',
-                            'Отмена',
-                          );
-
-                          if (confirmed) {
-                            widget.isActive
-                                ? await repo.assignDoctorAtomically(
-                                    requestId: widget.requestID,
-                                    doctorData: {'uid': widget.id},
-                                    remove: true, // назначен
-                                  )
-                                : await repo.assignDoctorAtomically(
-                                    requestId: widget.requestID,
-                                    doctorData: {'uid': widget.id},
-                                    select: true,
-                                    newStatus: '1', // назначен
-                                  );
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                            showCustomNotification(
+                          if (widget.isActive) {
+                            final confirmed = await showConfirmationDialog(
                               context,
-                              'Вы успешно выбрали своего\nлечащего врача!',
+                              'Снять врача',
+                              'Вы собираетесь снять данного\nврача с основного лечащего врача\nпо заявке от ${widget.datetime}',
+                              'Да',
+                              'Отмена',
                             );
+
+                            if (confirmed) {
+                              await repo.assignDoctorAtomically(
+                                requestId: widget.requestID,
+                                doctorData: {'uid': widget.id},
+                                remove: true,
+                              );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              showCustomNotification(
+                                context,
+                                'Вы успешно сняли своего\nлечащего врача!',
+                              );
+                            }
+                          } else {
+                            final confirmed = await showConfirmationDialog(
+                              context,
+                              'Выбрать врача',
+                              'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
+                              'Выбрать',
+                              'Отмена',
+                            );
+
+                            if (confirmed) {
+                              await repo.assignDoctorAtomically(
+                                requestId: widget.requestID,
+                                doctorData: {'uid': widget.id},
+                                select: true,
+                                newStatus: '1', // назначен
+                              );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              showCustomNotification(
+                                context,
+                                'Вы успешно выбрали своего\nлечащего врача!',
+                              );
+                            }
                           }
                         },
                         height: 60,

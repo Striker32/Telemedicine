@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -12,6 +15,7 @@ class ApplicationCard extends StatelessWidget {
   final String title;
   final String name;
   final String surname;
+  final Blob? avatar;
   final String datetime;
   final String doctor;
   final String description;
@@ -34,6 +38,7 @@ class ApplicationCard extends StatelessWidget {
     required this.city,
     required this.cost,
     required this.requestID,
+    this.avatar = null,
     this.responders = const [],
     this.hasResponded = false,
     this.urgent = false,
@@ -71,10 +76,24 @@ class ApplicationCard extends StatelessWidget {
             Row(
               children: [
                 // Иконка юзера
-                SvgPicture.asset(
-                  'assets/images/icons/userProfile.svg',
-                  width: 60,
-                  height: 60,
+                CircleAvatar(
+                  radius: 30, // размеры подравнять, если нужно
+                  backgroundImage:
+                      avatar !=
+                          null // вот тут убрать widget, либо widget.physician
+                      ? MemoryImage(
+                          (avatar!.bytes as Uint8List),
+                        ) // вот тут убрать widget, либо widget.physician
+                      : null,
+                  child:
+                      avatar ==
+                          null // вот тут убрать widget, либо widget.physician
+                      ? SvgPicture.asset(
+                          'assets/images/icons/userProfile.svg',
+                          width: 60, // размеры подравнять, если нужно
+                          height: 60, // размеры подравнять, если нужно
+                        )
+                      : null,
                 ),
 
                 const SizedBox(width: 15),
@@ -339,6 +358,7 @@ class ApplicationCard extends StatelessWidget {
                               name: name,
                               hasResponded: hasResponded,
                               requestID: requestID,
+                              avatar: avatar,
                             );
 
                             if (result != null) {
@@ -410,6 +430,7 @@ class ChangeApplicationPopup extends StatefulWidget {
   final String? name;
   final bool hasResponded;
   final String requestID;
+  final Blob? avatar;
 
   const ChangeApplicationPopup({
     super.key,
@@ -418,6 +439,7 @@ class ChangeApplicationPopup extends StatefulWidget {
     this.datetime,
     this.name,
     this.hasResponded = false,
+    this.avatar = null,
     required this.requestID,
   });
 
@@ -536,10 +558,24 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
               // Дата и время из widget.datetime
               Column(
                 children: [
-                  SvgPicture.asset(
-                    'assets/images/icons/userProfile.svg',
-                    width: 38,
-                    height: 38,
+                  CircleAvatar(
+                    radius: 19, // размеры подравнять, если нужно
+                    backgroundImage:
+                        widget.avatar !=
+                            null // вот тут убрать widget, либо widget.physician
+                        ? MemoryImage(
+                            (widget.avatar!.bytes as Uint8List),
+                          ) // вот тут убрать widget, либо widget.physician
+                        : null,
+                    child:
+                        widget.avatar ==
+                            null // вот тут убрать widget, либо widget.physician
+                        ? SvgPicture.asset(
+                            'assets/images/icons/userProfile.svg',
+                            width: 38, // размеры подравнять, если нужно
+                            height: 38, // размеры подравнять, если нужно
+                          )
+                        : null,
                   ),
 
                   const SizedBox(height: 6),
@@ -962,6 +998,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
   String? datetime,
   String? name,
   bool hasResponded = false,
+  Blob? avatar,
   required String requestID,
 }) {
   return showModalBottomSheet<Map<String, dynamic>>(
@@ -975,6 +1012,7 @@ Future<Map<String, dynamic>?> showChangeApplicationPopup(
       name: name,
       hasResponded: hasResponded,
       requestID: requestID,
+      avatar: avatar,
     ),
   );
 }

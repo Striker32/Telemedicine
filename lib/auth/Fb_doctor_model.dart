@@ -54,8 +54,8 @@ class DoctorModel {
       createdAt: map['createdAt'] as Timestamp?,
       updatedAt: map['updatedAt'] as Timestamp?,
       avatar: map['avatar'] as Blob?,
-      rating: map ['rating'] ?? '5',
-      completed: map['rating'] ?? '0',
+      rating: map['rating'] ?? '5',
+      completed: map['completed'] ?? '0',
     );
   }
 
@@ -71,9 +71,9 @@ class DoctorModel {
       'placeOfWork': placeOfWork,
       'price': price,
       'about': about,
-      'avatar' : avatar,
-      "rating" : rating,
-      "completed" : completed,
+      'avatar': avatar,
+      "rating": rating,
+      "completed": completed,
       // createdAt/updatedAt устанавливаются в репозитории через FieldValue.serverTimestamp()
     };
   }
@@ -85,17 +85,17 @@ class DoctorRepository {
   CollectionReference get _col => _db.collection('doctors'); // коллекция врачей
 
   DoctorRepository({FirebaseFirestore? firestore})
-      : _db = firestore ?? FirebaseFirestore.instance;
-
+    : _db = firestore ?? FirebaseFirestore.instance;
 
   Future<List<DoctorModel>> getDoctorsByUids(List<String> uids) async {
     if (uids.isEmpty) return [];
     final snap = await _col.where(FieldPath.documentId, whereIn: uids).get();
     return snap.docs
-        .map((d) => DoctorModel.fromMap(d.id, d.data()! as Map<String, dynamic>))
+        .map(
+          (d) => DoctorModel.fromMap(d.id, d.data()! as Map<String, dynamic>),
+        )
         .toList();
   }
-
 
   /// Получить доктора однократно
   Future<DoctorModel?> getDoctor(String uid) async {
@@ -114,10 +114,7 @@ class DoctorRepository {
 
   /// Частичное обновление полей доктора (update)
   Future<void> updateDoctor(String uid, Map<String, dynamic> patch) async {
-    final data = {
-      ...patch,
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
+    final data = {...patch, 'updatedAt': FieldValue.serverTimestamp()};
     await _col.doc(uid).set(data, SetOptions(merge: true));
   }
 
@@ -133,10 +130,7 @@ class DoctorRepository {
 
   /// Upsert: создать если нет, иначе обновить
   Future<void> upsertDoctor(String uid, Map<String, dynamic> patch) async {
-    final data = {
-      ...patch,
-      'updatedAt': FieldValue.serverTimestamp(),
-    };
+    final data = {...patch, 'updatedAt': FieldValue.serverTimestamp()};
     await _col.doc(uid).set(data, SetOptions(merge: true));
   }
 }

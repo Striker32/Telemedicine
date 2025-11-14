@@ -60,66 +60,57 @@ class MainDoctor extends StatelessWidget {
                         return const Center(child: Text("Нет объявлений"));
                       }
 
+                      // Опциональные улучшения (рекомендации, не обязательны сейчас)
+                      // Если список заявок может вырасти в будущем, используйте кэш в UserRepository: храните Map<uid, UserModel> и возвращайте cached или загружайте, чтобы не дергать сеть повторно при каждой сборке.
+
+                      // Для мгновенной UX можно сначала показывать локальные заглушки для карточек, а затем заменять их уже полученными данными (но это потребует изменений в логике отображения).
+
+                      // Если UserRepository.getUser может вернуть null, безопаснее сопоставлять пользователей по uid через Map, а не полагаться на порядок — но в вашей текущей структуре items и userFutures собираются в одном порядке, что проще и быстрее для MVP.
+
                       // Есть элементы — показываем заголовок как элемент списка и далее сами карточки
-                      return ListView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        itemCount:
-                            items.length +
-                            1, // +1 для заголовка "Все объявления"
-                        itemBuilder: (context, index) {
-                          if (index == 0) {
-                            // Заголовок и отступ — это первый элемент списка, поэтому он прокручивается вместе с остальным
-                            return Column(
-                              children: const [
-                                // SizedBox(height: 10),
-                                Center(
-                                  child: Text(
-                                    'Все объявления',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.mutedTitle,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                SizedBox(height: 5),
-                              ],
-                            );
+                      // Соберём все Future<UserModel> и дождёмся их разом, чтобы не запрашивать по одному при скролле
+                      final userFutures = items
+                          .map((r) => UserRepository().getUser(r.userUid))
+                          .toList();
+
+                      return FutureBuilder<List<UserModel>>(
+                        future: Future.wait(userFutures),
+                        builder: (context, usersSnap) {
+                          if (usersSnap.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(child: PulseLoadingWidget());
                           }
 
-                          final r = items[index - 1];
-                          final ts = r.updatedAt ?? r.createdAt;
-                          final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+                          final users = usersSnap.data ?? [];
 
-                          return FutureBuilder<UserModel>(
-                            future: UserRepository().getUser(r.userUid),
-                            builder: (context, userSnap) {
-                              if (userSnap.connectionState ==
-                                  ConnectionState.waiting) {
-                                // Небольшой placeholder вместо PulseLoadingWidget
-                                return const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                                  child: SizedBox(
-                                    height: 80,
-                                    child: Center(
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            itemCount: items.length + 1,
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return Column(
+                                  children: const [
+                                    Center(
+                                      child: Text(
+                                        'Все объявления',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.mutedTitle,
                                         ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
-                                  ),
+                                    SizedBox(height: 5),
+                                  ],
                                 );
                               }
 
-                              if (!userSnap.hasData || userSnap.data == null) {
-                                debugPrint("DEBUG: DATA NULL - main_doctor");
-                                return const SizedBox();
-                              }
+                              final r = items[index - 1];
+                              final ts = r.updatedAt ?? r.createdAt;
+                              final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
-                              final fullName = userSnap.data!;
+                              final fullName = users[index - 1];
+
                               final currentDoctorUid =
                                   FirebaseAuth.instance.currentUser!.uid;
                               final responded = r.hasResponded(
@@ -130,6 +121,7 @@ class MainDoctor extends StatelessWidget {
                                 title: r.reason,
                                 name: fullName.name,
                                 surname: fullName.surname,
+                                avatar: fullName.avatar,
                                 datetime: dtStr,
                                 doctor: r.specializationRequested,
                                 description: r.description,

@@ -14,12 +14,14 @@ class ChathistoryScreen extends StatefulWidget {
   final String requestID;
   final String recieverID;
   final String senderID;
+  final Blob? avatar;
 
   const ChathistoryScreen({
     Key? key,
     required this.requestID,
     required this.recieverID,
     required this.senderID,
+    this.avatar = null,
   }) : super(key: key);
 
   @override
@@ -38,7 +40,6 @@ class _ChathistoryScreenState extends State<ChathistoryScreen> {
   bool _canSend = false;
   String firstname = '';
   String lastname = '';
-  String avatarUrl = '';
 
   Future<void> _loadRecieverData() async {
     final chatService = ChatService();
@@ -110,7 +111,7 @@ class _ChathistoryScreenState extends State<ChathistoryScreen> {
                 lastName: lastname,
                 online: false,
                 lastSeenAgo: Timestamp(0, 0),
-                avatarUrl: avatarUrl,
+                avatarUrl: widget.avatar,
                 onBack: () => Navigator.maybePop(context),
               );
             }
@@ -126,7 +127,7 @@ class _ChathistoryScreenState extends State<ChathistoryScreen> {
               lastName: lastname,
               online: isOnline,
               lastSeenAgo: lastSeen,
-              avatarUrl: avatarUrl,
+              avatarUrl: widget.avatar,
               onBack: () => Navigator.maybePop(context),
             );
           },
