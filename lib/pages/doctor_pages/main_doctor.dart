@@ -11,8 +11,15 @@ import '../user_pages/subpages/Change_city.dart';
 import '../../auth/Fb_request_model.dart';
 import '../../auth/Fb_user_model.dart';
 
-class MainDoctor extends StatelessWidget {
-  const MainDoctor({super.key});
+class MainDoctor extends StatefulWidget {
+  const MainDoctor({Key? key}) : super(key: key);
+
+  @override
+  _MainDoctorState createState() => _MainDoctorState();
+}
+
+class _MainDoctorState extends State<MainDoctor> {
+  String? selectedCity;
 
   String _fmt(DateTime dt) {
     String two(int n) => n.toString().padLeft(2, '0');
@@ -33,10 +40,13 @@ class MainDoctor extends StatelessWidget {
           action: AppBarButton(
             label: 'Локация',
             onTap: () async {
-              final selectedCity = await Navigator.push<String>(
+              final city = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(builder: (_) => ChangeCityPage(selected: '')),
               );
+              if (city != null) {
+                setState(() => selectedCity = city);
+              }
             },
           ),
         ),
@@ -55,8 +65,16 @@ class MainDoctor extends StatelessWidget {
 
                       final items = snap.data ?? [];
 
+                      // Фильтрация
+                      final filteredItems =
+                          (selectedCity != null &&
+                              selectedCity!.isNotEmpty &&
+                              selectedCity != 'Не выбран')
+                          ? items.where((r) => r.city == selectedCity).toList()
+                          : items;
+
                       // Пустое состояние — только центрированный текст
-                      if (items.isEmpty) {
+                      if (filteredItems.isEmpty) {
                         return const Center(child: Text("Нет объявлений"));
                       }
 
@@ -69,7 +87,7 @@ class MainDoctor extends StatelessWidget {
 
                       // Есть элементы — показываем заголовок как элемент списка и далее сами карточки
                       // Соберём все Future<UserModel> и дождёмся их разом, чтобы не запрашивать по одному при скролле
-                      final userFutures = items
+                      final userFutures = filteredItems
                           .map((r) => UserRepository().getUser(r.userUid))
                           .toList();
 
@@ -85,7 +103,7 @@ class MainDoctor extends StatelessWidget {
 
                           return ListView.builder(
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            itemCount: items.length + 1,
+                            itemCount: filteredItems.length + 1,
                             itemBuilder: (context, index) {
                               if (index == 0) {
                                 return Column(
@@ -105,7 +123,7 @@ class MainDoctor extends StatelessWidget {
                                 );
                               }
 
-                              final r = items[index - 1];
+                              final r = filteredItems[index - 1];
                               final ts = r.updatedAt ?? r.createdAt;
                               final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
