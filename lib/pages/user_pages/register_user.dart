@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/auth/auth_service.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
@@ -14,8 +15,8 @@ class RegisterPageUser extends StatefulWidget {
 
   @override
   State<RegisterPageUser> createState() => _RegisterPageUserState();
-
 }
+
 class _RegisterPageUserState extends State<RegisterPageUser> {
   bool _isChecked = false;
 
@@ -34,14 +35,12 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
   Widget build(BuildContext context) {
     // цветовая палитра
 
-
-
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
     const dividerOfContinue = 10.0;
 
-    void register(BuildContext context) async  {
-      final _auth =AuthService();
+    void register(BuildContext context) async {
+      final _auth = AuthService();
 
       final phone_num = _phoneController.text;
       final pass = _pwController.text;
@@ -53,29 +52,48 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
         surname = "";
       }
 
-
       final email = '${phone_num}@user.com';
 
       debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
       try {
-        await _auth.signUpUserWithEmailPassword(pseudoemail: email , password: pass, phone: phone_num, name: name, surname: surname);
+        await _auth.signUpUserWithEmailPassword(
+          pseudoemail: email,
+          password: pass,
+          phone: phone_num,
+          name: name,
+          surname: surname,
+        );
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
-
       // catch errors
-      catch (e) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(e.toString()),
-          ),
-        );
+      on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          showCustomNotification(context, 'Слишком слабый пароль');
+        } else if (e.code == 'email-already-in-use') {
+          showCustomNotification(context, 'Этот номер телефона уже занят');
+        } else {
+          showCustomNotification(
+            context,
+            'Произошла ошибка, попробуйте ещё раз',
+          );
+        }
+      } catch (e) {
+        final msg = e.toString().toLowerCase();
+        if (msg.contains('weak-password')) {
+          showCustomNotification(context, 'Слишком слабый пароль');
+        } else if (msg.contains('email-already-in-use') ||
+            msg.contains('email already in use')) {
+          showCustomNotification(context, 'Этот номер телефона уже занят');
+        } else {
+          showCustomNotification(
+            context,
+            'Произошла ошибка, попробуйте ещё раз',
+          );
+        }
       }
-
     }
-
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -84,7 +102,6 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
         backgroundColor: Colors.white,
       ),
 
-
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -92,7 +109,6 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 24),
-
 
               // Заголовок
               const Text(
@@ -107,8 +123,6 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
               ),
 
               const SizedBox(height: 18),
-
-
 
               // Подзаголовок
               Text(
@@ -128,7 +142,9 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
                 onPressed: () {
                   Navigator.push(
                     context, // 'context' здесь очень важен!
-                    MaterialPageRoute(builder: (context) => LoginPageUser()), // Замените DoctorScreen() на ваш виджет
+                    MaterialPageRoute(
+                      builder: (context) => LoginPageUser(),
+                    ), // Замените DoctorScreen() на ваш виджет
                   );
                 },
                 style: TextButton.styleFrom(
@@ -175,7 +191,6 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
 
               DividerLine(),
 
-
               // Телефон: +7 и поле
               Container(
                 // сделать палку снизу
@@ -189,11 +204,16 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
                     Container(
                       decoration: BoxDecoration(
                         border: Border(
-                          right: BorderSide(color: AppColors.greyDivider, width: 1),
+                          right: BorderSide(
+                            color: AppColors.greyDivider,
+                            width: 1,
+                          ),
                         ),
                       ),
                       width: 72,
-                      padding: const EdgeInsets.symmetric(vertical: 20), // размер палка справа от +7
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 20,
+                      ), // размер палка справа от +7
                       alignment: Alignment.center,
                       // граница между кодом и полем — реализована визуально через контейнер
                       child: Center(
@@ -237,7 +257,6 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
                 ),
               ),
 
-
               // Пароль
               Container(
                 decoration: BoxDecoration(
@@ -269,8 +288,6 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
 
               const SizedBox(height: 20),
 
-
-
               // Политика конфиденциальности + переключатель
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -296,15 +313,9 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
                   ),
                 ],
               ),
-
             ],
           ),
-
         ),
-
-
-
-
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -315,7 +326,10 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
               if (_isFormValid) {
                 register(context);
               } else {
-                showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+                showCustomNotification(
+                  context,
+                  'Пожалуйста, заполните все поля!',
+                );
               }
             },
             style: ElevatedButton.styleFrom(
