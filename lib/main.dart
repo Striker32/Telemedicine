@@ -32,15 +32,18 @@ import 'package:last_telemedicine/themes/legacy/main_mode.dart';
 // Страницы доктора
 import 'package:last_telemedicine/pages/doctor_pages/main_doctor.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  final notificationService = NotificationService();
-  await notificationService.initFCM();
-  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  //final notificationService = NotificationService();
+  //await notificationService.initFCM();
+  //FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 
+  await NotificationService().initialize(navigatorKey);
 
   runApp(const Myapp());
 }
@@ -64,7 +67,7 @@ class Myapp extends StatelessWidget {
 }
 
 
-Future <void> handleBackgroundMessage(RemoteMessage message) async {
-// if app closed, background
-print('Message: ${message.notification?.title}');
-}
+// Future <void> handleBackgroundMessage(RemoteMessage message) async {
+// // if app closed, background
+// print('Message: ${message.notification?.title}');
+// }

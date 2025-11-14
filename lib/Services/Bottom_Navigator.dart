@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
 import 'package:last_telemedicine/pages/News_feed.dart';
@@ -12,6 +13,7 @@ import '../pages/doctor_pages/main_doctor.dart';
 import '../pages/doctor_pages/profile_doctor.dart';
 import '../pages/user_pages/profile_user.dart';
 import '../pages/legacy/profile_user_legacy.dart';
+import 'Notification/Listener_call_listener_service.dart';
 
 class BottomNavigator extends StatefulWidget {
   final int initialIndex;
@@ -32,6 +34,7 @@ class BottomNavigator extends StatefulWidget {
 class _BottomNavigatorState extends State<BottomNavigator> {
   late int _currentIndex;
   late final String _usertype = widget.usertype;
+  final CallListenerService _callListener = CallListenerService();
 
   // int _currentIndex = 2; // <- ВОТ СЮДА ПЕРЕДАВАТЬ КАКУЮ СТРАНИЦУ ОТКРЫТЬ
 
@@ -59,6 +62,18 @@ class _BottomNavigatorState extends State<BottomNavigator> {
     }
 
     _currentIndex = widget.initialIndex;
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      _callListener.startListening(currentUser.uid);
+    }
+
+  }
+
+  @override
+  void dispose() {
+    // Останавливаем прослушивание ОДИН РАЗ при уничтожении виджета
+    _callListener.stopListening();
+    super.dispose();
   }
 
     void _navigateBottomBar(int index) {

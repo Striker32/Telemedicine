@@ -1,88 +1,69 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+// lib/Services/notification_service.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:last_telemedicine/Services/Videocall_page.dart'; // Путь к вашему экрану звонка
 
 class NotificationService {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  // Создаем синглтон, чтобы был только один экземпляр этого сервиса
+  static final NotificationService _instance = NotificationService._internal();
+  factory NotificationService() => _instance;
+  NotificationService._internal();
 
-  initFCM() async {
-    final permission = await _firebaseMessaging.requestPermission();
-    if (permission.authorizationStatus == AuthorizationStatus.denied) {
-      throw Exception('User has denied permission');
-    }
+  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
-
-    final fcmToken = await _firebaseMessaging.getToken();
-
-    print('FCM token:  $fcmToken');
-    
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      // nor closed/back, nor in app
-      print('Message: ${message.notification?.title}');
-    });
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // in app
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android:  AndroidNotificationDetails(
-              'id insert here',
-              'title insert here',
-              channelDescription: 'description here',
-              importance: Importance.high,
-              priority: Priority.high,
-              icon: '@mipmap/ic_launcher',
-            ),
-          ),
-        );
-      }
-    });
-
+  // Метод для инициализации
+  Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-//ИЗМЕНИТЬ ПУТЬ ВЫШЕ
+    AndroidInitializationSettings('@mipmap/ic_launcher'); // Ваша иконка приложения
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
-      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-      onDidReceiveBackgroundNotificationResponse: onDidReceiveBackgroundNotificationResponse,
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
     );
 
-    await createLocalNotificationChannel;
+    await _localNotifications.initialize(
+      initializationSettings,
+      // Этот обработчик сработает, когда пользователь нажмет на уведомление
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        if (response.payload != null && response.payload!.startsWith('call:')) {
+          final channelName = response.payload!.substring(5); // Убираем префикс 'call:'
+          print("Нажато уведомление о звонке! Переходим на канал: $channelName");
+
+          // Используем глобальный ключ для навигации
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => VideoCallPage(channelName: channelName),
+            ),
+          );
+        }
+      },
+    );
   }
 
-  Future <void> createLocalNotificationChannel() async {
-    const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'id insert here',
-      'title insert here',
-      description: 'description here',
-      importance: Importance.high,
+  // Метод для показа уведомления
+  Future<void> showCallNotification({
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'incoming_calls_channel', // ID канала
+      'Входящие звонки',       // Имя, которое пользователь увидит в настройках
+      channelDescription: 'Уведомления о входящих видеозвонках.',
+      importance: Importance.high, // Обязательно для всплывающего уведомления
+      priority: Priority.high,     // Обязательно для всплывающего уведомления
+      sound: RawResourceAndroidNotificationSound('ringtone'), // Укажите имя вашего рингтона без расширения (если он есть)
     );
 
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin
-    >()
-        ?.createNotificationChannel(channel);
+    const NotificationDetails notificationDetails = NotificationDetails(android: androidDetails);
 
+    await _localNotifications.show(
+      0,       // ID уведомления. Для звонков всегда можно использовать 0, чтобы новое заменяло старое
+      title,
+      body,
+      notificationDetails,
+      payload: payload,
+    );
   }
-
 }
-
-onDidReceiveNotificationResponse (NotificationResponse details) {
-  print('Details: $details');
-}
-
-onDidReceiveBackgroundNotificationResponse (NotificationResponse details) {
-  print('Details: $details');
-}
+    
