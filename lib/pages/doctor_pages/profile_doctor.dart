@@ -10,6 +10,7 @@ import 'package:last_telemedicine/components/display_rate_component.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:last_telemedicine/components/pluralizeApplications.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../auth/Fb_doctor_model.dart';
 import '../../auth/auth_service.dart';
 import '../../components/Appbar/CustomAppBar.dart';
@@ -273,7 +274,44 @@ class _ProfilePageState extends State<ProfilePageDoctor> {
                 );
               },
             ),
-            body: const Center(child: Text('Профиль не найден')),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Профиль не найден',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () async {
+                      const url =
+                          'https://ru.wiktionary.org/wiki/%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0';
+                      if (await canLaunchUrl(Uri.parse(url))) {
+                        await launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } else {
+                        debugPrint('Не удалось открыть ссылку');
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Обратиться в поддержку',
+                        style: TextStyle(
+                          color: AppColors.mainColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
         }
 

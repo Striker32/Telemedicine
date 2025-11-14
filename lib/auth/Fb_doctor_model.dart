@@ -14,6 +14,7 @@ class DoctorModel {
   final String price;
   final String about;
   final String rating;
+  final String rating_count;
   final String completed;
   final Timestamp? createdAt;
   final Timestamp? updatedAt;
@@ -32,6 +33,7 @@ class DoctorModel {
     required this.price,
     required this.about,
     required this.rating,
+    required this.rating_count,
     required this.completed,
     this.createdAt,
     this.updatedAt,
@@ -55,6 +57,7 @@ class DoctorModel {
       updatedAt: map['updatedAt'] as Timestamp?,
       avatar: map['avatar'] as Blob?,
       rating: map['rating'] ?? '5',
+      rating_count: map['rating_count'] ?? '10',
       completed: map['completed'] ?? '0',
     );
   }
