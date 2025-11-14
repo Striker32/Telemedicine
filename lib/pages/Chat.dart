@@ -156,15 +156,7 @@ class _ChatScreenState extends State<ChatScreen> {
           },
         ),
       ),
-      body:
-          // Center(
-          //   child: Text(
-          //     'В диалоге ещё нет сообщений.\nНачните общение прямо сейчас!',
-          //     style: TextStyle(color: AppColors.primaryText),
-          //     textAlign: TextAlign.center,
-          //   ),
-          // ),//
-          Column(children: [Expanded(child: _buildMessageList())]),
+      body: Column(children: [Expanded(child: _buildMessageList())]),
       backgroundColor: AppColors.background2,
 
       bottomNavigationBar: AnimatedPadding(
@@ -198,8 +190,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                           ),
                         );
-                        debugPrint('Позвонить хотел? А вот хуй');
-                        // TODO: Начало звонка
                       },
                       child: Center(
                         child: Column(
