@@ -171,26 +171,43 @@ class RequestRepository {
     String id,
     Map<String, dynamic> patch, {
     String? doctorUid,
+    int? rating, // 1..5
   }) async {
     final data = {...patch, 'updatedAt': FieldValue.serverTimestamp()};
     final isStatus2 = patch['status']?.toString() == '2';
 
     if (isStatus2 && doctorUid != null && doctorUid.isNotEmpty) {
       final doctorRef = _db.collection('doctors').doc(doctorUid);
-      final doctorSnap = await doctorRef.get();
 
-      String completedStr = '0';
-      if (doctorSnap.exists) {
-        final raw = (doctorSnap.data() ?? {})['completed'];
-        if (raw != null) completedStr = raw.toString();
-      }
+      await _db.runTransaction((tx) async {
+        final docSnap = await tx.get(doctorRef);
+        final docData = docSnap.exists ? (docSnap.data() ?? {}) : {};
 
-      final completedInt = (int.tryParse(completedStr) ?? 0) + 1;
-      await doctorRef.set({
-        'completed': completedInt.toString(),
-      }, SetOptions(merge: true));
+        final completedStr = docData['completed']?.toString() ?? '0';
+        final ratingStr = docData['rating']?.toString() ?? '0';
+        final ratingCountStr = docData['rating_count']?.toString() ?? '0';
 
-      await _col.doc(id).set(data, SetOptions(merge: true));
+        final completedInt = (int.tryParse(completedStr) ?? 0) + 1;
+
+        final Map<String, dynamic> doctorPatch = {
+          'completed': completedInt.toString(),
+        };
+
+        if (rating != null) {
+          final currentCount = int.tryParse(ratingCountStr) ?? 0;
+          final currentRating = double.tryParse(ratingStr) ?? 0.0;
+          final newCount = currentCount + 1;
+          final newAverage = (currentRating * currentCount + rating) / newCount;
+          final newAverageStr = newAverage.toStringAsFixed(1);
+
+          doctorPatch['rating'] = newAverageStr;
+          doctorPatch['rating_count'] = newCount.toString();
+        }
+
+        tx.set(doctorRef, doctorPatch, SetOptions(merge: true));
+        tx.set(_col.doc(id), data, SetOptions(merge: true));
+      });
+
       return;
     }
 

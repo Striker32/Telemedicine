@@ -19,6 +19,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:last_telemedicine/components/DividerLine.dart';
+import 'package:last_telemedicine/components/SetRating.dart';
 import 'package:last_telemedicine/pages/Chat.dart';
 import 'package:last_telemedicine/pages/user_pages/profile_from_perspective_doctor.dart';
 import 'package:last_telemedicine/pages/user_pages/subpages/Change_city.dart';
@@ -690,18 +691,38 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                           );
 
                           if (confirmed) {
-                            final patch = {'status': '2'};
-                            final repo = RequestRepository();
-                            await repo.updateRequest(
-                              widget.requestID,
-                              patch,
-                              doctorUid: widget.physician["id"],
-                            );
-                            Navigator.pop(context, patch);
-                            showCustomNotification(
-                              context,
-                              'Заявка была успешно завершена!',
-                            );
+                            final sender = FirebaseAuth.instance.currentUser;
+                            if (sender != null) {
+                              final patch = {'status': '2'};
+                              final repo = RequestRepository();
+                              final isRating = await showRatingDialog(
+                                context: context,
+                                userID: sender.uid,
+                                doctorID: widget.physician["id"],
+                                requestID: widget.requestID,
+                              );
+
+                              if (!isRating) {
+                                // Если оставляет отзыв
+                                Navigator.pop(context, patch);
+                                showCustomNotification(
+                                  context,
+                                  'Заявка была успешно завершена!\nСпасибо за Ваш отзыв!',
+                                );
+                              } else {
+                                // Если НЕ оставляет отзыв
+                                await repo.updateRequest(
+                                  widget.requestID,
+                                  patch,
+                                  doctorUid: widget.physician["id"],
+                                );
+                                Navigator.pop(context, patch);
+                                showCustomNotification(
+                                  context,
+                                  'Заявка была успешно завершена!',
+                                );
+                              }
+                            }
                           }
                         },
                         child: Opacity(

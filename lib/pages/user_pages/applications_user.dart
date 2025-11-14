@@ -137,8 +137,8 @@ class ApplicationsPage extends StatelessWidget {
                 Expanded(
                   child: TabBarView(
                     children: [
-                      _ApplicationsEmptyView(),
-                      _HistoryApplicationsEmptyView(),
+                      ApplicationsEmptyView(),
+                      HistoryApplicationsEmptyView(),
                     ],
                   ),
                 ),
@@ -151,208 +151,15 @@ class ApplicationsPage extends StatelessWidget {
   }
 }
 
-// ================= История заявок =================
-
-class _HistoryApplicationsEmptyView extends StatelessWidget {
-  const _HistoryApplicationsEmptyView();
-
-  String _fmt(DateTime dt) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
-  }
+// ==================== Активные заявки =====================
+class ApplicationsEmptyView extends StatefulWidget {
+  const ApplicationsEmptyView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-    if (firebaseUser == null) {
-      return const Center(child: Text('Войдите, чтобы увидеть архив заявок'));
-    }
-
-    final repo = RequestRepository();
-    final userRepo = UserRepository();
-
-    return FutureBuilder<UserModel>(
-      future: userRepo.getUser(firebaseUser.uid),
-      builder: (context, userSnap) {
-        if (userSnap.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-            backgroundColor: AppColors.background2,
-            body: const PulseLoadingWidget(),
-          );
-        }
-        if (!userSnap.hasData) {
-          return const Center(child: Text('Не удалось загрузить профиль'));
-        }
-
-        final u = userSnap.data!;
-        final displayName = '${u.name}'.trim();
-
-        return StreamBuilder<List<RequestModel>>(
-          stream: repo.watchRequestsByUser(firebaseUser.uid),
-          builder: (context, snap) {
-            if (snap.connectionState == ConnectionState.waiting) {
-              return Scaffold(
-                backgroundColor: AppColors.background2,
-                body: const PulseLoadingWidget(),
-              );
-            }
-            final items = snap.data ?? [];
-            // final items = [];
-            // фильтруем только статус == '3'
-            final archived = items
-                .where((r) => r.status == '2' && r.userUid == firebaseUser.uid)
-                .toList();
-
-            if (archived.isEmpty) {
-              return LayoutBuilder(
-                builder: (context, constraints) {
-                  final height = constraints.maxHeight.isFinite
-                      ? constraints.maxHeight
-                      : MediaQuery.of(context).size.height;
-
-                  return SingleChildScrollView(
-                    child: SizedBox(
-                      height: height,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const SizedBox(height: 10),
-
-                          const Center(
-                            child: Text(
-                              "Нет заявок",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 30,
-                              ),
-                              child: Center(
-                                child: const Text(
-                                  'В данном разделе будут отображаться завершённые заявки.',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: AppColors.primaryText,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 30),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            }
-
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 5),
-                  Text(
-                    archived.isEmpty
-                        ? 'Нет архивных заявок'
-                        : '${archived.length} '
-                              '${archived.length % 10 == 1 && archived.length % 100 != 11 ? "архивная заявка" : (archived.length % 10 >= 2 && archived.length % 10 <= 4 && (archived.length % 100 < 10 || archived.length % 100 >= 20) ? "архивные заявки" : "архивных заявок")}',
-                    style: const TextStyle(fontSize: 12, color: Colors.black54),
-                  ),
-
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: archived.length,
-                    itemBuilder: (context, i) {
-                      final r = archived[i];
-
-                      String dtStr = '';
-                      final ts = r.updatedAt ?? r.createdAt;
-                      if (ts != null) {
-                        dtStr = _fmt(ts.toDate());
-                      }
-
-                      final doctorRepo = DoctorRepository();
-
-                      // если выбран врач
-                      if (r.selectedDoctorUid != null &&
-                          r.selectedDoctorUid!.isNotEmpty) {
-                        return FutureBuilder<DoctorModel?>(
-                          future: doctorRepo.getDoctor(r.selectedDoctorUid!),
-                          builder: (context, docSnap) {
-                            if (docSnap.connectionState ==
-                                ConnectionState.waiting) {
-                              return const SizedBox.shrink();
-                            }
-                            final d = docSnap.data;
-                            if (d == null) return const SizedBox.shrink();
-
-                            final responders = [
-                              {
-                                'id': d.uid,
-                                'name': d.name,
-                                'surname': d.surname,
-                                'avatar': d.avatar,
-                                'rating':
-                                    double.tryParse(d.rating.toString()) ?? 0.0,
-                                'specialization': d.specialization,
-                                'phone': d.phone,
-                                'email': d.realEmail,
-                                'city': d.city,
-                                'experience': d.experience,
-                                'price': d.price,
-                                'workplace': d.placeOfWork,
-                                'about': d.about,
-                                'completed': d.completed,
-                              },
-                            ];
-
-                            return HistoryApplicationCard(
-                              title: r.reason,
-                              user: displayName,
-                              avatar: u.avatar,
-                              datetime: dtStr,
-                              doctor: r.specializationRequested,
-                              description: r.description,
-                              city: r.city,
-                              cost: r.price,
-                              requestID: r.id,
-                              rating: d.rating,
-                              responder:
-                                  responders, // ← теперь список с одним врачом
-                            );
-                          },
-                        );
-                      }
-
-                      // если selectedDoctorUid нет — можно оставить пусто или подгрузить всех
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  _ApplicationsEmptyViewState createState() => _ApplicationsEmptyViewState();
 }
 
-// ==================== Активные заявки =====================
-
-class _ApplicationsEmptyView extends StatelessWidget {
-  const _ApplicationsEmptyView();
-
+class _ApplicationsEmptyViewState extends State<ApplicationsEmptyView> {
   String _fmt(DateTime dt) {
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
@@ -389,7 +196,6 @@ class _ApplicationsEmptyView extends StatelessWidget {
             }
 
             final items = snap.data ?? [];
-            // final items = [];
             final active = items
                 .where(
                   (r) =>
@@ -401,14 +207,12 @@ class _ApplicationsEmptyView extends StatelessWidget {
             String _activeLabel(int count) {
               if (count == 0) return 'Нет заявок';
 
-              // пробуем преобразовать в строку, иначе "Нет"
               final base = int.tryParse(count.toString()) != null
                   ? pluralizeApplications(count.toString())
                   : "Нет";
 
               final parts = base.split(' ');
 
-              // правильное окончание для прилагательного
               String adj;
               if (count % 10 == 1 && count % 100 != 11) {
                 adj = 'активная';
@@ -428,20 +232,15 @@ class _ApplicationsEmptyView extends StatelessWidget {
             if (active.isEmpty) {
               return LayoutBuilder(
                 builder: (context, constraints) {
-                  // Используем фиксированную высоту равную видимой высоте контейнера,
-                  // чтобы внутри можно было корректно центрировать без Expanded в SingleChildScrollView.
                   final availableHeight = constraints.maxHeight;
 
                   return SingleChildScrollView(
                     child: SizedBox(
-                      height:
-                          availableHeight, // гарантируем ограниченную высоту
+                      height: availableHeight,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           const SizedBox(height: 10),
-
-                          // счётчик (как был)
                           Center(
                             child: Text(
                               _activeLabel(active.length),
@@ -452,10 +251,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               textAlign: TextAlign.center,
                             ),
                           ),
-
                           const SizedBox(height: 10),
-
-                          // кнопка остаётся вверху, не трогаем
                           GestureDetector(
                             onTap: () {
                               showModalBottomSheet(
@@ -503,11 +299,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               ),
                             ),
                           ),
-
                           const SizedBox(height: 10),
-
-                          // Центрируем текст по вертикали и горизонтали внутри оставшегося пространства.
-                          // Важно: сам Text и Padding не трогаем (они такие же, как у тебя).
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -525,7 +317,6 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               ),
                             ),
                           ),
-
                           const SizedBox(height: 30),
                         ],
                       ),
@@ -535,53 +326,118 @@ class _ApplicationsEmptyView extends StatelessWidget {
               );
             }
 
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 5),
-                  Center(
-                    child: Text(
-                      _activeLabel(active.length),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.mutedTitle,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: active.length,
-                    itemBuilder: (context, i) {
-                      final r = active[i];
-                      final ts = r.updatedAt ?? r.createdAt;
-                      final dtStr = ts != null ? _fmt(ts.toDate()) : '';
-                      final doctorRepo = DoctorRepository();
+            // --- Новый блок: загружаем всех докторов разом для active ---
 
-                      if (r.selectedDoctorUid != null &&
-                          r.selectedDoctorUid!.isNotEmpty) {
-                        return FutureBuilder<DoctorModel?>(
-                          future: doctorRepo.getDoctor(r.selectedDoctorUid!),
-                          builder: (context, docSnap) {
-                            if (docSnap.connectionState ==
-                                ConnectionState.waiting) {
+            final doctorRepo = DoctorRepository();
+
+            // Собираем все уникальные doctor uid, которые могут потребоваться:
+            //  - selectedDoctorUid (если указан) и
+            //  - все uid из r.doctorUids
+            final allDoctorUids = <String>{};
+            for (final r in active) {
+              if (r.selectedDoctorUid != null &&
+                  r.selectedDoctorUid!.isNotEmpty) {
+                allDoctorUids.add(r.selectedDoctorUid!);
+              }
+              if (r.doctorUids != null && r.doctorUids.isNotEmpty) {
+                allDoctorUids.addAll(r.doctorUids);
+              }
+            }
+
+            // Если нет ни одного uid — можно сразу строить список (всегда пустые responders)
+            if (allDoctorUids.isEmpty) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 5),
+                    Center(
+                      child: Text(
+                        _activeLabel(active.length),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.mutedTitle,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: active.length,
+                      itemBuilder: (context, i) {
+                        final r = active[i];
+                        final ts = r.updatedAt ?? r.createdAt;
+                        final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+                        return ApplicationCard(
+                          title: r.reason,
+                          user: displayName,
+                          avatar: u.avatar,
+                          datetime: dtStr,
+                          doctor: r.specializationRequested,
+                          description: r.description,
+                          city: r.city,
+                          cost: r.price,
+                          requestID: r.id,
+                          urgent: r.urgent,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Запрашиваем всех докторов одним вызовом
+            return FutureBuilder<List<DoctorModel>>(
+              future: doctorRepo.getDoctorsByUids(allDoctorUids.toList()),
+              builder: (context, docSnap) {
+                if (docSnap.connectionState == ConnectionState.waiting) {
+                  return const Center(child: PulseLoadingWidget());
+                }
+
+                final doctorsList = docSnap.data ?? [];
+
+                // Мапаем по uid для быстрого доступа
+                final doctorsByUid = <String, DoctorModel>{};
+                for (final d in doctorsList) {
+                  doctorsByUid[d.uid] = d;
+                }
+
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 5),
+                      Center(
+                        child: Text(
+                          _activeLabel(active.length),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.mutedTitle,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: active.length,
+                        itemBuilder: (context, i) {
+                          final r = active[i];
+                          final ts = r.updatedAt ?? r.createdAt;
+                          final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+
+                          // Если выбран конкретный врач — возьмём его из мапы
+                          if (r.selectedDoctorUid != null &&
+                              r.selectedDoctorUid!.isNotEmpty) {
+                            final d = doctorsByUid[r.selectedDoctorUid!];
+                            if (d == null) {
+                              // placeholder, если не нашли доктора
                               return const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12.0),
-                                child: SizedBox(
-                                  height: 80,
-                                  child: Center(
-                                    child: SizedBox(
-                                      width: 48,
-                                      height: 48,
-                                      child: PulseLoadingWidget(),
-                                    ),
-                                  ),
-                                ),
+                                child: SizedBox(),
                               );
                             }
-                            final d = docSnap.data;
-                            if (d == null) return const SizedBox.shrink();
+
                             final physician = {
                               'id': d.uid,
                               'name': d.name,
@@ -598,6 +454,7 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               'completed': d.completed,
                               'avatar': d.avatar,
                             };
+
                             return ApplicationCard(
                               title: r.reason,
                               user: displayName,
@@ -611,52 +468,33 @@ class _ApplicationsEmptyView extends StatelessWidget {
                               physician: physician,
                               urgent: r.urgent,
                             );
-                          },
-                        );
-                      }
-
-                      return FutureBuilder<List<DoctorModel>>(
-                        future: doctorRepo.getDoctorsByUids(r.doctorUids),
-                        builder: (context, docSnap) {
-                          if (docSnap.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 12.0),
-                              child: SizedBox(
-                                height: 80,
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 48,
-                                    height: 48,
-                                    child: PulseLoadingWidget(),
-                                  ),
-                                ),
-                              ),
-                            );
                           }
-                          final doctors = docSnap.data ?? [];
-                          final responders = doctors
-                              .map(
-                                (d) => {
-                                  'id': d.uid,
-                                  'name': d.name,
-                                  'surname': d.surname,
-                                  'avatar': d.avatar,
-                                  'rating':
-                                      double.tryParse(d.rating.toString()) ??
-                                      0.0,
-                                  'specialization': d.specialization,
-                                  'phone': d.phone,
-                                  'email': d.realEmail,
-                                  'city': d.city,
-                                  'experience': d.experience,
-                                  'price': d.price,
-                                  'workplace': d.placeOfWork,
-                                  'about': d.about,
-                                  'completed': d.completed,
-                                },
-                              )
-                              .toList();
+
+                          // Иначе собираем список резондеров по r.doctorUids
+                          final doctorUids = r.doctorUids ?? [];
+                          final responders = <Map<String, dynamic>>[];
+                          for (final uid in doctorUids) {
+                            final d = doctorsByUid[uid];
+                            if (d != null) {
+                              responders.add({
+                                'id': d.uid,
+                                'name': d.name,
+                                'surname': d.surname,
+                                'avatar': d.avatar,
+                                'rating':
+                                    double.tryParse(d.rating.toString()) ?? 0.0,
+                                'specialization': d.specialization,
+                                'phone': d.phone,
+                                'email': d.realEmail,
+                                'city': d.city,
+                                'experience': d.experience,
+                                'price': d.price,
+                                'workplace': d.placeOfWork,
+                                'about': d.about,
+                                'completed': d.completed,
+                              });
+                            }
+                          }
 
                           return ApplicationCard(
                             title: r.reason,
@@ -672,11 +510,317 @@ class _ApplicationsEmptyView extends StatelessWidget {
                             urgent: r.urgent,
                           );
                         },
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+// ================= История заявок =================
+
+class HistoryApplicationsEmptyView extends StatefulWidget {
+  const HistoryApplicationsEmptyView({Key? key}) : super(key: key);
+
+  @override
+  _HistoryApplicationsEmptyViewState createState() =>
+      _HistoryApplicationsEmptyViewState();
+}
+
+class _HistoryApplicationsEmptyViewState
+    extends State<HistoryApplicationsEmptyView> {
+  String _fmt(DateTime dt) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) {
+      return const Center(child: Text('Войдите, чтобы увидеть архив заявок'));
+    }
+
+    final repo = RequestRepository();
+    final userRepo = UserRepository();
+
+    return FutureBuilder<UserModel>(
+      future: userRepo.getUser(firebaseUser.uid),
+      builder: (context, userSnap) {
+        if (userSnap.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: AppColors.background2,
+            body: const PulseLoadingWidget(),
+          );
+        }
+        if (!userSnap.hasData) {
+          return const Center(child: Text('Не удалось загрузить профиль'));
+        }
+
+        final u = userSnap.data!;
+        final displayName = '${u.name}'.trim();
+
+        return StreamBuilder<List<RequestModel>>(
+          stream: repo.watchRequestsByUser(firebaseUser.uid),
+          builder: (context, snap) {
+            if (snap.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                backgroundColor: AppColors.background2,
+                body: const PulseLoadingWidget(),
+              );
+            }
+            final items = snap.data ?? [];
+            // фильтруем только статус == '2' и принадлежащие текущему пользователю
+            final archived = items
+                .where((r) => r.status == '2' && r.userUid == firebaseUser.uid)
+                .toList();
+
+            if (archived.isEmpty) {
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final height = constraints.maxHeight.isFinite
+                      ? constraints.maxHeight
+                      : MediaQuery.of(context).size.height;
+
+                  return SingleChildScrollView(
+                    child: SizedBox(
+                      height: height,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 10),
+                          const Center(
+                            child: Text(
+                              "Нет заявок",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 30,
+                              ),
+                              child: Center(
+                                child: const Text(
+                                  'В данном разделе будут отображаться завершённые заявки.',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.primaryText,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 30),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+
+            // --- Новый блок: собираем все uid докторов из archived и загружаем их разом ---
+            final doctorRepo = DoctorRepository();
+            final allDoctorUids = <String>{};
+
+            for (final r in archived) {
+              if (r.selectedDoctorUid != null &&
+                  r.selectedDoctorUid!.isNotEmpty) {
+                allDoctorUids.add(r.selectedDoctorUid!);
+              }
+              if (r.doctorUids != null && r.doctorUids.isNotEmpty) {
+                allDoctorUids.addAll(r.doctorUids);
+              }
+            }
+
+            // Если нет ни одного uid, строим список без подгрузки докторов
+            if (allDoctorUids.isEmpty) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 5),
+                    Text(
+                      archived.isEmpty
+                          ? 'Нет архивных заявок'
+                          : '${archived.length} ${archived.length % 10 == 1 && archived.length % 100 != 11 ? "архивная заявка" : (archived.length % 10 >= 2 && archived.length % 10 <= 4 && (archived.length % 100 < 10 || archived.length % 100 >= 20) ? "архивные заявки" : "архивных заявок")}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: archived.length,
+                      itemBuilder: (context, i) {
+                        final r = archived[i];
+                        String dtStr = '';
+                        final ts = r.updatedAt ?? r.createdAt;
+                        if (ts != null) dtStr = _fmt(ts.toDate());
+
+                        // Без данных по врачам — показываем карточку без responder/physician
+                        return HistoryApplicationCard(
+                          title: r.reason,
+                          user: displayName,
+                          avatar: u.avatar,
+                          datetime: dtStr,
+                          doctor: r.specializationRequested,
+                          description: r.description,
+                          city: r.city,
+                          cost: r.price,
+                          requestID: r.id,
+                          rating: '0',
+                          responder: const [],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Запрашиваем всех докторов одним вызовом
+            return FutureBuilder<List<DoctorModel>>(
+              future: doctorRepo.getDoctorsByUids(allDoctorUids.toList()),
+              builder: (context, docSnap) {
+                if (docSnap.connectionState == ConnectionState.waiting) {
+                  return const Center(child: PulseLoadingWidget());
+                }
+
+                final doctorsList = docSnap.data ?? [];
+                final doctorsByUid = <String, DoctorModel>{};
+                for (final d in doctorsList) {
+                  doctorsByUid[d.uid] = d;
+                }
+
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 5),
+                      Text(
+                        archived.isEmpty
+                            ? 'Нет архивных заявок'
+                            : '${archived.length} ${archived.length % 10 == 1 && archived.length % 100 != 11 ? "архивная заявка" : (archived.length % 10 >= 2 && archived.length % 10 <= 4 && (archived.length % 100 < 10 || archived.length % 100 >= 20) ? "архивные заявки" : "архивных заявок")}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: archived.length,
+                        itemBuilder: (context, i) {
+                          final r = archived[i];
+                          String dtStr = '';
+                          final ts = r.updatedAt ?? r.createdAt;
+                          if (ts != null) dtStr = _fmt(ts.toDate());
+
+                          // Если выбран конкретный врач — берём его из мапы
+                          if (r.selectedDoctorUid != null &&
+                              r.selectedDoctorUid!.isNotEmpty) {
+                            final d = doctorsByUid[r.selectedDoctorUid!];
+                            if (d == null) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12.0),
+                                child: SizedBox(),
+                              );
+                            }
+
+                            final responders = [
+                              {
+                                'id': d.uid,
+                                'name': d.name,
+                                'surname': d.surname,
+                                'avatar': d.avatar,
+                                'rating':
+                                    double.tryParse(d.rating.toString()) ?? 0.0,
+                                'specialization': d.specialization,
+                                'phone': d.phone,
+                                'email': d.realEmail,
+                                'city': d.city,
+                                'experience': d.experience,
+                                'price': d.price,
+                                'workplace': d.placeOfWork,
+                                'about': d.about,
+                                'completed': d.completed,
+                              },
+                            ];
+
+                            return HistoryApplicationCard(
+                              title: r.reason,
+                              user: displayName,
+                              avatar: u.avatar,
+                              datetime: dtStr,
+                              doctor: r.specializationRequested,
+                              description: r.description,
+                              city: r.city,
+                              cost: r.price,
+                              requestID: r.id,
+                              rating: d.rating,
+                              responder: responders,
+                            );
+                          }
+
+                          // Иначе собираем список responders по r.doctorUids
+                          final doctorUids = r.doctorUids ?? [];
+                          final responders = <Map<String, dynamic>>[];
+                          for (final uid in doctorUids) {
+                            final d = doctorsByUid[uid];
+                            if (d != null) {
+                              responders.add({
+                                'id': d.uid,
+                                'name': d.name,
+                                'surname': d.surname,
+                                'avatar': d.avatar,
+                                'rating':
+                                    double.tryParse(d.rating.toString()) ?? 0.0,
+                                'specialization': d.specialization,
+                                'phone': d.phone,
+                                'email': d.realEmail,
+                                'city': d.city,
+                                'experience': d.experience,
+                                'price': d.price,
+                                'workplace': d.placeOfWork,
+                                'about': d.about,
+                                'completed': d.completed,
+                              });
+                            }
+                          }
+
+                          return HistoryApplicationCard(
+                            title: r.reason,
+                            user: displayName,
+                            avatar: u.avatar,
+                            datetime: dtStr,
+                            doctor: r.specializationRequested,
+                            description: r.description,
+                            city: r.city,
+                            cost: r.price,
+                            requestID: r.id,
+                            rating: responders.isNotEmpty
+                                ? responders.first['rating'].toString()
+                                : '0',
+                            responder: responders,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
             );
           },
         );

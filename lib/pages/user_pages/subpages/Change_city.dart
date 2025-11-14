@@ -5,7 +5,6 @@ import 'package:last_telemedicine/components/DividerLine.dart';
 import '../../../components/Appbar/AppBarButton.dart';
 import '../../../themes/AppColors.dart';
 
-
 class ChangeCityPage extends StatelessWidget {
   final String? selected;
 
@@ -14,6 +13,7 @@ class ChangeCityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> cities = [
+      "Не выбран",
       "Архангельск",
       "Вельск",
       "Волгоград",

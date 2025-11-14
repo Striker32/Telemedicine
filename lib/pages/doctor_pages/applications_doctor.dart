@@ -97,8 +97,8 @@ class ApplicationsPageDoctor extends StatelessWidget {
               Expanded(
                 child: TabBarView(
                   children: [
-                    _ActiveApplicationsView(),
-                    _ArchivedApplicationsView(),
+                    ActiveApplicationsView(),
+                    ArchivedApplicationsView(),
                   ],
                 ),
               ),
@@ -111,9 +111,14 @@ class ApplicationsPageDoctor extends StatelessWidget {
 }
 
 // ==================== Активные заявки =====================
-class _ActiveApplicationsView extends StatelessWidget {
-  const _ActiveApplicationsView();
+class ActiveApplicationsView extends StatefulWidget {
+  const ActiveApplicationsView({Key? key}) : super(key: key);
 
+  @override
+  _ActiveApplicationsViewState createState() => _ActiveApplicationsViewState();
+}
+
+class _ActiveApplicationsViewState extends State<ActiveApplicationsView> {
   String _fmt(DateTime dt) {
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
@@ -149,10 +154,13 @@ class _ActiveApplicationsView extends StatelessWidget {
           );
         }
         final items = snap.data ?? [];
+
+        // Фильтруем активные заявки как раньше
         final active = items
             .where((r) => r.hasResponded(doctor.uid) && !r.isArchived)
             .toList();
 
+        // Если нет активных заявок — прежнее поведение (без изменений)
         String _activeLabel(int count) {
           if (count == 0) return 'Нет заявок';
           return pluralizeApplications(
@@ -160,8 +168,6 @@ class _ActiveApplicationsView extends StatelessWidget {
           );
         }
 
-        // Верхний блок: отступ + текст с количеством заявок
-        // Если нет активных заявок — покажем центр с сообщением "тут будут заявки"
         if (active.isEmpty) {
           return SingleChildScrollView(
             child: Column(
@@ -200,38 +206,73 @@ class _ActiveApplicationsView extends StatelessWidget {
           );
         }
 
-        // Есть активные заявки — рендерим список с заголовком сверху
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 5),
-              Center(
-                child: Text(
-                  _activeLabel(active.length),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.mutedTitle,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              // const SizedBox(height: 5)
-              // Сам список — ListView.builder внутри Column: shrinkWrap и не скроллить отдельно
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: active.length,
-                itemBuilder: (context, i) {
-                  final r = active[i];
-                  final ts = r.updatedAt ?? r.createdAt;
-                  final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+        // --- Новый блок: загружаем всех пользователей разом для активных заявок ---
 
-                  return FutureBuilder<UserModel>(
-                    future: UserRepository().getUser(r.userUid),
-                    builder: (context, userSnap) {
-                      if (userSnap.connectionState == ConnectionState.waiting) {
-                        // Небольшой placeholder вместо Scaffold (сохраняет структуру списка)
+        // Собираем уникальные uid, чтобы не запрашивать одного пользователя несколько раз
+        final uids = <String>{};
+        for (final r in active) {
+          uids.add(r.userUid);
+        }
+
+        // Создаём список futures для уникальных uid
+        final userFuturesMap = <String, Future<UserModel?>>{};
+        for (final uid in uids) {
+          userFuturesMap[uid] = UserRepository().getUser(uid);
+        }
+
+        // Ждём всех UserModel параллельно
+        return FutureBuilder<List<MapEntry<String, UserModel?>>>(
+          future: Future.wait(
+            userFuturesMap.entries.map((e) async {
+              final user = await e.value;
+              return MapEntry(e.key, user);
+            }).toList(),
+          ),
+          builder: (context, usersSnap) {
+            if (usersSnap.connectionState == ConnectionState.waiting) {
+              // Показываем общий индикатор загрузки, сохраняя прежнюю структуру страницы
+              return Scaffold(
+                backgroundColor: AppColors.background2,
+                body: const Center(child: PulseLoadingWidget()),
+              );
+            }
+
+            // Собираем map uid -> UserModel? для быстрого доступа по userUid
+            final usersList = usersSnap.data ?? [];
+            final usersByUid = <String, UserModel?>{};
+            for (final e in usersList) {
+              usersByUid[e.key] = e.value;
+            }
+
+            // Строим ту же страницу + список, но уже синхронно получая user из usersByUid
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 5),
+                  Center(
+                    child: Text(
+                      _activeLabel(active.length),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.mutedTitle,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: active.length,
+                    itemBuilder: (context, i) {
+                      final r = active[i];
+                      final ts = r.updatedAt ?? r.createdAt;
+                      final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+
+                      final fullName = usersByUid[r.userUid];
+
+                      // Если пользователь не найден (null) — показываем пустую карточку или placeholder
+                      if (fullName == null) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: SizedBox(
@@ -246,7 +287,7 @@ class _ActiveApplicationsView extends StatelessWidget {
                           ),
                         );
                       }
-                      final fullName = userSnap.data!;
+
                       final currentDoctorUid =
                           FirebaseAuth.instance.currentUser!.uid;
                       final responded = r.hasResponded(currentDoctorUid);
@@ -267,11 +308,11 @@ class _ActiveApplicationsView extends StatelessWidget {
                         userID: r.userUid,
                       );
                     },
-                  );
-                },
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -279,9 +320,15 @@ class _ActiveApplicationsView extends StatelessWidget {
 }
 
 // ================= История заявок =================
-class _ArchivedApplicationsView extends StatelessWidget {
-  const _ArchivedApplicationsView();
+class ArchivedApplicationsView extends StatefulWidget {
+  const ArchivedApplicationsView({Key? key}) : super(key: key);
 
+  @override
+  _ArchivedApplicationsViewState createState() =>
+      _ArchivedApplicationsViewState();
+}
+
+class _ArchivedApplicationsViewState extends State<ArchivedApplicationsView> {
   String _fmt(DateTime dt) {
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
@@ -319,7 +366,6 @@ class _ArchivedApplicationsView extends StatelessWidget {
           );
         }
 
-        // Пустое состояние: показываем заголовок и центральное сообщение
         if (archived.isEmpty) {
           return SingleChildScrollView(
             child: Column(
@@ -358,37 +404,70 @@ class _ArchivedApplicationsView extends StatelessWidget {
           );
         }
 
-        // Есть архивные заявки — рендерим заголовок и список
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 5),
-              Center(
-                child: Text(
-                  _archiveLabel(archived.length),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.mutedTitle,
+        // --- Новый блок: загружаем всех users разом для archived ---
+
+        // Сделаем de-dup uid, чтобы не запрашивать одного пользователя несколько раз
+        final uids = <String>{};
+        for (final r in archived) {
+          uids.add(r.userUid);
+        }
+
+        // Собираем futures по уникальным uid
+        final userFuturesMap = <String, Future<UserModel?>>{};
+        for (final uid in uids) {
+          userFuturesMap[uid] = UserRepository().getUser(uid);
+        }
+
+        // Ждём всех пользователей параллельно и мапим результат по uid
+        return FutureBuilder<List<MapEntry<String, UserModel?>>>(
+          future: Future.wait(
+            userFuturesMap.entries.map((e) async {
+              final user = await e.value;
+              return MapEntry(e.key, user);
+            }).toList(),
+          ),
+          builder: (context, usersSnap) {
+            if (usersSnap.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                backgroundColor: AppColors.background2,
+                body: const PulseLoadingWidget(),
+              );
+            }
+
+            final usersList = usersSnap.data ?? [];
+            final usersByUid = <String, UserModel?>{};
+            for (final e in usersList) {
+              usersByUid[e.key] = e.value;
+            }
+
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 5),
+                  Center(
+                    child: Text(
+                      _archiveLabel(archived.length),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.mutedTitle,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
 
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: archived.length,
-                itemBuilder: (context, i) {
-                  final r = archived[i];
-                  final ts = r.updatedAt ?? r.createdAt;
-                  final dtStr = ts != null ? _fmt(ts.toDate()) : '';
+                  ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: archived.length,
+                    itemBuilder: (context, i) {
+                      final r = archived[i];
+                      final ts = r.updatedAt ?? r.createdAt;
+                      final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
-                  return FutureBuilder<UserModel>(
-                    future: UserRepository().getUser(r.userUid),
-                    builder: (context, userSnap) {
-                      if (userSnap.connectionState == ConnectionState.waiting) {
-                        // placeholder вместо Scaffold — чтобы не ломать список
+                      final fullName = usersByUid[r.userUid];
+
+                      if (fullName == null) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: SizedBox(
@@ -404,7 +483,6 @@ class _ArchivedApplicationsView extends StatelessWidget {
                         );
                       }
 
-                      final fullName = userSnap.data!;
                       return HistoryApplicationCard(
                         title: r.reason,
                         name: fullName.name,
@@ -420,11 +498,11 @@ class _ArchivedApplicationsView extends StatelessWidget {
                         userID: r.userUid,
                       );
                     },
-                  );
-                },
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
