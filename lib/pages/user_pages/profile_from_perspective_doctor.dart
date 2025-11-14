@@ -434,33 +434,51 @@ class _ProfilePageState extends State<ProfilePageFromUserPers> {
                       child: DoctorRespondedButton(
                         isActive: widget.isActive,
                         onTap: () async {
-                          final confirmed = await showConfirmationDialog(
-                            context,
-                            'Выбрать врача',
-                            'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
-                            'Выбрать',
-                            'Отмена',
-                          );
-
-                          if (confirmed) {
-                            widget.isActive
-                                ? await repo.assignDoctorAtomically(
-                                    requestId: widget.requestID,
-                                    doctorData: {'uid': widget.id},
-                                    remove: true, // назначен
-                                  )
-                                : await repo.assignDoctorAtomically(
-                                    requestId: widget.requestID,
-                                    doctorData: {'uid': widget.id},
-                                    select: true,
-                                    newStatus: '1', // назначен
-                                  );
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-                            showCustomNotification(
+                          if (widget.isActive) {
+                            final confirmed = await showConfirmationDialog(
                               context,
-                              'Вы успешно выбрали своего\nлечащего врача!',
+                              'Снять врача',
+                              'Вы собираетесь снять данного\nврача с основного лечащего врача\nпо заявке от ${widget.datetime}',
+                              'Да',
+                              'Отмена',
                             );
+
+                            if (confirmed) {
+                              await repo.assignDoctorAtomically(
+                                requestId: widget.requestID,
+                                doctorData: {'uid': widget.id},
+                                remove: true,
+                              );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              showCustomNotification(
+                                context,
+                                'Вы успешно сняли своего\nлечащего врача!',
+                              );
+                            }
+                          } else {
+                            final confirmed = await showConfirmationDialog(
+                              context,
+                              'Выбрать врача',
+                              'Вы собираетесь выбрать данного\nврача Вашим основным лечащим врачом.\nпо заявке от ${widget.datetime}',
+                              'Выбрать',
+                              'Отмена',
+                            );
+
+                            if (confirmed) {
+                              await repo.assignDoctorAtomically(
+                                requestId: widget.requestID,
+                                doctorData: {'uid': widget.id},
+                                select: true,
+                                newStatus: '1', // назначен
+                              );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              showCustomNotification(
+                                context,
+                                'Вы успешно выбрали своего\nлечащего врача!',
+                              );
+                            }
                           }
                         },
                         height: 60,
