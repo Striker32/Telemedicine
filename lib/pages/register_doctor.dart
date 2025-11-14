@@ -12,17 +12,15 @@ class CoveredRegisterDoctor extends StatefulWidget {
 
   @override
   State<CoveredRegisterDoctor> createState() => _CoveredRegisterDoctorState();
-
 }
-class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
 
+class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _pwController = TextEditingController();
 
   bool get _isFormValid {
-    return
-        _nameController.text.trim().isNotEmpty &&
+    return _nameController.text.trim().isNotEmpty &&
         _phoneController.text.trim().isNotEmpty &&
         _pwController.text.trim().isNotEmpty;
   }
@@ -31,14 +29,12 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
   Widget build(BuildContext context) {
     // цветовая палитра
 
-
-
     // общий отступ по горизонтали
     const horizontalPadding = 10.0;
     const dividerOfContinue = 10.0;
 
-    void register(BuildContext context) async  {
-      final _auth =AuthService();
+    void register(BuildContext context) async {
+      final _auth = AuthService();
 
       final phone_num = _phoneController.text;
       final pass = _pwController.text;
@@ -50,29 +46,29 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
         surname = "";
       }
 
-
       final email = '${phone_num}@doctor.com';
 
       debugPrint('DEBUG: email="$email", pass length=${pass.length}');
 
       try {
-        await _auth.signUpDoctorWithEmailPassword(pseudoemail: email , password: pass, phone: phone_num, name: name, surname: surname);
+        await _auth.signUpDoctorWithEmailPassword(
+          pseudoemail: email,
+          password: pass,
+          phone: phone_num,
+          name: name,
+          surname: surname,
+        );
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
-
       // catch errors
       catch (e) {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text(e.toString()),
-          ),
+          builder: (context) => AlertDialog(title: Text(e.toString())),
         );
       }
-
     }
-
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -81,7 +77,6 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
         backgroundColor: Colors.white,
       ),
 
-
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -89,7 +84,6 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 24),
-
 
               // Заголовок
               const Text(
@@ -104,10 +98,6 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
               ),
 
               const SizedBox(height: 18),
-
-
-
-
 
               const SizedBox(height: 80),
 
@@ -137,7 +127,6 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
 
               DividerLine(),
 
-
               // Телефон: +7 и поле
               Container(
                 // сделать палку снизу
@@ -151,11 +140,16 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
                     Container(
                       decoration: BoxDecoration(
                         border: Border(
-                          right: BorderSide(color: AppColors.greyDivider, width: 1),
+                          right: BorderSide(
+                            color: AppColors.greyDivider,
+                            width: 1,
+                          ),
                         ),
                       ),
                       width: 72,
-                      padding: const EdgeInsets.symmetric(vertical: 20), // размер палка справа от +7
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 20,
+                      ), // размер палка справа от +7
                       alignment: Alignment.center,
                       // граница между кодом и полем — реализована визуально через контейнер
                       child: Center(
@@ -199,7 +193,6 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
                 ),
               ),
 
-
               // Пароль
               Container(
                 decoration: BoxDecoration(
@@ -230,18 +223,9 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
               ),
 
               const SizedBox(height: 20),
-
-
-
-
             ],
           ),
-
         ),
-
-
-
-
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
@@ -252,7 +236,10 @@ class _CoveredRegisterDoctorState extends State<CoveredRegisterDoctor> {
               if (_isFormValid) {
                 register(context);
               } else {
-                showCustomNotification(context, 'Пожалуйста, заполните все поля!');
+                showCustomNotification(
+                  context,
+                  'Пожалуйста, заполните все поля!',
+                );
               }
             },
             style: ElevatedButton.styleFrom(

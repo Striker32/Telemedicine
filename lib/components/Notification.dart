@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../themes/AppColors.dart';
 import 'DividerLine.dart';
 
-void showCustomNotification(BuildContext context, String titleText) {
+void showCustomNotification(BuildContext? context, String titleText) {
+  if (context == null || !context.mounted) return;
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -42,8 +43,10 @@ void showCustomNotification(BuildContext context, String titleText) {
                     width: double.infinity,
                     child: TextButton(
                       style: ButtonStyle(
-                        overlayColor: MaterialStateProperty.all(Colors.transparent),
-                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                        overlayColor: WidgetStateProperty.all(
+                          Colors.transparent,
+                        ),
+                        padding: WidgetStateProperty.all(EdgeInsets.zero),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         alignment: Alignment.center,
                       ),
