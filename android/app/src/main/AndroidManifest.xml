@@ -12,7 +12,7 @@
     <!-- For Android 12 and above devices, the following permission is also required. -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <application
-        android:label="last_telemedicine"
+        android:label="MedConnect"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

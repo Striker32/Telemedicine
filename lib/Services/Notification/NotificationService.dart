@@ -1,36 +1,54 @@
-// lib/Services/notification_service.dart
+// lib/Services/Notification/NotificationService.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:last_telemedicine/Services/Videocall_page.dart'; // Путь к вашему экрану звонка
+import 'package:last_telemedicine/Services/Videocall_page.dart'; // Убедитесь, что путь верный
 
 class NotificationService {
-  // Создаем синглтон, чтобы был только один экземпляр этого сервиса
+  // 1. === СОЗДАЕМ ЕДИНСТВЕННЫЙ ЭКЗЕМПЛЯР ===
+  // `static final` гарантирует, что этот объект будет создан только один раз.
   static final NotificationService _instance = NotificationService._internal();
-  factory NotificationService() => _instance;
+
+  // 2. === СОЗДАЕМ "ФАБРИКУ" ДЛЯ ПОЛУЧЕНИЯ ЭКЗЕМПЛЯРА ===
+  // Теперь, когда вы будете писать NotificationService(), вы всегда будете получать
+  // один и тот же _instance, а не создавать новый.
+  factory NotificationService() {
+    return _instance;
+  }
+
+  // 3. === Приватный конструктор, чтобы никто не мог создать новый экземпляр случайно ===
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  // --- Остальной код остается почти без изменений ---
 
-  // Метод для инициализации
+  final FlutterLocalNotificationsPlugin _localNotifications =
+  FlutterLocalNotificationsPlugin();
+
+  GlobalKey<NavigatorState>? _navigatorKey;
+
   Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher'); // Ваша иконка приложения
+    _navigatorKey = navigatorKey;
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
+    const AndroidInitializationSettings androidSettings =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
 
+    const InitializationSettings settings =
+    InitializationSettings(android: androidSettings, iOS: iosSettings);
+
     await _localNotifications.initialize(
-      initializationSettings,
-      // Этот обработчик сработает, когда пользователь нажмет на уведомление
+      settings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         if (response.payload != null && response.payload!.startsWith('call:')) {
-          final channelName = response.payload!.substring(5); // Убираем префикс 'call:'
-          print("Нажато уведомление о звонке! Переходим на канал: $channelName");
+          final channelName = response.payload!.substring(5);
+          print("Нажато уведомление! Перехожу на VideoCallPage с каналом: $channelName");
 
-          // Используем глобальный ключ для навигации
-          navigatorKey.currentState?.push(
+          _navigatorKey?.currentState?.push(
             MaterialPageRoute(
               builder: (context) => VideoCallPage(channelName: channelName),
             ),
@@ -40,25 +58,26 @@ class NotificationService {
     );
   }
 
-  // Метод для показа уведомления
   Future<void> showCallNotification({
     required String title,
     required String body,
     required String payload,
   }) async {
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'incoming_calls_channel', // ID канала
-      'Входящие звонки',       // Имя, которое пользователь увидит в настройках
+      'incoming_calls_channel',
+      'Входящие звонки',
       channelDescription: 'Уведомления о входящих видеозвонках.',
-      importance: Importance.high, // Обязательно для всплывающего уведомления
-      priority: Priority.high,     // Обязательно для всплывающего уведомления
-      sound: RawResourceAndroidNotificationSound('ringtone'), // Укажите имя вашего рингтона без расширения (если он есть)
+      importance: Importance.max,
+      priority: Priority.high,
+      //sound: RawResourceAndroidNotificationSound('ringtone'), // Убедитесь, что файл ringtone.mp3/wav есть в android/app/src/main/res/raw
+      playSound: true,
     );
 
-    const NotificationDetails notificationDetails = NotificationDetails(android: androidDetails);
+    const NotificationDetails notificationDetails =
+    NotificationDetails(android: androidDetails);
 
     await _localNotifications.show(
-      0,       // ID уведомления. Для звонков всегда можно использовать 0, чтобы новое заменяло старое
+      0,
       title,
       body,
       notificationDetails,
@@ -66,4 +85,3 @@ class NotificationService {
     );
   }
 }
-    

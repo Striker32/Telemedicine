@@ -61,6 +61,7 @@ class Myapp extends StatelessWidget {
           cursorColor: AppColors.mainColor,
         ),
       ),
+      navigatorKey: navigatorKey,
       home: SplashScreen(),
     );
   }
