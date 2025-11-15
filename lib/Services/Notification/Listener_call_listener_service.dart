@@ -72,6 +72,17 @@ class CallListenerService {
       body: 'Вам звонит $callerName по заявке $reason',
       payload: 'call:$channelName',
     );
+
+    try {
+      await requestDoc.reference.update({
+        'isCalling': false,
+        'callerId': null, // FieldValue.delete() также хороший вариант
+      });
+      print("Флаги звонка для заявки $channelName немедленно сброшены.");
+    } catch (e) {
+      print("Ошибка при сбросе флагов звонка: $e");
+    }
+
   }
 
   // Вспомогательная функция для получения имени (без изменений)
