@@ -35,7 +35,7 @@ class BottomNavigator extends StatefulWidget {
 class _BottomNavigatorState extends State<BottomNavigator> {
   late int _currentIndex;
   late final String _usertype = widget.usertype;
-  final ListenerCallListenerService _callListener = ListenerCallListenerService();
+  final CallListenerService _callListener = CallListenerService();
   final ChatListenerService _chatListener = ChatListenerService();
 
   // int _currentIndex = 2; // <- ВОТ СЮДА ПЕРЕДАВАТЬ КАКУЮ СТРАНИЦУ ОТКРЫТЬ

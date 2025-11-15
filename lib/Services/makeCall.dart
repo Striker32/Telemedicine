@@ -1,4 +1,4 @@
-// lib/Services/makeCall.dart
+// lib/Services/Notification/makeCall.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,36 +11,39 @@ Future<void> makeCall(BuildContext context, {required String applicationId}) asy
   final currentUser = FirebaseAuth.instance.currentUser;
   if (currentUser == null) return;
 
-  final docRef = FirebaseFirestore.instance.collection('requests').doc(applicationId);
-
   try {
-    // 1. Просто устанавливаем флаги в Firestore. Всю проверку сделает получатель.
+    // ИСПРАВЛЕНО: используем коллекцию 'requests'
+    final docRef = FirebaseFirestore.instance.collection('requests').doc(applicationId);
+
+    // Устанавливаем флаг звонка и ID звонящего
     await docRef.update({
       'isCalling': true,
       'callerId': currentUser.uid,
     });
 
-    print("Отправлен сигнал к звонку. Переход на экран звонка.");
+    print("Отправлен сигнал к звонку. Переход на экран звонка с каналом: $applicationId");
 
-    // 2. Переходим на экран звонка
-    if (context.mounted) {
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => VideoCallPage(channelName: applicationId),
-        ),
-      );
-    }
+    // Переходим на экран звонка
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => VideoCallPage(channelName: applicationId),
+      ),
+    );
 
-    // 3. Когда звонок завершен штатно, просто сбрасываем флаги
+    // Когда звонок завершен, снимаем флаг
     await docRef.update({
       'isCalling': false,
-      'callerId': null,
+      'callerId': null, // Очищаем поле
     });
     print("Звонок завершен, флаг снят.");
 
   } catch (e) {
     print("Ошибка при попытке начать звонок: $e");
-    // В случае ошибки тоже пытаемся все очистить
-    await docRef.update({'isCalling': false, 'callerId': null});
+    // В случае ошибки тоже снимаем флаг
+    await FirebaseFirestore.instance.collection('requests').doc(applicationId).update({
+      'isCalling': false,
+      'callerId': null,
+    });
+    // ... ваш код для показа ошибки пользователю
   }
 }
