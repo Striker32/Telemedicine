@@ -25,7 +25,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
   void _openPrivacyPolicy() {
     // Навигация на страницу политики конфиденциальности
     launchUrl(
-      Uri.parse('https://example.com/privacy'),
+      Uri.parse('https://02.rkn.gov.ru/directions/p4172/p18331/'),
       mode: LaunchMode.externalApplication,
     );
   }
@@ -33,7 +33,9 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
   void _openMedicalDocument() {
     // Навигация на медицинский документ
     launchUrl(
-      Uri.parse('https://example.com/oath'),
+      Uri.parse(
+        'https://www.it-lex.ru/usloviya_ispolzovaniya_servisa/polzovatelskoe_soglashenie',
+      ),
       mode: LaunchMode.externalApplication,
     );
   }
@@ -72,7 +74,6 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
       body: SafeArea(
         child: Column(
           children: [
-
             // Список настроек в Expanded
             Expanded(
               child: ListView(
@@ -91,7 +92,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                       DividerLine(),
 
                       SettingsRow(
-                        viewTitle: 'Политика конфиденциальности',
+                        viewTitle: 'Политика обработки ПД',
                         onTap: _openPrivacyPolicy,
                         showArrow: true,
                       ),
@@ -99,7 +100,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                       DividerLine(),
 
                       SettingsRow(
-                        viewTitle: 'Медицинский документ',
+                        viewTitle: 'Пользовательское соглашение',
                         onTap: _openMedicalDocument,
                         showArrow: true,
                       ),
@@ -130,7 +131,6 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
                   ),
 
                   // Contact support
-
                   const SizedBox(height: 30),
 
                   DividerLine(),

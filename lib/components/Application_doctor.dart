@@ -595,7 +595,7 @@ class _ChangeApplicationPopupState extends State<ChangeApplicationPopup> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Пациент выбрал Вас',
+                              'Вы лечащий врач',
                               style: TextStyle(
                                 color: const Color(0xFFF5F5F7),
                                 fontSize: 14,

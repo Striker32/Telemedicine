@@ -67,7 +67,6 @@ class Myapp extends StatelessWidget {
   }
 }
 
-
 // Future <void> handleBackgroundMessage(RemoteMessage message) async {
 // // if app closed, background
 // print('Message: ${message.notification?.title}');

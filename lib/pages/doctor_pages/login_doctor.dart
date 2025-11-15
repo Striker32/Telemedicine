@@ -208,7 +208,9 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
                     children: [
                       InkWell(
                         onTap: () => launchUrl(
-                          Uri.parse('https://example.com/privacy'),
+                          Uri.parse(
+                            'https://www.it-lex.ru/usloviya_ispolzovaniya_servisa/polzovatelskoe_soglashenie',
+                          ),
                           mode: LaunchMode.externalApplication,
                         ),
                         child: Text(
@@ -240,11 +242,13 @@ class _LoginPageDoctorState extends State<LoginPageDoctor> {
                     children: [
                       InkWell(
                         onTap: () => launchUrl(
-                          Uri.parse('https://example.com/oath'),
+                          Uri.parse(
+                            'https://02.rkn.gov.ru/directions/p4172/p18331/',
+                          ),
                           mode: LaunchMode.externalApplication,
                         ),
                         child: Text(
-                          'Политику обработки персональных\nданных',
+                          'Политику обработки\nперсональных данных',
                           style: TextStyle(
                             fontFamily: 'SF Pro Display',
                             fontSize: 14,
