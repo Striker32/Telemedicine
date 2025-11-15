@@ -269,7 +269,7 @@ class _LoginPageUserState extends State<LoginPageUser> {
                           mode: LaunchMode.externalApplication,
                         ),
                         child: Text(
-                          'Политику обработки персональных\nданных',
+                          'Политику обработки\nперсональных данных',
                           style: TextStyle(
                             fontFamily: 'SF Pro Display',
                             fontSize: 14,

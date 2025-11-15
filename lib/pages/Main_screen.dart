@@ -22,46 +22,40 @@ class MainScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Spacer(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end, // всё уходит вниз
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // прижимаем к левому краю
+              children: [
+                // Логотип
+                SvgPicture.asset(
+                  "assets/images/app/MedConnectText.svg",
+                  width: 237,
+                  height: 30,
+                ),
 
-                  Padding(
-                    padding: const EdgeInsets.only(right: 110),
-                    child: SvgPicture.asset(
-                      "assets/images/app/MedConnectText.svg",
-                      fit: BoxFit.cover,
-                      width: 100, // Растягиваем на всю ширину
-                      height: 35, // Растягиваем на всю высоту
-                    ),
+                const SizedBox(height: 15),
+
+                // Текст
+                Text(
+                  "Наше приложение поможет быстро найти "
+                  "\nнужного врача: в вашем городе или из любого"
+                  "\nрегиона России — онлайн или на приёме.",
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 16,
+                    fontFamily: "SF Pro Display",
+                    fontWeight: FontWeight.w400,
                   ),
+                ),
 
-                  const SizedBox(height: 15),
+                const SizedBox(height: 20),
 
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Text(
-                      "Наше приложение поможет быстро найти "
-                          "\nнужного врача: в вашем городе или из любого"
-                          "\nрегиона России — онлайн или на приёме.",
-
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 16,
-                        fontFamily: "SF Pro Display",
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // Кнопка Врач
-                  SizedBox(
+                // Кнопка по центру
+                Center(
+                  child: SizedBox(
                     width: 390,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -74,8 +68,10 @@ class MainScreen extends StatelessWidget {
                       ),
                       onPressed: () {
                         Navigator.push(
-                          context, // 'context' здесь очень важен!
-                          MaterialPageRoute(builder: (context) => ChooseProfile()), // Замените DoctorScreen() на ваш виджет
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChooseProfile(),
+                          ),
                         );
                       },
                       child: const Text(
@@ -89,10 +85,8 @@ class MainScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 15),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

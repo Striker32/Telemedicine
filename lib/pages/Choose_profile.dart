@@ -46,63 +46,69 @@ class ChooseProfile extends StatelessWidget {
             // Нижняя часть — кнопки по центру и прижаты к низу
             Column(
               children: [
-                SizedBox(
-                  width: 370,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accentRed,
-                      foregroundColor: AppColors.mainColor,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegisterPageUser(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accentRed,
+                        foregroundColor: AppColors.mainColor,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      );
-                    },
-                    child: const Text(
-                      "Пациент",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: "SF Pro Display",
-                        fontWeight: FontWeight.w500,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterPageUser(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Пациент",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: "SF Pro Display",
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: 370,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.background3,
-                      foregroundColor: AppColors.primaryText,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPageDoctor(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.background3,
+                        foregroundColor: AppColors.primaryText,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      );
-                    },
-                    child: const Text(
-                      "Врач",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: "SF Pro Display",
-                        fontWeight: FontWeight.w500,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPageDoctor(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Врач",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: "SF Pro Display",
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
