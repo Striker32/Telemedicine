@@ -42,6 +42,8 @@ class _ChatScreenState extends State<ChatScreen> {
   late DatabaseReference _presenceRef;
   late Stream<DatabaseEvent> _presenceStream;
 
+
+
   void sendMessage() async {
     final cleanedMessage = _controller.text
         .split('\n')
@@ -59,6 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
       widget.requestID,
       cleanedMessage,
     );
+
   }
 
   bool _canSend = false;
