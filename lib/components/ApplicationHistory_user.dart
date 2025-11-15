@@ -35,7 +35,7 @@ class HistoryApplicationCard extends StatelessWidget {
   final String doctor;
   final String description;
   final String city;
-  final String rating;
+  final int rating;
   final String cost;
   final String requestID;
 
@@ -53,7 +53,7 @@ class HistoryApplicationCard extends StatelessWidget {
     required this.responder,
     required this.requestID,
     this.avatar = null,
-    this.rating = '',
+    this.rating = 0,
   }) : super(key: key);
 
   // Палитра/токены
@@ -100,7 +100,7 @@ class HistoryApplicationCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 30),
-                if (rating != '')
+                if (rating != 0)
                   Container(
                     width: 48,
                     height: 25,
@@ -119,7 +119,7 @@ class HistoryApplicationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          rating,
+                          rating.toString(),
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -213,7 +213,7 @@ class HistoryApplicationCard extends StatelessWidget {
                               initialValues: initialValues,
                               datetime: datetime,
                               responder: responder,
-                              hasRating: rating != '',
+                              hasRating: rating != 0,
                               rating: rating,
                               requestID: requestID,
                             );
@@ -336,7 +336,7 @@ class HistoryApplicationPopup extends StatefulWidget {
   final String? datetime;
   final List<dynamic> responder;
   final bool? hasRating;
-  final String? rating;
+  final int rating;
   final String requestID;
 
   const HistoryApplicationPopup({
@@ -345,7 +345,7 @@ class HistoryApplicationPopup extends StatefulWidget {
     this.initialValues,
     this.datetime,
     this.hasRating,
-    this.rating,
+    this.rating = 0,
     this.responder = const [],
   });
 
@@ -638,7 +638,7 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                     itemBuilder: (context, index) {
                       final responder = widget.responder[index];
                       final bool hasRating = widget.hasRating ?? false;
-                      final String rating = widget.rating ?? '';
+                      final String rating = widget.rating.toString();
                       final String name = (responder['name'] ?? '') as String;
                       final String surname =
                           (responder['surname'] ?? '') as String;
@@ -1000,7 +1000,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
   String? datetime,
   List<dynamic> responder = const [],
   bool? hasRating,
-  String? rating,
+  int rating = 0,
   required String requestID,
 }) {
   return showModalBottomSheet<Map<String, dynamic>>(

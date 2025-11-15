@@ -493,7 +493,7 @@ class _ArchivedApplicationsViewState extends State<ArchivedApplicationsView> {
                         description: r.description,
                         city: r.city,
                         cost: r.price,
-                        rating: '5',
+                        rating: r.rating,
                         requestID: r.id,
                         userID: r.userUid,
                       );

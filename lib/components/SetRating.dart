@@ -181,7 +181,10 @@ Future<bool> showRatingDialog({
                                     final sender =
                                         FirebaseAuth.instance.currentUser;
                                     if (sender != null) {
-                                      final patch = {'status': '2'};
+                                      final patch = {
+                                        'status': '2',
+                                        'rating': rating,
+                                      };
 
                                       final repo = RequestRepository();
 
