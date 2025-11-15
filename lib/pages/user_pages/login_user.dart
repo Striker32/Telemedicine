@@ -156,8 +156,10 @@ class _LoginPageUserState extends State<LoginPageUser> {
                       child: TextFormField(
                         onChanged: (_) => setState(() {}),
                         keyboardType: TextInputType.phone,
+                        maxLength: 10,
                         controller: _phoneController,
                         decoration: const InputDecoration(
+                          counterText: "",
                           hintText: 'Ваш номер телефона',
                           hintStyle: TextStyle(
                             fontFamily: 'SF Pro Display',

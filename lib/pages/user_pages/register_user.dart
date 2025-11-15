@@ -236,8 +236,10 @@ class _RegisterPageUserState extends State<RegisterPageUser> {
                       child: TextFormField(
                         onChanged: (_) => setState(() {}),
                         controller: _phoneController,
+                        maxLength: 10,
                         keyboardType: TextInputType.phone,
                         decoration: const InputDecoration(
+                          counterText: "",
                           hintText: 'Ваш номер телефона',
                           hintStyle: TextStyle(
                             fontFamily: 'SF Pro Display',
