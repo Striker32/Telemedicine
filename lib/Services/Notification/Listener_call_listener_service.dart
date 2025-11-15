@@ -1,102 +1,85 @@
-// lib/Services/Notification/Listener_call_listener_service.dart
+// D:/IT projects/last_telemedicine/lib/Services/Notification/Listener_call_listener_service.dart
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'NotificationService.dart';
+// 1. ДОБАВЛЯЕМ ИМПОРТ REALTIME DATABASE
+import 'package:firebase_database/firebase_database.dart';
+import 'package:last_telemedicine/Services/Notification/NotificationService.dart'; // Убедитесь, что путь верный
 
-class CallListenerService {
+class ListenerCallListenerService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // 2. СОЗДАЕМ ЭКЗЕМПЛЯР REALTIME DATABASE
+  final FirebaseDatabase _database = FirebaseDatabase.instance;
+
+  // Оставляем подписки как приватные поля класса
   StreamSubscription? _callSubscription;
+  StreamSubscription? _callerPresenceSubscription;
 
-  // 1. === ИСПРАВЛЕНИЕ: СОЗДАЕМ ЭКЗЕМПЛЯР ПЛАГИНА ===
-  // Эта строка создает "пульт управления" уведомлениями, который мы будем использовать ниже.
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
-
-  // 2. === ИСПРАВЛЕНИЕ: ДЕЛАЕМ МЕТОД АСИНХРОННЫМ (`async`) ===
-  void startListening(String currentUserId) async {
+  void startListening(String myId) {
+    // Останавливаем предыдущие слушатели, если они были
     stopListening();
+    print("CallListenerService: Начинаю прослушивание звонков для $myId");
 
-    // 3. === ТЕПЕРЬ ЭТОТ КОД РАБОТАЕТ ===
-    // Запрашиваем разрешение у пользователя
-    bool? granted = await _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
-
-    print("Разрешение на уведомления предоставлено: $granted");
-
-    if (granted == false) {
-      // Если пользователь отказал, нет смысла слушать звонки.
-      print("Пользователь отказал в разрешении на уведомления. Прослушивание не начнется.");
-      return;
-    }
-
-    print("Начинаю прослушивание звонков для пользователя: $currentUserId");
-
-    // --- Остальной код остается без изменений ---
-    _callSubscription = FirebaseFirestore.instance
-        .collection('requests')
-        .where('isCalling', isEqualTo: true)
+    // Ваш запрос к Firestore для поиска входящих звонков
+    // (Я использую примерный запрос, у вас он может быть другим)
+    _callSubscription = _firestore.collection('requests')
+        .where('doctorId', isEqualTo: myId) // Пример вашего фильтра
         .snapshots()
         .listen((snapshot) {
-      for (var doc in snapshot.docs) {
-        final requestData = doc.data();
-        final userUid = requestData['userUid'];
-        final selectedDoctorUid = requestData['selectedDoctorUid'];
-        final callerId = requestData['callerId'];
 
-        bool isMyRequest = (userUid == currentUserId || selectedDoctorUid == currentUserId);
-        bool isNotMyCall = (callerId != null && callerId != currentUserId);
+      // При каждом новом событии от Firestore, отменяем старую проверку статуса
+      _callerPresenceSubscription?.cancel();
 
-        if (isMyRequest && isNotMyCall) {
-          _onCallReceived(doc);
-          break;
-        }
+      // Ищем первый документ, где есть активный звонок
+      final callDocs = snapshot.docs.where((doc) => doc.data()['isCalling'] == true).toList();
+
+      if (callDocs.isEmpty) {
+        return; // Нет активных звонков, выходим
+      }
+
+      final callDoc = callDocs.first;
+      final data = callDoc.data();
+      final String? callerId = data['callerId'];
+
+      if (callerId != null) {
+        print("CallListenerService: Обнаружен флаг звонка от $callerId. Проверяю его онлайн-статус...");
+
+        // 3. ПОДПИСЫВАЕМСЯ НА ОНЛАЙН-СТАТУС ЗВОНЯЩЕГО В REALTIME DATABASE
+        // Путь 'presence/$callerId/online' должен соответствовать тому,
+        // что записывает ваш PresenceService
+        _callerPresenceSubscription = _database.ref('presence/$callerId/online').onValue.listen((event) {
+
+          // Проверяем значение: оно должно быть именно true
+          final bool isCallerOnline = event.snapshot.value == true;
+
+          // 4. ПРИНИМАЕМ РЕШЕНИЕ
+          if (isCallerOnline) {
+            // Звонящий онлайн + флаг isCalling=true. ЭТО РЕАЛЬНЫЙ ЗВОНОК!
+            print("CallListenerService: Звонящий онлайн. Показываю уведомление.");
+            // Вызываем ваш сервис уведомлений
+            NotificationService().showCallNotification(
+              title: 'Входящий звонок',
+              body: 'Вам звонят...',
+              payload: 'call:${callDoc.id}',
+            );
+          } else {
+            // Звонящий оффлайн! ЭТО "ФАНТОМНЫЙ" ЗВОНОК.
+            print("CallListenerService: Звонящий оффлайн. Сбрасываю 'фантомный' звонок.");
+            // САМОСТОЯТЕЛЬНО СБРАСЫВАЕМ ФЛАГИ В FIRESTORE
+            callDoc.reference.update({
+              'isCalling': false,
+              'callerId': null,
+            });
+          }
+        });
       }
     });
   }
 
-  // Общий обработчик для входящего звонка (без изменений)
-  Future<void> _onCallReceived(DocumentSnapshot requestDoc) async {
-    final requestData = requestDoc.data() as Map<String, dynamic>;
-    final channelName = requestDoc.id;
-    final reason = requestData['reason'] as String;
-    final callerId = requestData['callerId'] as String;
-    String callerName = await _getUserName(callerId);
-
-    print("Обнаружен входящий звонок от $callerName по каналу $channelName!");
-
-    NotificationService().showCallNotification(
-      title: 'Входящий звонок',
-      body: 'Вам звонит $callerName по заявке $reason',
-      payload: 'call:$channelName',
-    );
-  }
-
-  // Вспомогательная функция для получения имени (без изменений)
-  Future<String> _getUserName(String userId) async {
-    try {
-      var doc = await FirebaseFirestore.instance.collection('doctors').doc(userId).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        return "${data['name'] ?? ''} ${data['surname'] ?? ''}".trim();
-      }
-      doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
-      if (doc.exists) {
-        final data = doc.data()!;
-        return "${data['name'] ?? ''} ${data['surname'] ?? ''}".trim();
-      }
-    } catch (e) {
-      print("Ошибка при получении имени пользователя: $e");
-    }
-    return 'Неизвестный';
-  }
-
-  // Метод остановки (без изменений)
   void stopListening() {
-    print("Останавливаю прослушивание звонков.");
+    print("CallListenerService: Останавливаю прослушивание.");
+    // Важно отменять обе подписки
     _callSubscription?.cancel();
-    _callSubscription = null;
+    _callerPresenceSubscription?.cancel();
   }
 }
