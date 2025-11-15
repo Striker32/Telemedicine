@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/Appbar/AppBarButton.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../components/Appbar/CustomAppBar.dart';
 import '../../components/DividerLine.dart';
@@ -23,17 +24,17 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
 
   void _openPrivacyPolicy() {
     // Навигация на страницу политики конфиденциальности
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => PrivacyPolicyPage()),
+    launchUrl(
+      Uri.parse('https://example.com/privacy'),
+      mode: LaunchMode.externalApplication,
     );
   }
 
   void _openMedicalDocument() {
     // Навигация на медицинский документ
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => MedicalDocumentPage()),
+    launchUrl(
+      Uri.parse('https://example.com/oath'),
+      mode: LaunchMode.externalApplication,
     );
   }
 
@@ -91,7 +92,7 @@ class _ProfileSettingsPageUserState extends State<ProfileSettingsPageUser> {
 
                       SettingsRow(
                         viewTitle: 'Политика конфиденциальности',
-                        onTap: _openMedicalDocument,
+                        onTap: _openPrivacyPolicy,
                         showArrow: true,
                       ),
 
