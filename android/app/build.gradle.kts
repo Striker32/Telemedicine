@@ -1,8 +1,5 @@
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
-    id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -14,14 +11,12 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-
-        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_21.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {
@@ -46,15 +41,4 @@ android {
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    // --- ИСПРАВЛЕНИЕ 2 ---
-    // (Используйте вашу версию Kotlin, 2.1.10 - это пример, если он не работает, используйте "1.8.20" или тот, что в корневом файле)
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.10")
-
-    // Эта зависимость добавляет библиотеку "desugaring"
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-
-    // ... (здесь могут быть другие ваши зависимости, например, для Firebase)
 }

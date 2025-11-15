@@ -22,7 +22,3 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
-
-// Source - https://stackoverflow.com/a
-// Posted by Dasun wijesundara, modified by community. See post 'Timeline' for change history
-// Retrieved 2025-11-14, License - CC BY-SA 4.0
