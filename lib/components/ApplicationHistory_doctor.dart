@@ -33,7 +33,7 @@ class HistoryApplicationCard extends StatelessWidget {
   final String doctor;
   final String description;
   final String city;
-  final String rating;
+  final int rating;
   final String cost;
   final String requestID;
   final String userID;
@@ -51,7 +51,7 @@ class HistoryApplicationCard extends StatelessWidget {
     required this.requestID,
     required this.userID,
     this.avatar = null,
-    this.rating = '',
+    this.rating = 0,
   }) : super(key: key);
 
   // Палитра/токены
@@ -136,7 +136,7 @@ class HistoryApplicationCard extends StatelessWidget {
 
                 SizedBox(width: 30),
 
-                if (rating != '')
+                if (rating != 0)
                   Container(
                     width: 48,
                     height: 25,
@@ -155,7 +155,7 @@ class HistoryApplicationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          rating,
+                          rating.toString(),
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -233,7 +233,7 @@ class HistoryApplicationCard extends StatelessWidget {
                               context,
                               initialValues: initialValues,
                               datetime: datetime,
-                              hasRating: rating != '',
+                              hasRating: rating != 0,
                               rating: rating,
                               name: name,
                               surname: surname,
@@ -360,7 +360,7 @@ class HistoryApplicationPopup extends StatefulWidget {
   final String? datetime;
   final List<dynamic> responder;
   final bool? hasRating;
-  final String? rating;
+  final int rating;
   final String? name;
   final String? surname;
   final String requestID;
@@ -372,7 +372,7 @@ class HistoryApplicationPopup extends StatefulWidget {
     this.initialValues,
     this.datetime,
     this.hasRating,
-    this.rating,
+    this.rating = 0,
     this.name = "Гость",
     this.surname = "",
     this.responder = const [],
@@ -562,7 +562,7 @@ class _HistoryApplicationPopupState extends State<HistoryApplicationPopup> {
                             ),
                             const SizedBox(width: 3),
                             Text(
-                              widget.rating ?? "0",
+                              widget.rating.toString(),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -951,7 +951,7 @@ Future<Map<String, dynamic>?> showHistoryApplicationPopup(
   String? datetime,
   List<dynamic> responder = const [],
   bool? hasRating,
-  String? rating,
+  int rating = 0,
   String? name,
   String? surname,
   Blob? avatar,

@@ -196,6 +196,7 @@ class _ApplicationsEmptyViewState extends State<ApplicationsEmptyView> {
             }
 
             final items = snap.data ?? [];
+            debugPrint('DEBUG: snap? ${snap}');
             final active = items
                 .where(
                   (r) =>
@@ -681,7 +682,7 @@ class _HistoryApplicationsEmptyViewState
                           city: r.city,
                           cost: r.price,
                           requestID: r.id,
-                          rating: '0',
+                          rating: r.rating,
                           responder: const [],
                         );
                       },
@@ -769,7 +770,7 @@ class _HistoryApplicationsEmptyViewState
                               city: r.city,
                               cost: r.price,
                               requestID: r.id,
-                              rating: d.rating,
+                              rating: r.rating,
                               responder: responders,
                             );
                           }
@@ -810,9 +811,7 @@ class _HistoryApplicationsEmptyViewState
                             city: r.city,
                             cost: r.price,
                             requestID: r.id,
-                            rating: responders.isNotEmpty
-                                ? responders.first['rating'].toString()
-                                : '0',
+                            rating: r.rating,
                             responder: responders,
                           );
                         },

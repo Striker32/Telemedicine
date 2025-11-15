@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Модель заявки
@@ -19,6 +21,7 @@ class RequestModel {
   final bool urgent;
   final Timestamp? createdAt;
   final Timestamp? updatedAt;
+  final int rating;
 
   RequestModel({
     required this.id,
@@ -31,6 +34,7 @@ class RequestModel {
     required this.price,
     required this.specializationRequested,
     required this.selectedDoctorUid,
+    this.rating = 0,
     this.urgent = false,
     this.createdAt,
     this.updatedAt,
@@ -64,6 +68,7 @@ class RequestModel {
       specializationRequested: map['specializationRequested']?.toString() ?? '',
       createdAt: map['createdAt'] as Timestamp?,
       updatedAt: map['updatedAt'] as Timestamp?,
+      rating: map['rating'] as int? ?? 0,
       selectedDoctorUid: map['selectedDoctorUid']?.toString(),
     );
   }
@@ -80,6 +85,7 @@ class RequestModel {
       'price': price,
       'urgent': urgent,
       'updatedAt': FieldValue.serverTimestamp(),
+      'rating': rating,
       'selectedDoctorUid': selectedDoctorUid,
     };
   }
@@ -171,9 +177,13 @@ class RequestRepository {
     String id,
     Map<String, dynamic> patch, {
     String? doctorUid,
-    int? rating, // 1..5
+    int? rating,
   }) async {
-    final data = {...patch, 'updatedAt': FieldValue.serverTimestamp()};
+    final data = {
+      ...patch,
+      'updatedAt': FieldValue.serverTimestamp(),
+      if (rating != null) 'rating': rating,
+    };
     final isStatus2 = patch['status']?.toString() == '2';
 
     if (isStatus2 && doctorUid != null && doctorUid.isNotEmpty) {
@@ -205,7 +215,11 @@ class RequestRepository {
         }
 
         tx.set(doctorRef, doctorPatch, SetOptions(merge: true));
-        tx.set(_col.doc(id), data, SetOptions(merge: true));
+        tx.set(
+          _col.doc(id),
+          data,
+          SetOptions(merge: true),
+        ); // data уже содержит rating как int если был передан
       });
 
       return;

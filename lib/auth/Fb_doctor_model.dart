@@ -76,6 +76,7 @@ class DoctorModel {
       'about': about,
       'avatar': avatar,
       "rating": rating,
+      'rating_count': rating_count,
       "completed": completed,
       // createdAt/updatedAt устанавливаются в репозитории через FieldValue.serverTimestamp()
     };
