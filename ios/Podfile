@@ -1,19 +1,11 @@
+# Поддержка iOS 15
 platform :ios, '15.0'
 
 use_frameworks!
 use_modular_headers!
 
-# Подключаем flutter podhelper
-require File.expand_path(File.join('..', 'Flutter', 'podhelper.rb'), __FILE__)
-
 target 'Runner' do
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-
-  post_install do |installer|
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-      end
-    end
-  end
+  flutter_application_path = '../'
+  # подключаем podhelper.rb, если он есть
+  load File.join(flutter_application_path, 'ios', 'Flutter', 'podhelper.rb') if File.exist?(File.join(flutter_application_path, 'ios', 'Flutter', 'podhelper.rb'))
 end
