@@ -45,5 +45,14 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Для совершения видеозвонков требуется доступ к вашей камере.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Для совершения аудио- и видеозвонков требуется доступ к вашему микрофону.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+	<string>fetch</string>
+	<string>remote-notification</string>
+	</array>
 </dict>
 </plist>

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/themes/AppColors.dart';
@@ -12,7 +13,7 @@ const String appId = "2ef6fb981a01460d916cb37c51a9306a";
 
 class VideoCallPage extends StatefulWidget {
   final String channelName; // Имя канала, уникальное для чата
- // final String token; // Токен доступа для этого канала
+  // final String token; // Токен доступа для этого канала
 
   const VideoCallPage({
     Key? key,
@@ -150,7 +151,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
     await _engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
     await _engine.joinChannel(
-     token: "",
+      token: "",
       channelId: widget.channelName,
       options: const ChannelMediaOptions(),
       uid: 0, // uid = 0, Agora назначает UID автоматически
