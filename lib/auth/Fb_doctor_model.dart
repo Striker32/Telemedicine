@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 /// Модель данных доктора
 class DoctorModel {
@@ -41,6 +44,30 @@ class DoctorModel {
   });
 
   factory DoctorModel.fromMap(String uid, Map<String, dynamic> map) {
+    final avatarRaw = map['avatar'];
+
+    Blob? parsedAvatar;
+    if (avatarRaw == null) {
+      parsedAvatar = null;
+    } else if (avatarRaw is Blob) {
+      // Firestore SDK вернул Blob напрямую
+      parsedAvatar = avatarRaw;
+    } else if (avatarRaw is Map<String, dynamic> &&
+        avatarRaw.containsKey('_byteString')) {
+      // Иногда Firestore сериализует Blob как Map
+      try {
+        parsedAvatar = Blob(
+          Uint8List.fromList((avatarRaw['_byteString'] as String).codeUnits),
+        );
+      } catch (e) {
+        debugPrint('Ошибка парсинга avatar: $e');
+        parsedAvatar = null;
+      }
+    } else {
+      debugPrint('Неожиданный тип avatar: ${avatarRaw.runtimeType}');
+      parsedAvatar = null;
+    }
+
     return DoctorModel(
       uid: uid,
       name: map['name'] ?? '',
@@ -55,7 +82,7 @@ class DoctorModel {
       about: map['about'] ?? '',
       createdAt: map['createdAt'] as Timestamp?,
       updatedAt: map['updatedAt'] as Timestamp?,
-      avatar: map['avatar'] as Blob?,
+      avatar: parsedAvatar,
       rating: map['rating'] ?? '5',
       rating_count: map['rating_count'] ?? '10',
       completed: map['completed'] ?? '0',

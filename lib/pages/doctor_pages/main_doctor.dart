@@ -101,34 +101,33 @@ class _MainDoctorState extends State<MainDoctor> {
 
                           final users = usersSnap.data ?? [];
 
+                          if (filteredItems.isEmpty) {
+                            return Column(
+                              children: const [
+                                Center(
+                                  child: Text(
+                                    'Все объявления',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.mutedTitle,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                              ],
+                            );
+                          }
+
                           return ListView.builder(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             itemCount: filteredItems.length + 1,
                             itemBuilder: (context, index) {
-                              if (index == 0) {
-                                return Column(
-                                  children: const [
-                                    Center(
-                                      child: Text(
-                                        'Все объявления',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.mutedTitle,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                  ],
-                                );
-                              }
-
                               final r = filteredItems[index - 1];
                               final ts = r.updatedAt ?? r.createdAt;
                               final dtStr = ts != null ? _fmt(ts.toDate()) : '';
 
                               final fullName = users[index - 1];
-
                               final currentDoctorUid =
                                   FirebaseAuth.instance.currentUser!.uid;
                               final responded = r.hasResponded(

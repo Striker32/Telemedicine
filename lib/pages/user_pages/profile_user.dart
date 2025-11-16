@@ -179,7 +179,7 @@ class _ProfilePageState extends State<ProfilePageUser> {
     final uid = firebaseUser.uid;
 
     return StreamBuilder<UserModel?>(
-      stream: repo.watchUser(context, uid),
+      stream: repo.watchUser(uid),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
           return Scaffold(

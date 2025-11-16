@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:last_telemedicine/components/Notification.dart';
@@ -10,7 +12,7 @@ class UserRepository {
     return UserModel.fromMap(doc.data()!);
   }
 
-  Stream<UserModel?> watchUser(context, String uid) {
+  Stream<UserModel?> watchUser(String uid) {
     return _db.collection('users').doc(uid).snapshots().map((doc) {
       if (!doc.exists || doc.data() == null) {
         return null;
@@ -19,8 +21,8 @@ class UserRepository {
       try {
         return UserModel.fromMap(doc.data()!);
       } catch (e, stacktrace) {
-        showCustomNotification(context, 'Ошибка маппинга UserModel: $e');
-        showCustomNotification(context, 'Stacktrace: $stacktrace');
+        debugPrint('Ошибка маппинга UserModel: $e');
+        debugPrint('Stacktrace: $stacktrace');
         return null; // Возвращаем null, чтобы не было краша
       }
     });
@@ -52,13 +54,37 @@ class UserModel {
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
+    final avatarRaw = map['avatar'];
+
+    Blob? parsedAvatar;
+    if (avatarRaw == null) {
+      parsedAvatar = null;
+    } else if (avatarRaw is Blob) {
+      // Firestore SDK вернул Blob напрямую
+      parsedAvatar = avatarRaw;
+    } else if (avatarRaw is Map<String, dynamic> &&
+        avatarRaw.containsKey('_byteString')) {
+      // Иногда Firestore сериализует Blob как Map
+      try {
+        parsedAvatar = Blob(
+          Uint8List.fromList((avatarRaw['_byteString'] as String).codeUnits),
+        );
+      } catch (e) {
+        debugPrint('Ошибка парсинга avatar: $e');
+        parsedAvatar = null;
+      }
+    } else {
+      debugPrint('Неожиданный тип avatar: ${avatarRaw.runtimeType}');
+      parsedAvatar = null;
+    }
+
     return UserModel(
       name: map['name'] ?? '',
       surname: map['surname'] ?? '',
       realEmail: map['realEmail'] ?? '',
       phone: map['phone'] ?? '',
       city: map['city'] ?? '',
-      avatar: map['avatar'] as Blob?,
+      avatar: parsedAvatar,
     );
   }
 }

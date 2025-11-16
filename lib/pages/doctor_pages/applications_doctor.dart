@@ -277,13 +277,7 @@ class _ActiveApplicationsViewState extends State<ActiveApplicationsView> {
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: SizedBox(
                             height: 80,
-                            child: Center(
-                              child: SizedBox(
-                                width: 48,
-                                height: 48,
-                                child: PulseLoadingWidget(),
-                              ),
-                            ),
+                            child: Center(child: SizedBox()),
                           ),
                         );
                       }
@@ -472,13 +466,7 @@ class _ArchivedApplicationsViewState extends State<ArchivedApplicationsView> {
                           padding: const EdgeInsets.symmetric(vertical: 12.0),
                           child: SizedBox(
                             height: 80,
-                            child: Center(
-                              child: SizedBox(
-                                width: 48,
-                                height: 48,
-                                child: PulseLoadingWidget(),
-                              ),
-                            ),
+                            child: Center(child: SizedBox()),
                           ),
                         );
                       }
