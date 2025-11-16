@@ -207,7 +207,25 @@ class _ProfilePageState extends State<ProfilePageUser> {
                 );
               },
             ),
-            body: const Center(child: Text('Профиль не найден')),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Профиль не найден'),
+                  const SizedBox(height: 30),
+                  const DividerLine(),
+                  CustomButton(
+                    onTap: () {
+                      logout(uid);
+                    },
+                    label: 'Выйти',
+                    color: AppColors.mainColor,
+                  ),
+                  const DividerLine(),
+                ],
+              ),
+            ),
+
           );
         }
 
