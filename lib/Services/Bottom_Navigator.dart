@@ -148,8 +148,7 @@ class _BottomNavigatorState extends State<BottomNavigator> {
                 ),
               ],
             ),
-            const SizedBox(height: 30), // ← отступ снизу
-          ],
+                   ],
         ),
       );
     }

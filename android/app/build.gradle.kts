@@ -11,12 +11,13 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_21.toString()
     }
 
     defaultConfig {
@@ -41,4 +42,15 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // --- ИСПРАВЛЕНИЕ 2 ---
+    // (Используйте вашу версию Kotlin, 2.1.10 - это пример, если он не работает, используйте "1.8.20" или тот, что в корневом файле)
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.21")
+
+    // Эта зависимость добавляет библиотеку "desugaring"
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+
+    // ... (здесь могут быть другие ваши зависимости, например, для Firebase)
 }
