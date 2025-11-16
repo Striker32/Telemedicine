@@ -20,23 +20,27 @@ void showCustomNotification(BuildContext? context, String titleText) {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Text(
-                    titleText,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: 'SF Pro Display',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.primaryText,
-                      decoration: TextDecoration.none,
+                // Прокручиваемая часть
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      titleText,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'SF Pro Display',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.primaryText,
+                        decoration: TextDecoration.none,
+                      ),
                     ),
                   ),
                 ),
 
                 const DividerLine(),
 
+                // Кнопка всегда внизу
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 0),
                   child: SizedBox(
