@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:last_telemedicine/components/Notification.dart';
+import 'package:last_telemedicine/components/Notification_global.dart';
 
 class UserRepository {
   final _db = FirebaseFirestore.instance;
@@ -79,7 +80,9 @@ class UserModel {
             try {
               return Blob(Uint8List.fromList(bs.codeUnits));
             } catch (e) {
-              debugPrint('avatar: failed to decode String _byteString: $e');
+              showGlobalNotification(
+                'avatar: failed to decode String _byteString: $e',
+              );
               return null;
             }
           }
@@ -91,7 +94,9 @@ class UserModel {
             final listInt = bs.cast<int>();
             return Blob(Uint8List.fromList(listInt));
           } catch (e) {
-            debugPrint('avatar: failed to cast List _byteString: $e');
+            showGlobalNotification(
+              'avatar: failed to cast List _byteString: $e',
+            );
             return null;
           }
         }
@@ -102,7 +107,7 @@ class UserModel {
           try {
             return Blob(Uint8List.fromList(alt.cast<int>()));
           } catch (e) {
-            debugPrint('avatar: failed to parse alt bytes: $e');
+            showGlobalNotification('avatar: failed to parse alt bytes: $e');
           }
         }
       }
@@ -115,14 +120,18 @@ class UserModel {
         try {
           return Blob(base64Decode(avatarRaw));
         } catch (e) {
-          debugPrint('avatar: failed to base64Decode top-level String: $e');
+          showGlobalNotification(
+            'avatar: failed to base64Decode top-level String: $e',
+          );
         }
       }
 
-      debugPrint('Неожиданный тип avatar: ${avatarRaw.runtimeType}');
+      showGlobalNotification(
+        'Неожиданный тип avatar: ${avatarRaw.runtimeType}',
+      );
       return null;
     } catch (e) {
-      debugPrint('Ошибка парсинга avatar общий catch: $e');
+      showGlobalNotification('Ошибка парсинга avatar общий catch: $e');
       return null;
     }
   }
