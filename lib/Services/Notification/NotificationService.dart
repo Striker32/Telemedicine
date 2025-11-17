@@ -173,8 +173,16 @@ class NotificationService {
           largeIcon: largeIcon,
         );
 
+    // Добавляем детали для iOS
+    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+      presentAlert: true, // Показать баннер
+      presentBadge: true, // Обновить бэдж (если нужно)
+      presentSound: true, // Проиграть звук
+    );
+
     const NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
+      iOS: iosDetails,
     );
 
     // ID = 1 для сообщений, чтобы не затирать уведомление о звонке
