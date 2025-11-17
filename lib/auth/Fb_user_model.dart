@@ -63,46 +63,65 @@ class UserModel {
     try {
       if (avatarRaw == null) return null;
 
+      // Уже Blob
       if (avatarRaw is Blob) return avatarRaw;
 
-      // Иногда Firestore кладёт Map с ключом _byteString
-      if (avatarRaw is Map<String, dynamic>) {
-        final bs = avatarRaw['_byteString'];
-        if (bs == null) return null;
+      // Если верхнеуровневый список байтов
+      if (avatarRaw is List) {
+        try {
+          final listInt = avatarRaw.cast<int>();
+          return Blob(Uint8List.fromList(listInt));
+        } catch (e) {
+          showGlobalNotification(
+            'avatar: failed to cast top-level List to int: $e',
+          );
+          return null;
+        }
+      }
 
-        // Если приходит base64-строка
-        if (bs is String) {
-          try {
-            final bytes = base64Decode(bs);
-            return Blob(bytes);
-          } catch (_) {
-            // не base64 — как fallback попробуем codeUnits (мало вероятно коректно)
+      // Map с разными вариантами сериализации
+      if (avatarRaw is Map) {
+        // Вариант _byteString может быть String (base64) или List
+        final bs =
+            avatarRaw['_byteString'] ??
+            avatarRaw['bytes'] ??
+            avatarRaw['value'];
+        if (bs != null) {
+          // base64 строка
+          if (bs is String) {
+            // иногда _byteString может быть "List<int>" в виде строки — попробуем base64 сначала
             try {
-              return Blob(Uint8List.fromList(bs.codeUnits));
+              final bytes = base64Decode(bs);
+              return Blob(Uint8List.fromList(bytes));
+            } catch (_) {
+              // fallback: если строка — вероятно codeUnits, но это редко; логируем
+              try {
+                return Blob(Uint8List.fromList(bs.codeUnits));
+              } catch (e) {
+                showGlobalNotification(
+                  'avatar: failed to decode String _byteString: $e',
+                );
+                return null;
+              }
+            }
+          }
+
+          // список чисел внутри map
+          if (bs is List) {
+            try {
+              final listInt = bs.cast<int>();
+              return Blob(Uint8List.fromList(listInt));
             } catch (e) {
               showGlobalNotification(
-                'avatar: failed to decode String _byteString: $e',
+                'avatar: failed to cast Map._byteString List to int: $e',
               );
               return null;
             }
           }
         }
 
-        // Если приходит список чисел
-        if (bs is List) {
-          try {
-            final listInt = bs.cast<int>();
-            return Blob(Uint8List.fromList(listInt));
-          } catch (e) {
-            showGlobalNotification(
-              'avatar: failed to cast List _byteString: $e',
-            );
-            return null;
-          }
-        }
-
-        // Если в map лежат щё другие варианты, попробуем найти 'bytes'
-        final alt = avatarRaw['bytes'] ?? avatarRaw['value'];
+        // Дополнительные поля: возможно просто поле 'data'/'raw'
+        final alt = avatarRaw['data'] ?? avatarRaw['raw'];
         if (alt is List) {
           try {
             return Blob(Uint8List.fromList(alt.cast<int>()));
@@ -112,13 +131,10 @@ class UserModel {
         }
       }
 
-      // Если приходит прямо List<int>
-      if (avatarRaw is List<int>) return Blob(Uint8List.fromList(avatarRaw));
-
-      // На крайний случай — если пришла строка (возможно base64 без _byteString)
+      // Если пришла строка (возможно base64 без обёртки)
       if (avatarRaw is String) {
         try {
-          return Blob(base64Decode(avatarRaw));
+          return Blob(Uint8List.fromList(base64Decode(avatarRaw)));
         } catch (e) {
           showGlobalNotification(
             'avatar: failed to base64Decode top-level String: $e',
@@ -130,8 +146,8 @@ class UserModel {
         'Неожиданный тип avatar: ${avatarRaw.runtimeType}',
       );
       return null;
-    } catch (e) {
-      showGlobalNotification('Ошибка парсинга avatar общий catch: $e');
+    } catch (e, st) {
+      showGlobalNotification('Ошибка парсинга avatar общий catch: $e\n$st');
       return null;
     }
   }

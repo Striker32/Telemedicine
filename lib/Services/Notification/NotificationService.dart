@@ -19,7 +19,7 @@ class NotificationService {
   // ---------------------------------------------------
 
   final FlutterLocalNotificationsPlugin _localNotifications =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   GlobalKey<NavigatorState>? _navigatorKey;
 
@@ -28,16 +28,26 @@ class NotificationService {
 
     // Используем вашу кастомную иконку для уведомлений
     const AndroidInitializationSettings androidSettings =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+    const DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings(
+          // 1. Запрашиваем разрешения (это у вас уже было)
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+
+          // 2. Указываем, что нужно показывать уведомление,
+          //    даже если приложение в этот момент открыто (foreground)
+          defaultPresentAlert: true,
+          defaultPresentBadge: true,
+          defaultPresentSound: true,
+        );
+
+    const InitializationSettings settings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
     );
-
-    const InitializationSettings settings =
-    InitializationSettings(android: androidSettings, iOS: iosSettings);
 
     await _localNotifications.initialize(
       settings,
@@ -51,10 +61,12 @@ class NotificationService {
         if (payload.startsWith('call:')) {
           final channelName = payload.substring(5);
           print(
-              "Нажато уведомление о звонке! Перехожу на VideoCallPage с каналом: $channelName");
+            "Нажато уведомление о звонке! Перехожу на VideoCallPage с каналом: $channelName",
+          );
           _navigatorKey?.currentState?.push(
             MaterialPageRoute(
-                builder: (context) => VideoCallPage(channelName: channelName)),
+              builder: (context) => VideoCallPage(channelName: channelName),
+            ),
           );
         }
         // --- Обработка нажатия на уведомление о СООБЩЕНИИ ---
@@ -90,23 +102,26 @@ class NotificationService {
     required String body,
     required String payload,
   }) async {
-    const AndroidBitmap<Object> largeIcon =
-    DrawableResourceAndroidBitmap('@mipmap/app_icon_color');
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'incoming_calls_channel',
-      'Входящие звонки',
-      channelDescription: 'Уведомления о входящих видеозвонках.',
-      importance: Importance.max,
-      priority: Priority.high,
-      //sound: RawResourceAndroidNotificationSound('ringtone'),
-      playSound: true,
-      // Основной цвет приложения для кружка под иконкой
-      color: Colors.red,
-      largeIcon: largeIcon,
+    const AndroidBitmap<Object> largeIcon = DrawableResourceAndroidBitmap(
+      '@mipmap/app_icon_color',
     );
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'incoming_calls_channel',
+          'Входящие звонки',
+          channelDescription: 'Уведомления о входящих видеозвонках.',
+          importance: Importance.max,
+          priority: Priority.high,
+          //sound: RawResourceAndroidNotificationSound('ringtone'),
+          playSound: true,
+          // Основной цвет приложения для кружка под иконкой
+          color: Colors.red,
+          largeIcon: largeIcon,
+        );
 
-    const NotificationDetails notificationDetails =
-    NotificationDetails(android: androidDetails);
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
 
     // ID = 0 для звонков
     await _localNotifications.show(
@@ -124,25 +139,30 @@ class NotificationService {
     required String body,
     required String payload,
   }) async {
-    const AndroidBitmap<Object> largeIcon =
-    DrawableResourceAndroidBitmap('@mipmap/app_icon_color');
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'new_messages_channel', // Другой ID канала
-      'Новые сообщения',
-      channelDescription: 'Уведомления о новых сообщениях в чатах.',
-      importance: Importance.defaultImportance, // Обычная важность, не как у звонка
-      priority: Priority.defaultPriority,
-      color: Colors.blue, // Другой цвет для кружка
-      // Используем стандартный звук уведомлений, а не рингтон
-      largeIcon: largeIcon,
+    const AndroidBitmap<Object> largeIcon = DrawableResourceAndroidBitmap(
+      '@mipmap/app_icon_color',
     );
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'new_messages_channel', // Другой ID канала
+          'Новые сообщения',
+          channelDescription: 'Уведомления о новых сообщениях в чатах.',
+          importance:
+              Importance.defaultImportance, // Обычная важность, не как у звонка
+          priority: Priority.defaultPriority,
+          color: Colors.blue, // Другой цвет для кружка
+          // Используем стандартный звук уведомлений, а не рингтон
+          largeIcon: largeIcon,
+        );
 
-    const NotificationDetails notificationDetails =
-    NotificationDetails(android: androidDetails);
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
 
     // ID = 1 для сообщений, чтобы не затирать уведомление о звонке
     await _localNotifications.show(
-      DateTime.now().millisecond, // Используем уникальный ID, чтобы сообщения не перезаписывали друг друга
+      DateTime.now()
+          .millisecond, // Используем уникальный ID, чтобы сообщения не перезаписывали друг друга
       title,
       body,
       notificationDetails,
