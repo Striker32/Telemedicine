@@ -10,32 +10,38 @@ import flutter_local_notifications
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
     
-    // УДАЛЕНО: UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
-    // Плагин делает это сам при регистрации.
-    
+    // ВАЖНО: Устанавливаем делегата, чтобы плагин мог работать с Foreground
+    if #available(iOS 10.0, *) {
+      UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+    }
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
 
-// 3. Расширение для обработки уведомлений (Foreground и Tap)
+// ЭТОТ БЛОК ДОЛЖЕН БЫТЬ ПЕРЕХВАЧЕН ПЛАГИНОМ АВТОМАТИЧЕСКИ, 
+// НО ЕСЛИ ЕСТЬ ПРОБЛЕМЫ, ДОБАВЬТЕ ЕГО ДЛЯ РУЧНОЙ ПЕРЕДАЧИ
 extension AppDelegate: UNUserNotificationCenterDelegate {
     
-    // Метод для показа уведомлений, когда приложение активно (Foreground)
+    // 1. Показ уведомления в Foreground
     override func userNotificationCenter(_ center: UNUserNotificationCenter, 
                                         willPresent notification: UNNotification, 
                                         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         
-        // Разрешаем показ алерта, бэйджа и звука. Flutter_local_notifications
-        // сам проверит настройки defaultPresentAlert из Dart.
-        completionHandler([.alert, .badge, .sound]) 
+        completionHandler(
+            // Плагин ожидает, что вы передадите ему эти опции. 
+            // Это разрешает показ уведомлений, когда приложение активно.
+            // Плагин сам решит, показывать ли их на основе Dart-настроек.
+            [.alert, .badge, .sound]
+        )
     }
     
-    // Метод для обработки нажатия на уведомление
+    // 2. Обработка нажатия на уведомление
     override func userNotificationCenter(_ center: UNUserNotificationCenter, 
-                                        didReceive response: UNNotificationResponse, 
-                                        withCompletionHandler completionHandler: @escaping () -> Void) {
+                                         didReceive response: UNNotificationResponse, 
+                                         withCompletionHandler completionHandler: @escaping () -> Void) {
         
-        // ИСПРАВЛЕНО: Используем актуальный API
+        // Обязательная передача нажатия обратно в Flutter.
         FlutterLocalNotificationsPlugin.handleNotificationAction(response)
         
         completionHandler()
