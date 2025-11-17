@@ -1,7 +1,12 @@
 import 'dart:typed_data';
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:last_telemedicine/components/Notification.dart';
 
 class UserRepository {
@@ -53,31 +58,77 @@ class UserModel {
     this.avatar,
   });
 
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    final avatarRaw = map['avatar'];
+  static Blob? _parseAvatar(dynamic avatarRaw) {
+    try {
+      if (avatarRaw == null) return null;
 
-    Blob? parsedAvatar;
-    if (avatarRaw == null) {
-      parsedAvatar = null;
-    } else if (avatarRaw is Blob) {
-      // Firestore SDK вернул Blob напрямую
-      parsedAvatar = avatarRaw;
-    } else if (avatarRaw is Map<String, dynamic> &&
-        avatarRaw.containsKey('_byteString')) {
-      // Иногда Firestore сериализует Blob как Map
-      try {
-        parsedAvatar = Blob(
-          Uint8List.fromList((avatarRaw['_byteString'] as String).codeUnits),
-        );
-      } catch (e) {
-        debugPrint('Ошибка парсинга avatar: $e');
-        parsedAvatar = null;
+      if (avatarRaw is Blob) return avatarRaw;
+
+      // Иногда Firestore кладёт Map с ключом _byteString
+      if (avatarRaw is Map<String, dynamic>) {
+        final bs = avatarRaw['_byteString'];
+        if (bs == null) return null;
+
+        // Если приходит base64-строка
+        if (bs is String) {
+          try {
+            final bytes = base64Decode(bs);
+            return Blob(bytes);
+          } catch (_) {
+            // не base64 — как fallback попробуем codeUnits (мало вероятно коректно)
+            try {
+              return Blob(Uint8List.fromList(bs.codeUnits));
+            } catch (e) {
+              debugPrint('avatar: failed to decode String _byteString: $e');
+              return null;
+            }
+          }
+        }
+
+        // Если приходит список чисел
+        if (bs is List) {
+          try {
+            final listInt = bs.cast<int>();
+            return Blob(Uint8List.fromList(listInt));
+          } catch (e) {
+            debugPrint('avatar: failed to cast List _byteString: $e');
+            return null;
+          }
+        }
+
+        // Если в map лежат щё другие варианты, попробуем найти 'bytes'
+        final alt = avatarRaw['bytes'] ?? avatarRaw['value'];
+        if (alt is List) {
+          try {
+            return Blob(Uint8List.fromList(alt.cast<int>()));
+          } catch (e) {
+            debugPrint('avatar: failed to parse alt bytes: $e');
+          }
+        }
       }
-    } else {
-      debugPrint('Неожиданный тип avatar: ${avatarRaw.runtimeType}');
-      parsedAvatar = null;
-    }
 
+      // Если приходит прямо List<int>
+      if (avatarRaw is List<int>) return Blob(Uint8List.fromList(avatarRaw));
+
+      // На крайний случай — если пришла строка (возможно base64 без _byteString)
+      if (avatarRaw is String) {
+        try {
+          return Blob(base64Decode(avatarRaw));
+        } catch (e) {
+          debugPrint('avatar: failed to base64Decode top-level String: $e');
+        }
+      }
+
+      debugPrint('Неожиданный тип avatar: ${avatarRaw.runtimeType}');
+      return null;
+    } catch (e) {
+      debugPrint('Ошибка парсинга avatar общий catch: $e');
+      return null;
+    }
+  }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    final parsedAvatar = _parseAvatar(map['avatar']);
     return UserModel(
       name: map['name'] ?? '',
       surname: map['surname'] ?? '',
