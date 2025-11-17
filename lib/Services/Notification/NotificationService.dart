@@ -1,5 +1,7 @@
 // lib/Services/Notification/NotificationService.dart
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -22,6 +24,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   GlobalKey<NavigatorState>? _navigatorKey;
+
+  final Completer<void> _initCompleter = Completer<void>();
 
   Future<void> initialize(GlobalKey<NavigatorState> navigatorKey) async {
     _navigatorKey = navigatorKey;
@@ -94,6 +98,10 @@ class NotificationService {
         }
       },
     );
+
+    if (!_initCompleter.isCompleted) {
+      _initCompleter.complete();
+    }
   }
 
   // --- Метод для показа уведомлений о ЗВОНКАХ ---
@@ -102,6 +110,7 @@ class NotificationService {
     required String body,
     required String payload,
   }) async {
+    await _initCompleter.future;
     const AndroidBitmap<Object> largeIcon = DrawableResourceAndroidBitmap(
       '@mipmap/app_icon_color',
     );
@@ -147,6 +156,7 @@ class NotificationService {
     required String body,
     required String payload,
   }) async {
+    await _initCompleter.future;
     const AndroidBitmap<Object> largeIcon = DrawableResourceAndroidBitmap(
       '@mipmap/app_icon_color',
     );

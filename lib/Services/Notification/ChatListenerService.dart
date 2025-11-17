@@ -13,7 +13,9 @@ class ChatListenerService {
   // Начинаем прослушивание
   void startListening(String currentUserId) {
     stopListening();
-    print("Начинаю прослушивание новых сообщений для пользователя: $currentUserId");
+    print(
+      "Начинаю прослушивание новых сообщений для пользователя: $currentUserId",
+    );
 
     _chatSubscription = _firestore
         .collectionGroup('messages')
@@ -21,13 +23,13 @@ class ChatListenerService {
         .where('isRead', isEqualTo: false)
         .snapshots()
         .listen((snapshot) {
-      for (var docChange in snapshot.docChanges) {
-        if (docChange.type.name == 'added') {
-          print("Обнаружено новое сообщение!");
-          _onNewMessageReceived(docChange.doc);
-        }
-      }
-    });
+          for (var docChange in snapshot.docChanges) {
+            if (docChange.type.name == 'added') {
+              print("Обнаружено новое сообщение!");
+              _onNewMessageReceived(docChange.doc);
+            }
+          }
+        });
   }
 
   // Обработчик нового сообщения
@@ -40,7 +42,9 @@ class ChatListenerService {
       final messageData = freshMessageDoc.data() as Map<String, dynamic>;
       final bool isRead = messageData['isRead'] ?? false;
       if (isRead) {
-        print("Сообщение ${freshMessageDoc.id} было прочитано. Уведомление отменено.");
+        print(
+          "Сообщение ${freshMessageDoc.id} было прочитано. Уведомление отменено.",
+        );
         return;
       }
 
@@ -53,7 +57,7 @@ class ChatListenerService {
       final senderName = await _getUserName(senderID);
 
       // Показываем уведомление
-      NotificationService().showMessageNotification(
+      await NotificationService().showMessageNotification(
         title: senderName,
         body: messageText,
         // 2. ФОРМИРУЕМ ПРОСТОЙ PAYLOAD. Аватар больше не передаем.
@@ -67,8 +71,10 @@ class ChatListenerService {
   // 3. УПРОЩЕННАЯ ФУНКЦИЯ, ВОЗВРАЩАЕТ ТОЛЬКО ИМЯ (String)
   Future<String> _getUserName(String userId) async {
     try {
-      DocumentSnapshot doc =
-      await _firestore.collection('doctors').doc(userId).get();
+      DocumentSnapshot doc = await _firestore
+          .collection('doctors')
+          .doc(userId)
+          .get();
       if (!doc.exists) {
         doc = await _firestore.collection('users').doc(userId).get();
       }

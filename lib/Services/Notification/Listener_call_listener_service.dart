@@ -11,7 +11,7 @@ class CallListenerService {
   // 1. === ИСПРАВЛЕНИЕ: СОЗДАЕМ ЭКЗЕМПЛЯР ПЛАГИНА ===
   // Эта строка создает "пульт управления" уведомлениями, который мы будем использовать ниже.
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   // 2. === ИСПРАВЛЕНИЕ: ДЕЛАЕМ МЕТОД АСИНХРОННЫМ (`async`) ===
   void startListening(String currentUserId) async {
@@ -21,14 +21,17 @@ class CallListenerService {
     // Запрашиваем разрешение у пользователя
     bool? granted = await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
 
     print("Разрешение на уведомления предоставлено: $granted");
 
     if (granted == false) {
       // Если пользователь отказал, нет смысла слушать звонки.
-      print("Пользователь отказал в разрешении на уведомления. Прослушивание не начнется.");
+      print(
+        "Пользователь отказал в разрешении на уведомления. Прослушивание не начнется.",
+      );
       return;
     }
 
@@ -40,21 +43,23 @@ class CallListenerService {
         .where('isCalling', isEqualTo: true)
         .snapshots()
         .listen((snapshot) {
-      for (var doc in snapshot.docs) {
-        final requestData = doc.data();
-        final userUid = requestData['userUid'];
-        final selectedDoctorUid = requestData['selectedDoctorUid'];
-        final callerId = requestData['callerId'];
+          for (var doc in snapshot.docs) {
+            final requestData = doc.data();
+            final userUid = requestData['userUid'];
+            final selectedDoctorUid = requestData['selectedDoctorUid'];
+            final callerId = requestData['callerId'];
 
-        bool isMyRequest = (userUid == currentUserId || selectedDoctorUid == currentUserId);
-        bool isNotMyCall = (callerId != null && callerId != currentUserId);
+            bool isMyRequest =
+                (userUid == currentUserId ||
+                selectedDoctorUid == currentUserId);
+            bool isNotMyCall = (callerId != null && callerId != currentUserId);
 
-        if (isMyRequest && isNotMyCall) {
-          _onCallReceived(doc);
-          break;
-        }
-      }
-    });
+            if (isMyRequest && isNotMyCall) {
+              _onCallReceived(doc);
+              break;
+            }
+          }
+        });
   }
 
   // Общий обработчик для входящего звонка (без изменений)
@@ -67,7 +72,7 @@ class CallListenerService {
 
     print("Обнаружен входящий звонок от $callerName по каналу $channelName!");
 
-    NotificationService().showCallNotification(
+    await NotificationService().showCallNotification(
       title: 'Входящий звонок',
       body: 'Вам звонит $callerName по заявке $reason',
       payload: 'call:$channelName',
@@ -82,18 +87,23 @@ class CallListenerService {
     } catch (e) {
       print("Ошибка при сбросе флагов звонка: $e");
     }
-
   }
 
   // Вспомогательная функция для получения имени (без изменений)
   Future<String> _getUserName(String userId) async {
     try {
-      var doc = await FirebaseFirestore.instance.collection('doctors').doc(userId).get();
+      var doc = await FirebaseFirestore.instance
+          .collection('doctors')
+          .doc(userId)
+          .get();
       if (doc.exists) {
         final data = doc.data()!;
         return "${data['name'] ?? ''} ${data['surname'] ?? ''}".trim();
       }
-      doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
       if (doc.exists) {
         final data = doc.data()!;
         return "${data['name'] ?? ''} ${data['surname'] ?? ''}".trim();
