@@ -7,9 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:last_telemedicine/components/Notification.dart';
-import 'package:last_telemedicine/components/Notification_global.dart';
-
 class UserRepository {
   final _db = FirebaseFirestore.instance;
 
@@ -72,9 +69,7 @@ class UserModel {
           final listInt = avatarRaw.cast<int>();
           return Blob(Uint8List.fromList(listInt));
         } catch (e) {
-          showGlobalNotification(
-            'avatar: failed to cast top-level List to int: $e',
-          );
+          debugPrint('avatar: failed to cast top-level List to int: $e');
           return null;
         }
       }
@@ -98,9 +93,7 @@ class UserModel {
               try {
                 return Blob(Uint8List.fromList(bs.codeUnits));
               } catch (e) {
-                showGlobalNotification(
-                  'avatar: failed to decode String _byteString: $e',
-                );
+                debugPrint('avatar: failed to decode String _byteString: $e');
                 return null;
               }
             }
@@ -112,7 +105,7 @@ class UserModel {
               final listInt = bs.cast<int>();
               return Blob(Uint8List.fromList(listInt));
             } catch (e) {
-              showGlobalNotification(
+              debugPrint(
                 'avatar: failed to cast Map._byteString List to int: $e',
               );
               return null;
@@ -126,7 +119,7 @@ class UserModel {
           try {
             return Blob(Uint8List.fromList(alt.cast<int>()));
           } catch (e) {
-            showGlobalNotification('avatar: failed to parse alt bytes: $e');
+            debugPrint('avatar: failed to parse alt bytes: $e');
           }
         }
       }
@@ -136,18 +129,14 @@ class UserModel {
         try {
           return Blob(Uint8List.fromList(base64Decode(avatarRaw)));
         } catch (e) {
-          showGlobalNotification(
-            'avatar: failed to base64Decode top-level String: $e',
-          );
+          debugPrint('avatar: failed to base64Decode top-level String: $e');
         }
       }
 
-      showGlobalNotification(
-        'Неожиданный тип avatar: ${avatarRaw.runtimeType}',
-      );
+      debugPrint('Неожиданный тип avatar: ${avatarRaw.runtimeType}');
       return null;
     } catch (e, st) {
-      showGlobalNotification('Ошибка парсинга avatar общий catch: $e\n$st');
+      debugPrint('Ошибка парсинга avatar общий catch: $e\n$st');
       return null;
     }
   }

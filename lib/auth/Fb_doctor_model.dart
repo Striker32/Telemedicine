@@ -1,6 +1,9 @@
 import 'dart:typed_data';
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Модель данных доктора
@@ -43,30 +46,86 @@ class DoctorModel {
     this.avatar,
   });
 
-  factory DoctorModel.fromMap(String uid, Map<String, dynamic> map) {
-    final avatarRaw = map['avatar'];
+  static Blob? _parseAvatar(dynamic avatarRaw) {
+    try {
+      if (avatarRaw == null) return null;
+      if (avatarRaw is Blob) return avatarRaw;
 
-    Blob? parsedAvatar;
-    if (avatarRaw == null) {
-      parsedAvatar = null;
-    } else if (avatarRaw is Blob) {
-      // Firestore SDK вернул Blob напрямую
-      parsedAvatar = avatarRaw;
-    } else if (avatarRaw is Map<String, dynamic> &&
-        avatarRaw.containsKey('_byteString')) {
-      // Иногда Firestore сериализует Blob как Map
-      try {
-        parsedAvatar = Blob(
-          Uint8List.fromList((avatarRaw['_byteString'] as String).codeUnits),
-        );
-      } catch (e) {
-        debugPrint('Ошибка парсинга avatar: $e');
-        parsedAvatar = null;
+      if (avatarRaw is List) {
+        try {
+          return _blobFromList(avatarRaw.cast<int>());
+        } catch (e) {
+          debugPrint('avatar: failed to cast top-level List to int: $e');
+          return null;
+        }
       }
-    } else {
+
+      if (avatarRaw is Map) {
+        final bs =
+            avatarRaw['_byteString'] ??
+            avatarRaw['bytes'] ??
+            avatarRaw['value'] ??
+            avatarRaw['data'] ??
+            avatarRaw['raw'];
+        if (bs != null) {
+          if (bs is String) {
+            try {
+              return _blobFromBytes(Uint8List.fromList(base64Decode(bs)));
+            } catch (_) {
+              try {
+                return _blobFromBytes(Uint8List.fromList(bs.codeUnits));
+              } catch (e) {
+                debugPrint('avatar: failed to decode String _byteString: $e');
+                return null;
+              }
+            }
+          }
+          if (bs is List) {
+            try {
+              return _blobFromList(bs.cast<int>());
+            } catch (e) {
+              debugPrint(
+                'avatar: failed to cast Map._byteString List to int: $e',
+              );
+              return null;
+            }
+          }
+        }
+      }
+
+      if (avatarRaw is String) {
+        try {
+          return _blobFromBytes(Uint8List.fromList(base64Decode(avatarRaw)));
+        } catch (e) {
+          debugPrint('avatar: failed to base64Decode top-level String: $e');
+        }
+      }
+
       debugPrint('Неожиданный тип avatar: ${avatarRaw.runtimeType}');
-      parsedAvatar = null;
+      return null;
+    } catch (e, st) {
+      debugPrint('Ошибка парсинга avatar общий catch: $e\n$st');
+      return null;
     }
+  }
+
+  // небольшой helper чтобы централизовать создание Blob — адаптируй конструктор под свою версию cloud_firestore
+  static Blob? _blobFromBytes(Uint8List bytes) {
+    try {
+      // Конструктор Blob(Uint8List) есть в большинстве версий SDK
+      return Blob(bytes);
+    } catch (e) {
+      debugPrint('Failed to construct Blob from bytes: $e');
+      return null;
+    }
+  }
+
+  static Blob? _blobFromList(List<int> list) {
+    return _blobFromBytes(Uint8List.fromList(list));
+  }
+
+  factory DoctorModel.fromMap(String uid, Map<String, dynamic> map) {
+    final parsedAvatar = _parseAvatar(map['avatar']);
 
     return DoctorModel(
       uid: uid,
